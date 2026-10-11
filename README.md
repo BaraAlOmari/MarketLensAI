@@ -4,7 +4,7 @@ Natural-language marketplace search: ask "Find me a used iPhone 17 in great cond
 
 The spec is in [REQUIREMENTS.md](REQUIREMENTS.md). Verified facts and decisions are in [docs/decisions.md](docs/decisions.md).
 
-**Status:** Stage 0 (scaffolding) complete.
+**Status:** Stage 1 (schema and synthetic data) complete: 2,205 bilingual listings, mostly priced in QAR. See [data/README.md](data/README.md).
 
 ## Layout
 
@@ -27,6 +27,8 @@ python -m venv .venv
 .venv\Scripts\python -m pip install -e ".[dev]"
 Copy-Item .env.example .env          # then fill in DATABASE_URL
 .venv\Scripts\python scripts\verify_db.py
+.venv\Scripts\python scripts\migrate.py         # create tables
+.venv\Scripts\python scripts\load_listings.py   # load data/listings.jsonl
 .venv\Scripts\python -m uvicorn app.main:app --reload --port 8000
 
 # Frontend (second terminal)
@@ -40,8 +42,8 @@ npm run dev                          # http://localhost:3000
 
 | | Backend (`backend/`) | Frontend (`frontend/`) |
 |---|---|---|
-| Lint | `.venv\Scripts\ruff check .` | `npm run lint` |
-| Format | `.venv\Scripts\ruff format .` | `npm run format` |
+| Lint | `.venv\Scripts\ruff check . ..\data` | `npm run lint` |
+| Format | `.venv\Scripts\ruff format . ..\data` | `npm run format` |
 | Types | | `npm run typecheck` |
 | Tests | `.venv\Scripts\python -m pytest` | |
 | Build | | `npm run build` |

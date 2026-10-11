@@ -1,0 +1,14 @@
+# Shared by backend/ and data/. From backend/: .venv/Scripts/ruff check . ../data
+line-length = 100
+target-version = "py311"
+
+[lint]
+select = ["E", "F", "I", "B", "UP", "ASYNC", "SIM"]
+
+[lint.isort]
+known-first-party = ["app", "generator"]
+
+[lint.per-file-ignores]
+# One catalog entry per line reads better than wrapped tuples.
+"data/generator/catalog.py" = ["E501"]
+"data/generator/template_writer.py" = ["E501"]  # phrase bank

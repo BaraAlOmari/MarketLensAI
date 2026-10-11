@@ -22,3 +22,6 @@ out/
 .idea/
 .DS_Store
 Thumbs.db
+
+# Generator temp output
+data/*.tmp

@@ -8,7 +8,8 @@ Every external fact the project relies on is recorded here with its source and t
 |---|---|---|
 | 2026-10-10 | Project name: **MarketLens** | |
 | 2026-10-10 | Prices and currency are written in **English** (Western digits, ISO currency code in `currency`). | |
-| 2026-10-10 | Currency: **QAR is the primary currency, with multi-currency support** (for example USD alongside it). | Planned for Stage 1: store `price` + `currency` as listed, plus a normalized `price_qar` computed from configured exchange rates, so price filters work across currencies ("under $900" also matches listings priced in QAR). The rates' source and date go in this file. |
+| 2026-10-10 | Currency: **QAR is the primary currency, with multi-currency support** (for example USD alongside it). | Each listing stores `price` + `currency` as listed, plus a normalized `price_qar` computed from configured rates (`FX_RATES_TO_QAR`), so price filters work across currencies ("under $900" also matches listings priced in QAR). Rates are below under *FX pegs*. |
+| 2026-10-10 | Synthetic text uses a **mix**: an offline phrase bank writes every listing's text immediately, and Gemini rewrites listings in batches as daily quota allows. | User choice. With 20 requests/day, Gemini alone would block Stage 2 for 2-3 days. Gemini stays the main writer, as the spec requires; template text is the fallback. Each record's `meta.writer` says which wrote it. |
 | 2026-10-10 | Listing text is **bilingual: English and Arabic**. | Requires a multilingual embedding model (see below). Queries may arrive in either language. |
 | 2026-10-10 | Supabase project is created by the user, following `docs/supabase-setup.md`. | Agent never handles the database password directly beyond the local `.env`. |
 | 2026-10-10 | Reranker approach is deferred to Stage 6. | Spec section 11. |
@@ -25,6 +26,23 @@ Every external fact the project relies on is recorded here with its source and t
 | 2026-10-10 | Frontend calls FastAPI from the **server** (route handler / server component) via `BACKEND_URL`. | No backend URL in the browser bundle; avoids CORS for server calls. CORS is still configured for the later streaming chat. |
 | 2026-10-10 | Embedding dimension **1536** stored as pgvector `vector(1536)`. | Recommended Matryoshka size for `gemini-embedding-2`; under the 2,000-dim HNSW limit for `vector`. About 6 KB per row, roughly 12 MB for 2,000 listings plus index, well within 500 MB. |
 | 2026-10-10 | Frontend: Next.js 16.4 App Router + TypeScript + Tailwind 4 (create-next-app defaults, `cacheComponents: true`). Prettier + ESLint. Backend: ruff (lint + format) + pytest. | Spec: linting, formatting, test runner. |
+
+### Stage 1: schema and synthetic data
+
+| Date | Decision | Reason |
+|---|---|---|
+| 2026-10-10 | **Python decides every structured fact** (category, brand/model, specs, condition, price, currency, location, language, near-duplicate links) from a seeded catalog (`data/generator/`). The writer (template or Gemini) only writes title + description, from those facts. | Ground truth for the Stage 3 eval comes from the generator, not from LLM output, so it is reliable. The same seed always gives the same facts. |
+| 2026-10-10 | Gemini text is **validated** before use: right language, length limits, and **no written prices** (regex). A rejected item keeps its template text and is retried at most twice. | The structured price is the only source of truth for prices (spec section 4). |
+| 2026-10-10 | Schema deviations from spec section 6: added `source` + `external_id` (unique together; makes loading idempotent), `price_qar`, `language`, `updated_at`. The btree price index is on **`price_qar`** rather than `price`. | Filters compare normalized prices. Upserts need a stable key. |
+| 2026-10-10 | `id` is `bigint` identity (not uuid). | The LLM will cite listing IDs in Stage 7; short integers cost fewer tokens and are harder to garble. |
+| 2026-10-10 | `fts` = `to_tsvector('english', search_text) \|\| to_tsvector('arabic', search_text)`. | Supabase Postgres 17 ships an `arabic` text-search config (checked with `pg_ts_config`). Listings mix both languages. Revisit in Stage 5. |
+| 2026-10-10 | HNSW index on `embedding` is **deferred to Stage 2** (created after embeddings load). | Spec Stage 2: "build HNSW index after loading". |
+| 2026-10-10 | Row Level Security enabled on `listings` and `schema_migrations`, with no policies. | The Supabase Data API (anon key) cannot read or write them. The backend's `postgres` role bypasses RLS. |
+| 2026-10-10 | When `search_text` changes on upsert, `embedding` is reset to null. | Stage 2's resumable job re-embeds exactly the changed rows. |
+| 2026-10-10 | `image_url` is null for synthetic listings. | No real photos. Random stock photos would mislead. Stage 9 renders a category placeholder. |
+| 2026-10-10 | Catalog stops at models released in 2025. | 2026 launches were not verified. |
+| 2026-10-10 | Gemini is called through the **Interactions API** (`client.aio.interactions.create`, `response_format` JSON schema, `thinking_level="low"`, `store=False`). | Current docs (structured-output, thinking pages, 2026-10-10) document this API. `gemini-3.8-flash` supports thinking levels low/medium/high (default medium). |
+| 2026-10-10 | Generator pacing: 4 requests/min, 50 listings per request. Daily-quota 429s stop the run cleanly, and progress is cached in `data/cache/`. | Free tier for `gemini-3.8-flash` on this project: **5 RPM, 20 RPD** (user read from AI Studio, 2026-10-10). |
 
 ## Verified facts
 
@@ -44,7 +62,17 @@ Every external fact the project relies on is recorded here with its source and t
 | Task types | `gemini-embedding-2` **does not accept `task_type`**. Use a text prefix instead, for example `task: search result \| query: {content}`. | same |
 | Languages | "over 100 languages". **Arabic is not named explicitly.** Stage 2 adds a cross-lingual sanity check (Arabic query to English listing and the reverse) before building on it. | same |
 | Free-tier rate limits | **Not published as numbers in the docs.** Per-model limits are shown in AI Studio (https://aistudio.google.com/rate-limit). Preview/experimental models are more restricted. RPD resets at midnight Pacific. | https://ai.google.dev/gemini-api/docs/rate-limits |
-| Consequence | The user should read their actual RPM/TPM/RPD in AI Studio before Stage 1; the generator and ingestion job will read limits from config and back off on HTTP 429. | |
+| This project's free tier | `gemini-3.8-flash`: **5 RPM, 20 RPD** (read by the user in AI Studio, 2026-10-10). The generator and ingestion job read limits from config and back off on HTTP 429. | AI Studio |
+
+### FX pegs (checked 2026-10-10)
+
+| Currency | Rate | Source |
+|---|---|---|
+| QAR | 3.64 per USD (fixed by Royal Decree No. 34 of 2001) | https://www.wise.com/il/currency-converter/currencies/qar-qatari-rial ; https://www.arabianbusiness.com/gcc/qatar-won-t-depeg-against-dollar-513908 |
+| SAR | 3.75 per USD (since 1986) → 0.970667 QAR | https://gulfnews.com/business/markets/saudi-arabia-breaks-gulf-silence-on-peg-seen-here-to-stay-1.1573457 |
+| AED | 3.6725 per USD → 0.991150 QAR | https://gulfnews.com/business/markets/dollar-peg-here-to-stay-uae-central-bank-official-says-1.1424317 |
+
+These are secondary sources (no central-bank page came up). The pegs are long-standing, so fixed rates suit a synthetic demo. A floating currency (EUR, GBP) would need a dated rate added to `FX_RATES_TO_QAR`.
 
 ### Supabase (checked 2026-10-10)
 
