@@ -4,7 +4,7 @@ Natural-language marketplace search: ask "Find me a used iPhone 17 in great cond
 
 The spec is in [REQUIREMENTS.md](REQUIREMENTS.md). Verified facts and decisions are in [docs/decisions.md](docs/decisions.md).
 
-**Status:** Stage 1 (schema and synthetic data) complete: 2,205 bilingual listings, mostly priced in QAR. See [data/README.md](data/README.md).
+**Status:** Stage 2 (embeddings) complete: all 2,205 bilingual listings embedded with `gemini-embedding-2` (1536-d) and indexed with HNSW. See [docs/stage2-nn-check.md](docs/stage2-nn-check.md) and [data/README.md](data/README.md).
 
 ## Layout
 
@@ -29,6 +29,7 @@ Copy-Item .env.example .env          # then fill in DATABASE_URL
 .venv\Scripts\python scripts\verify_db.py
 .venv\Scripts\python scripts\migrate.py         # create tables
 .venv\Scripts\python scripts\load_listings.py   # load data/listings.jsonl
+.venv\Scripts\python scripts\embed_listings.py  # embed listings (resumable; free tier ~900/day)
 .venv\Scripts\python -m uvicorn app.main:app --reload --port 8000
 
 # Frontend (second terminal)

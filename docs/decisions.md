@@ -44,6 +44,21 @@ Every external fact the project relies on is recorded here with its source and t
 | 2026-10-10 | Gemini is called through the **Interactions API** (`client.aio.interactions.create`, `response_format` JSON schema, `thinking_level="low"`, `store=False`). | Current docs (structured-output, thinking pages, 2026-10-10) document this API. `gemini-3.8-flash` supports thinking levels low/medium/high (default medium). |
 | 2026-10-10 | Generator pacing: 4 requests/min, 50 listings per request. Daily-quota 429s stop the run cleanly, and progress is cached in `data/cache/`. | Free tier for `gemini-3.8-flash` on this project: **5 RPM, 20 RPD** (user read from AI Studio, 2026-10-10). |
 
+### Stage 2: embeddings and ingestion
+
+| Date | Decision | Reason |
+|---|---|---|
+| 2026-10-11 | `EmbeddingProvider` interface (`embed_documents(texts, titles)`, `embed_query(text)`) with `GeminiEmbeddingProvider` as the first implementation, chosen by `EMBEDDING_PROVIDER`. | Spec section 5: swappable providers. |
+| 2026-10-11 | Documents are embedded as `title: {title} \| text: {search_text}` and queries as `task: search result \| query: {text}`. | Google's recommended asymmetric-retrieval prefixes for `gemini-embedding-2` (no `task_type`). |
+| 2026-10-11 | Each text is sent as its **own `Content`**. | A plain list of strings is folded by the SDK into one Content, which `gemini-embedding-2` turns into one aggregated embedding (checked in SDK source and docs; covered by a unit test). |
+| 2026-10-11 | The job is **paced per text**, not per call: at most 90 texts and 27k estimated tokens per minute (90% of the limits), 45 texts per call. The daily budget is `RPD − 100 reserved for search queries − texts already sent today` (Pacific day, from `docs/logs/embedding-runs.jsonl`). | Measured: one call with 60 texts followed by a second with 60 hit the 100 RPM limit, so each text counts as a request. 2,205 listings therefore take 3 free-tier days. |
+| 2026-10-11 | Tokens are **estimated** as characters ÷ 2.5. | The embed response has no usage metadata on the Gemini API. `count_tokens` on sampled listings gave about 3.0 characters per token (English 3.04, Arabic 2.81, mixed 2.97), so ÷ 2.5 overestimates slightly, which keeps pacing safe and costs conservative. |
+| 2026-10-11 | Pending = `embedding is null or embedding_model <> EMBEDDING_MODEL`. Vectors are written per batch, and only if `md5(search_text)` still matches what was embedded. | Resumable and re-runnable (no-op when nothing is pending). Changing the model re-embeds everything; a concurrent reload never leaves a stale vector. |
+| 2026-10-11 | The dimension lives in the column type (`vector(1536)`); the job refuses to run if `EMBEDDING_DIMENSION` differs. | Spec: model name and dimension stored in config and in the database. |
+| 2026-10-11 | Gemini-written synthetic listings are embedded first. | Template-text rows will change after the next `rewrite`, so embedding them early would waste free-tier requests. |
+| 2026-10-11 | HNSW index (`vector_cosine_ops`, default `m=16`, `ef_construction=64`) is created by the embed job once no rows are pending, followed by `ANALYZE`. Queries set `hnsw.iterative_scan = relaxed_order` so filtered searches still return enough rows. | Spec: build the index after loading. pgvector 0.8 iterative scans fix the "filter after ANN" recall drop. |
+| 2026-10-12 | `with_retries` is the **only real retry layer**. It also retries google-genai's wrapped `APIConnectionError`/`APITimeoutError` (found by class name and `raise ... from` cause chain). The Interactions client is created with `HttpRetryOptions(attempts=1)` (the SDK minimum, 1 internal retry), and every attempt has a hard `asyncio.wait_for` deadline. | On 2026-10-12 a dropped connection crashed the rewrite (the wrapper class was not recognized), and a later batch hung for 15+ minutes because the SDK's default 3 internal retries × 240 s timeout ran inside each of our 6 attempts. The embeddings client (classic `models` API) has no SDK retries by default. |
+
 ## Verified facts
 
 ### Google Gemini API (checked 2026-10-10)
@@ -60,9 +75,12 @@ Every external fact the project relies on is recorded here with its source and t
 | Embedding input limit | 8,192 tokens | same |
 | Embedding output dimension | Default 3072, any value 128 to 3072 (Matryoshka); recommended 768 / 1536 / 3072. Set via `EmbedContentConfig(output_dimensionality=...)`. | https://ai.google.dev/gemini-api/docs/embeddings |
 | Task types | `gemini-embedding-2` **does not accept `task_type`**. Use a text prefix instead, for example `task: search result \| query: {content}`. | same |
+| Batching (checked 2026-10-11) | Multiple parts in one `contents` give **one aggregated embedding**; wrap each input in its own `Content` for separate vectors. A list of strings only gives separate vectors on `gemini-embedding-001`. No max item count is stated; the 8,192-token input limit applies. | https://ai.google.dev/gemini-api/docs/embeddings |
+| Normalization (checked 2026-10-11) | `gemini-embedding-2` auto-normalizes truncated dimensions (measured norm 1.0 at 1536). | same |
+| Pricing (checked 2026-10-11) | `gemini-embedding-2` text input: free tier free of charge; paid **$0.20 / 1M tokens**, Batch API $0.10 / 1M (Batch not available on free tier). | https://ai.google.dev/gemini-api/docs/pricing |
 | Languages | "over 100 languages". **Arabic is not named explicitly.** Stage 2 adds a cross-lingual sanity check (Arabic query to English listing and the reverse) before building on it. | same |
 | Free-tier rate limits | **Not published as numbers in the docs.** Per-model limits are shown in AI Studio (https://aistudio.google.com/rate-limit). Preview/experimental models are more restricted. RPD resets at midnight Pacific. | https://ai.google.dev/gemini-api/docs/rate-limits |
-| This project's free tier | `gemini-3.8-flash`: **5 RPM, 20 RPD** (read by the user in AI Studio, 2026-10-10). The generator and ingestion job read limits from config and back off on HTTP 429. | AI Studio |
+| This project's free tier | `gemini-3.8-flash`: **5 RPM, 20 RPD**. `gemini-embedding-2`: **100 RPM, 1,000 RPD, 30k input tokens/min** (both read by the user in AI Studio, 2026-10-10/11). The generator and ingestion job read limits from config and back off on HTTP 429. | AI Studio |
 
 ### FX pegs (checked 2026-10-10)
 

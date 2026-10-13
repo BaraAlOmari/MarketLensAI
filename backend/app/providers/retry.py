@@ -33,9 +33,27 @@ def is_daily_quota(exc: BaseException) -> bool:
     return status_of(exc) == 429 and ("perday" in text or "daily" in text)
 
 
+# google-genai's Interactions client wraps network failures in its own (private-module)
+# APIConnectionError / APITimeoutError, raised from the underlying httpx error.
+CONNECTION_ERROR_NAMES = {"APIConnectionError", "APITimeoutError"}
+
+
+def causes(exc: BaseException):
+    """The exception and everything it was explicitly raised from (`raise ... from`)."""
+    seen: set[int] = set()
+    current: BaseException | None = exc
+    while current is not None and id(current) not in seen:
+        seen.add(id(current))
+        yield current
+        current = current.__cause__
+
+
 def is_retryable(exc: BaseException) -> bool:
-    if isinstance(exc, httpx.TransportError | asyncio.TimeoutError):
-        return True
+    for e in causes(exc):
+        if isinstance(e, httpx.TransportError | asyncio.TimeoutError | ConnectionError):
+            return True
+        if type(e).__name__ in CONNECTION_ERROR_NAMES:
+            return True
     return status_of(exc) in RETRYABLE_STATUS
 
 

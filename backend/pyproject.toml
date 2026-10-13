@@ -10,6 +10,7 @@ dependencies = [
     "pydantic==2.14.0",
     "pydantic-settings==2.15.0",
     "google-genai==2.29.0",
+    "tzdata==2026.5",  # zoneinfo on Windows (quota day = Pacific time)
 ]
 
 [project.optional-dependencies]

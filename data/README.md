@@ -22,8 +22,11 @@ Nothing here is real. There was no scraping, and seller names are random.
 .venv\Scripts\python ..\data\generate.py status           # Gemini vs template text so far
 .venv\Scripts\python scripts\load_listings.py             # upsert into Postgres (idempotent)
 .venv\Scripts\python scripts\spot_check.py                # writes docs/stage1-spot-check.md
+.venv\Scripts\python scripts\embed_listings.py            # embed new/changed rows (Stage 2)
 ```
 
 Options: `--locale qa|us`, `--seed N`, `--currency-mix QAR:0.7,USD:0.3`, `--out path.jsonl`, plus `--model` and `--batch-size` for `rewrite`. Any non-default configuration writes to `listings-<locale>-s<seed>.jsonl`, leaving the main dataset alone.
 
 With the free tier (20 requests/day), `rewrite -n 19` once a day converts about 950 listings per day.
+
+Daily routine while text is still converting: `rewrite -n 19`, then `load_listings.py` (clears the embedding of every row whose text changed), then `embed_listings.py` (embeds up to 900 rows per day on the free tier).

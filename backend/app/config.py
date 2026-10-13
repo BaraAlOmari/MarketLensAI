@@ -46,6 +46,16 @@ class Settings(BaseSettings):
     embedding_dimension: int = Field(default=1536, ge=128, le=2000)
     gemini_api_key: SecretStr | None = None
 
+    # Embedding quota. Free tier for gemini-embedding-2: 100 RPM, 1,000 RPD, 30k input TPM
+    # (AI Studio, 2026-10-11). Every text in a batch call counts as one request.
+    embedding_rpm_limit: int = Field(default=100, gt=0)
+    embedding_tpm_limit: int = Field(default=30_000, gt=0)
+    embedding_rpd_limit: int = Field(default=1_000, gt=0)
+    embedding_query_reserve: int = Field(default=100, ge=0)  # left for search queries
+    embedding_batch_size: int = Field(default=45, ge=1, le=100)  # 2 calls fit in 90 RPM
+    # Paid-tier list price, used only to report what a run would cost (free tier is $0).
+    embedding_price_per_mtok_usd: Decimal = Decimal("0.20")
+
     # Currency: QAR is the base; every listing also stores price_qar for cross-currency filters.
     base_currency: str = "QAR"
     fx_rates_to_qar: dict[str, Decimal] = Field(

@@ -4,12 +4,20 @@ Verified 2026-10-10 against ai.google.dev/gemini-api/docs/structured-output and 
 installed SDK (google-genai 2.29.0): `client.aio.interactions.create(...)` with
 `response_format={"type": "text", "mime_type": "application/json", "schema": ...}`
 returns an Interaction whose `output_text` holds the JSON and `usage` the token counts.
+
+Retries: the Interactions client retries on its own by default (3 retries, connection
+errors included), which nested inside `with_retries` let one bad batch hang for over an
+hour on 2026-10-12. The client is created with the minimum the SDK allows (1 internal
+retry), and each attempt gets a hard `asyncio.wait_for` deadline so `with_retries` stays
+in control of total time.
 """
 
+import asyncio
 from dataclasses import dataclass
 from typing import Any
 
 from google import genai
+from google.genai import types
 
 from app.providers.retry import with_retries
 
@@ -24,7 +32,10 @@ class JsonResult:
 
 class GeminiJsonClient:
     def __init__(self, api_key: str, model: str, timeout_s: float = 240.0) -> None:
-        self._client = genai.Client(api_key=api_key)
+        self._client = genai.Client(
+            api_key=api_key,
+            http_options=types.HttpOptions(retry_options=types.HttpRetryOptions(attempts=1)),
+        )
         self.model = model
         self._timeout_s = timeout_s
 
@@ -37,7 +48,7 @@ class GeminiJsonClient:
         thinking_level: str = "low",
     ) -> JsonResult:
         async def call():
-            return await self._client.aio.interactions.create(
+            request = self._client.aio.interactions.create(
                 model=self.model,
                 system_instruction=system,
                 input=prompt,
@@ -46,6 +57,7 @@ class GeminiJsonClient:
                 store=False,
                 timeout=self._timeout_s,
             )
+            return await asyncio.wait_for(request, timeout=self._timeout_s + 10)
 
         interaction = await with_retries(call)
         usage = interaction.usage
