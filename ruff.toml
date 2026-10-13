@@ -6,7 +6,7 @@ target-version = "py311"
 select = ["E", "F", "I", "B", "UP", "ASYNC", "SIM"]
 
 [lint.isort]
-known-first-party = ["app", "generator"]
+known-first-party = ["app", "generator", "ground_truth", "run"]
 
 [lint.per-file-ignores]
 # One catalog entry per line reads better than wrapped tuples.

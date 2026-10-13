@@ -4,7 +4,7 @@ Natural-language marketplace search: ask "Find me a used iPhone 17 in great cond
 
 The spec is in [REQUIREMENTS.md](REQUIREMENTS.md). Verified facts and decisions are in [docs/decisions.md](docs/decisions.md).
 
-**Status:** Stage 2 (embeddings) complete: all 2,205 bilingual listings embedded with `gemini-embedding-2` (1536-d) and indexed with HNSW. See [docs/stage2-nn-check.md](docs/stage2-nn-check.md) and [data/README.md](data/README.md).
+**Status:** Stage 3 (eval harness and baseline) complete: 45 test queries with ground truth from the generator's facts, and a vector-only `POST /api/search` baseline at Recall@10 0.853 / MRR 0.919, with 31% of shown results breaking a constraint. See [docs/results.md](docs/results.md) and [eval/README.md](eval/README.md).
 
 ## Layout
 
@@ -43,8 +43,10 @@ npm run dev                          # http://localhost:3000
 
 | | Backend (`backend/`) | Frontend (`frontend/`) |
 |---|---|---|
-| Lint | `.venv\Scripts\ruff check . ..\data` | `npm run lint` |
-| Format | `.venv\Scripts\ruff format . ..\data` | `npm run format` |
+| Lint | `.venv\Scripts\ruff check . ..\data ..\eval` | `npm run lint` |
+| Format | `.venv\Scripts\ruff format . ..\data ..\eval` | `npm run format` |
 | Types | | `npm run typecheck` |
 | Tests | `.venv\Scripts\python -m pytest` | |
+| Eval | `.venv\Scripts\python ..\eval\run.py` | |
+un.py` | |
 | Build | | `npm run build` |

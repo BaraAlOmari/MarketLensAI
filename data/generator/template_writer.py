@@ -85,6 +85,8 @@ REASONS_AR = ["مسافر ونهائي", "بسبب السفر", "غيرت وأب
               "بنتقل من البيت"]  # fmt: skip
 OPENERS_EN = ["Selling my", "For sale:", "Up for sale", "Selling", "Urgent sale -", ""]
 OPENERS_AR = ["للبيع", "للبيع عاجل", "معروض للبيع", "للبيع"]
+# Same length as OPENERS_AR so rng.choice consumes the same randomness for every listing.
+OPENERS_AR_RENT = ["للإيجار", "للإيجار فوراً", "متاح للإيجار", "للإيجار"]
 
 ABBREVIATIONS = [
     (r"\bwith\b", "w/"), (r"\bcondition\b", "cond"), (r"\bgood\b", "gd"), (r"\bplease\b", "pls"),
@@ -491,7 +493,8 @@ class TemplateWriter(TextWriter):
         en_title, en_desc = self._english(f, rng)
         ar_title, ar_desc = self._arabic(f, rng)
         specs = specs_en(f, rng)[:2]
-        title = rng.choice((en_title, f"{en_title} {rng.choice(OPENERS_AR)}", ar_title))
+        openers = OPENERS_AR_RENT if f.listing_type == "rent" else OPENERS_AR
+        title = rng.choice((en_title, f"{en_title} {rng.choice(openers)}", ar_title))
         desc = f"{ar_desc}\n{' / '.join(specs)}" if specs else f"{ar_desc}\n{en_desc[:120]}"
         if title == ar_title and not re.search(r"[A-Za-z]", title + desc):
             desc = f"{desc} {f.item_label}"

@@ -107,3 +107,11 @@ async def test_gemini_prompt_hides_omitted_facts(facts):
     sent = json.loads(client.prompts[0])["items"][0]
     assert not set(f.omit) & set(sent["attributes"])
     assert "price" not in json.dumps(sent).lower().replace("price_period", "")
+
+
+def test_template_never_calls_a_rental_for_sale(facts):
+    w = TemplateWriter()
+    for f in facts:
+        if f.listing_type == "rent":
+            t = w.write_one(f)
+            assert "للبيع" not in t.title + t.description, f.external_id

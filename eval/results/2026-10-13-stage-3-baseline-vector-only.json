@@ -1,0 +1,2142 @@
+{
+ "label": "Stage 3 baseline (vector only)",
+ "date": "2026-10-13 13:44 UTC",
+ "queries": 45,
+ "recall_at_10": 0.8526366843033509,
+ "mrr": 0.9185185185185186,
+ "zero_hit_queries": 0,
+ "latency_ms": {
+  "server_mean": 891.0288888888889,
+  "server_p95": 920.7,
+  "wall_mean": 894.4488888888889,
+  "embed_uncached_mean": null,
+  "cached_embeddings": 45
+ },
+ "est_cost_per_query_usd": 4.595555555555556e-06,
+ "groups": {
+  "lang:ar": {
+   "n": 12,
+   "recall_at_10": 0.8854166666666666,
+   "mrr": 0.9583333333333334
+  },
+  "lang:en": {
+   "n": 29,
+   "recall_at_10": 0.8313902572523262,
+   "mrr": 0.9080459770114943
+  },
+  "lang:mixed": {
+   "n": 4,
+   "recall_at_10": 0.9083333333333333,
+   "mrr": 0.875
+  },
+  "tag:attribute": {
+   "n": 19,
+   "recall_at_10": 0.8143274853801169,
+   "mrr": 0.881578947368421
+  },
+  "tag:brand": {
+   "n": 1,
+   "recall_at_10": 1.0,
+   "mrr": 1.0
+  },
+  "tag:condition": {
+   "n": 11,
+   "recall_at_10": 0.8542207792207793,
+   "mrr": 0.9318181818181818
+  },
+  "tag:currency": {
+   "n": 1,
+   "recall_at_10": 0.6,
+   "mrr": 1.0
+  },
+  "tag:item": {
+   "n": 6,
+   "recall_at_10": 0.861904761904762,
+   "mrr": 0.7916666666666666
+  },
+  "tag:location": {
+   "n": 6,
+   "recall_at_10": 0.9444444444444445,
+   "mrr": 0.9166666666666666
+  },
+  "tag:model": {
+   "n": 18,
+   "recall_at_10": 0.8859567901234568,
+   "mrr": 1.0
+  },
+  "tag:price": {
+   "n": 11,
+   "recall_at_10": 0.7731601731601732,
+   "mrr": 0.8257575757575758
+  },
+  "tag:rent_sale": {
+   "n": 10,
+   "recall_at_10": 0.8933333333333333,
+   "mrr": 0.9
+  },
+  "tag:vague": {
+   "n": 9,
+   "recall_at_10": 0.7703703703703704,
+   "mrr": 0.8425925925925926
+  }
+ },
+ "failures": {
+  "wrong_results": 138,
+  "results_total": 450,
+  "by_reason": {
+   "price": {
+    "results": 30,
+    "queries": 7
+   },
+   "condition": {
+    "results": 28,
+    "queries": 9
+   },
+   "attr:bedrooms": {
+    "results": 25,
+    "queries": 6
+   },
+   "attr:mileage_km": {
+    "results": 12,
+    "queries": 2
+   },
+   "model": {
+    "results": 10,
+    "queries": 7
+   },
+   "attr:amenities": {
+    "results": 7,
+    "queries": 1
+   },
+   "attr:delivery_available": {
+    "results": 6,
+    "queries": 1
+   },
+   "rent_sale": {
+    "results": 6,
+    "queries": 2
+   },
+   "attr:storage_gb": {
+    "results": 5,
+    "queries": 2
+   },
+   "attr:furnished": {
+    "results": 4,
+    "queries": 2
+   },
+   "location": {
+    "results": 3,
+    "queries": 2
+   },
+   "attr:private_pool": {
+    "results": 2,
+    "queries": 2
+   },
+   "attr:accident_free": {
+    "results": 1,
+    "queries": 1
+   },
+   "attr:gcc_specs": {
+    "results": 1,
+    "queries": 1
+   },
+   "brand": {
+    "results": 1,
+    "queries": 1
+   },
+   "attr:item_type": {
+    "results": 1,
+    "queries": 1
+   },
+   "category": {
+    "results": 1,
+    "queries": 1
+   }
+  }
+ },
+ "per_query": [
+  {
+   "id": "ph01",
+   "query": "used iPhone 15 Pro Max",
+   "lang": "en",
+   "tags": [
+    "model",
+    "condition"
+   ],
+   "relevant_count": 16,
+   "returned": [
+    "syn-qa-02057",
+    "syn-qa-01560",
+    "syn-qa-01983",
+    "syn-qa-01086",
+    "syn-qa-01659",
+    "syn-qa-00763",
+    "syn-qa-00369",
+    "syn-qa-00574",
+    "syn-qa-00507",
+    "syn-qa-00069"
+   ],
+   "hits": 10,
+   "recall_at_10": 1.0,
+   "rr": 1.0,
+   "violations": {},
+   "wall_ms": 3115.6,
+   "server_ms": {
+    "embed": 1585.1,
+    "retrieve": 1477.4,
+    "total": 3062.7
+   },
+   "embedding_cached": true,
+   "est_cost_usd_uncached": 4.2e-06
+  },
+  {
+   "id": "ph02",
+   "query": "iPhone 16 Pro under 3000 QAR",
+   "lang": "en",
+   "tags": [
+    "model",
+    "price"
+   ],
+   "relevant_count": 13,
+   "returned": [
+    "syn-qa-00863",
+    "syn-qa-01896",
+    "syn-qa-01079",
+    "syn-qa-02000",
+    "syn-qa-00513",
+    "syn-qa-00430",
+    "syn-qa-00248",
+    "syn-qa-01110",
+    "syn-qa-01863",
+    "syn-qa-00692"
+   ],
+   "hits": 8,
+   "recall_at_10": 0.8,
+   "rr": 1.0,
+   "violations": {
+    "syn-qa-00430": [
+     "price"
+    ],
+    "syn-qa-01863": [
+     "price"
+    ]
+   },
+   "wall_ms": 903.3,
+   "server_ms": {
+    "embed": 325.1,
+    "retrieve": 575.8,
+    "total": 901.0
+   },
+   "embedding_cached": true,
+   "est_cost_usd_uncached": 4.6e-06
+  },
+  {
+   "id": "ph03",
+   "query": "Samsung Galaxy S24 Ultra 512GB",
+   "lang": "en",
+   "tags": [
+    "model",
+    "attribute"
+   ],
+   "relevant_count": 6,
+   "returned": [
+    "syn-qa-01881",
+    "syn-qa-00855",
+    "syn-qa-00101",
+    "syn-qa-01450",
+    "syn-qa-01224",
+    "syn-qa-02122",
+    "syn-qa-00567",
+    "syn-qa-00732",
+    "syn-qa-01683",
+    "syn-qa-01817"
+   ],
+   "hits": 6,
+   "recall_at_10": 1.0,
+   "rr": 1.0,
+   "violations": {
+    "syn-qa-02122": [
+     "attr:storage_gb"
+    ],
+    "syn-qa-00567": [
+     "model"
+    ],
+    "syn-qa-00732": [
+     "attr:storage_gb"
+    ],
+    "syn-qa-01683": [
+     "attr:storage_gb"
+    ]
+   },
+   "wall_ms": 921.7,
+   "server_ms": {
+    "embed": 322.7,
+    "retrieve": 596.3,
+    "total": 919.2
+   },
+   "embedding_cached": true,
+   "est_cost_usd_uncached": 4.800000000000001e-06
+  },
+  {
+   "id": "ph04",
+   "query": "cheap android phone under 1000 riyals",
+   "lang": "en",
+   "tags": [
+    "vague",
+    "price"
+   ],
+   "relevant_count": 25,
+   "returned": [
+    "syn-qa-00830",
+    "syn-qa-01293",
+    "syn-qa-01432",
+    "syn-qa-01738",
+    "syn-qa-02167",
+    "syn-qa-01502",
+    "syn-qa-00539",
+    "syn-qa-00328",
+    "syn-qa-00026",
+    "syn-qa-01867"
+   ],
+   "hits": 4,
+   "recall_at_10": 0.4,
+   "rr": 0.3333333333333333,
+   "violations": {
+    "syn-qa-00830": [
+     "price"
+    ],
+    "syn-qa-01293": [
+     "price"
+    ],
+    "syn-qa-01738": [
+     "price"
+    ],
+    "syn-qa-02167": [
+     "price"
+    ],
+    "syn-qa-00328": [
+     "price"
+    ],
+    "syn-qa-00026": [
+     "price"
+    ]
+   },
+   "wall_ms": 909.6,
+   "server_ms": {
+    "embed": 324.8,
+    "retrieve": 581.7,
+    "total": 906.9
+   },
+   "embedding_cached": true,
+   "est_cost_usd_uncached": 5.4e-06
+  },
+  {
+   "id": "ph05",
+   "query": "brand new iPhone 15 Pro Max",
+   "lang": "en",
+   "tags": [
+    "model",
+    "condition"
+   ],
+   "relevant_count": 6,
+   "returned": [
+    "syn-qa-00765",
+    "syn-qa-00911",
+    "syn-qa-01816",
+    "syn-qa-01241",
+    "syn-qa-00039",
+    "syn-qa-00123",
+    "syn-qa-00162",
+    "syn-qa-00310",
+    "syn-qa-00369",
+    "syn-qa-00433"
+   ],
+   "hits": 6,
+   "recall_at_10": 1.0,
+   "rr": 1.0,
+   "violations": {
+    "syn-qa-00162": [
+     "condition"
+    ],
+    "syn-qa-00310": [
+     "model"
+    ],
+    "syn-qa-00369": [
+     "condition"
+    ],
+    "syn-qa-00433": [
+     "condition"
+    ]
+   },
+   "wall_ms": 822.3,
+   "server_ms": {
+    "embed": 321.7,
+    "retrieve": 498.2,
+    "total": 820.1
+   },
+   "embedding_cached": true,
+   "est_cost_usd_uncached": 4.6e-06
+  },
+  {
+   "id": "ph06",
+   "query": "foldable phone in like new condition",
+   "lang": "en",
+   "tags": [
+    "vague",
+    "condition"
+   ],
+   "relevant_count": 21,
+   "returned": [
+    "syn-qa-00944",
+    "syn-qa-00508",
+    "syn-qa-01734",
+    "syn-qa-01492",
+    "syn-qa-01157",
+    "syn-qa-01357",
+    "syn-qa-00499",
+    "syn-qa-01425",
+    "syn-qa-00140",
+    "syn-qa-00195"
+   ],
+   "hits": 8,
+   "recall_at_10": 0.8,
+   "rr": 1.0,
+   "violations": {
+    "syn-qa-01157": [
+     "condition"
+    ],
+    "syn-qa-00195": [
+     "condition"
+    ]
+   },
+   "wall_ms": 835.6,
+   "server_ms": {
+    "embed": 323.8,
+    "retrieve": 509.1,
+    "total": 833.2
+   },
+   "embedding_cached": true,
+   "est_cost_usd_uncached": 5.2e-06
+  },
+  {
+   "id": "ph07",
+   "query": "iPhone 17 Pro around $1000",
+   "lang": "en",
+   "tags": [
+    "model",
+    "price",
+    "currency"
+   ],
+   "relevant_count": 14,
+   "returned": [
+    "syn-qa-01783",
+    "syn-qa-01496",
+    "syn-qa-02016",
+    "syn-qa-01794",
+    "syn-qa-00378",
+    "syn-qa-00839",
+    "syn-qa-01595",
+    "syn-qa-01579",
+    "syn-qa-01959",
+    "syn-qa-00729"
+   ],
+   "hits": 6,
+   "recall_at_10": 0.6,
+   "rr": 1.0,
+   "violations": {
+    "syn-qa-00378": [
+     "model"
+    ],
+    "syn-qa-01595": [
+     "model",
+     "price"
+    ],
+    "syn-qa-01959": [
+     "model",
+     "price"
+    ],
+    "syn-qa-00729": [
+     "price"
+    ]
+   },
+   "wall_ms": 826.8,
+   "server_ms": {
+    "embed": 326.9,
+    "retrieve": 493.8,
+    "total": 821.8
+   },
+   "embedding_cached": true,
+   "est_cost_usd_uncached": 4.4e-06
+  },
+  {
+   "id": "ph08",
+   "query": "ايفون 16 بحالة ممتازة",
+   "lang": "ar",
+   "tags": [
+    "model",
+    "condition"
+   ],
+   "relevant_count": 8,
+   "returned": [
+    "syn-qa-01371",
+    "syn-qa-02164",
+    "syn-qa-00355",
+    "syn-qa-00070",
+    "syn-qa-01303",
+    "syn-qa-01097",
+    "syn-qa-00739",
+    "syn-qa-00583",
+    "syn-qa-00758",
+    "syn-qa-00964"
+   ],
+   "hits": 5,
+   "recall_at_10": 0.625,
+   "rr": 1.0,
+   "violations": {
+    "syn-qa-00355": [
+     "condition"
+    ],
+    "syn-qa-01303": [
+     "condition"
+    ],
+    "syn-qa-00583": [
+     "condition"
+    ],
+    "syn-qa-00758": [
+     "condition"
+    ],
+    "syn-qa-00964": [
+     "condition"
+    ]
+   },
+   "wall_ms": 822.3,
+   "server_ms": {
+    "embed": 323.8,
+    "retrieve": 495.5,
+    "total": 819.4
+   },
+   "embedding_cached": true,
+   "est_cost_usd_uncached": 4.000000000000001e-06
+  },
+  {
+   "id": "ph09",
+   "query": "سامسونج جالكسي S25 الترا جديد",
+   "lang": "ar",
+   "tags": [
+    "model",
+    "condition"
+   ],
+   "relevant_count": 2,
+   "returned": [
+    "syn-qa-01424",
+    "syn-qa-00960",
+    "syn-qa-01524",
+    "syn-qa-01792",
+    "syn-qa-00567",
+    "syn-qa-00619",
+    "syn-qa-00343",
+    "syn-qa-01429",
+    "syn-qa-00173",
+    "syn-qa-00393"
+   ],
+   "hits": 2,
+   "recall_at_10": 1.0,
+   "rr": 1.0,
+   "violations": {
+    "syn-qa-01524": [
+     "condition"
+    ],
+    "syn-qa-01792": [
+     "condition"
+    ],
+    "syn-qa-00567": [
+     "condition"
+    ],
+    "syn-qa-00619": [
+     "condition"
+    ],
+    "syn-qa-00343": [
+     "condition"
+    ],
+    "syn-qa-01429": [
+     "condition"
+    ],
+    "syn-qa-00173": [
+     "condition"
+    ],
+    "syn-qa-00393": [
+     "condition"
+    ]
+   },
+   "wall_ms": 820.9,
+   "server_ms": {
+    "embed": 325.7,
+    "retrieve": 493.4,
+    "total": 819.2
+   },
+   "embedding_cached": true,
+   "est_cost_usd_uncached": 4.800000000000001e-06
+  },
+  {
+   "id": "ph10",
+   "query": "iPhone 14 نظيف أقل من 1500 ريال",
+   "lang": "mixed",
+   "tags": [
+    "model",
+    "price"
+   ],
+   "relevant_count": 16,
+   "returned": [
+    "syn-qa-01508",
+    "syn-qa-01438",
+    "syn-qa-01055",
+    "syn-qa-00172",
+    "syn-qa-01765",
+    "syn-qa-01832",
+    "syn-qa-00210",
+    "syn-qa-01918",
+    "syn-qa-00690",
+    "syn-qa-01567"
+   ],
+   "hits": 10,
+   "recall_at_10": 1.0,
+   "rr": 1.0,
+   "violations": {},
+   "wall_ms": 820.1,
+   "server_ms": {
+    "embed": 320.2,
+    "retrieve": 498.0,
+    "total": 818.3
+   },
+   "embedding_cached": true,
+   "est_cost_usd_uncached": 4.800000000000001e-06
+  },
+  {
+   "id": "lp01",
+   "query": "MacBook Air M4 with 16GB RAM",
+   "lang": "en",
+   "tags": [
+    "model",
+    "attribute"
+   ],
+   "relevant_count": 33,
+   "returned": [
+    "syn-qa-01692",
+    "syn-qa-00174",
+    "syn-qa-00852",
+    "syn-qa-01455",
+    "syn-qa-01340",
+    "syn-qa-00017",
+    "syn-qa-01963",
+    "syn-qa-00787",
+    "syn-qa-00526",
+    "syn-qa-01565"
+   ],
+   "hits": 10,
+   "recall_at_10": 1.0,
+   "rr": 1.0,
+   "violations": {},
+   "wall_ms": 918.7,
+   "server_ms": {
+    "embed": 326.7,
+    "retrieve": 589.6,
+    "total": 916.5
+   },
+   "embedding_cached": true,
+   "est_cost_usd_uncached": 4.6e-06
+  },
+  {
+   "id": "lp02",
+   "query": "gaming laptop under 4000 QAR",
+   "lang": "en",
+   "tags": [
+    "vague",
+    "price"
+   ],
+   "relevant_count": 82,
+   "returned": [
+    "syn-qa-00824",
+    "syn-qa-00776",
+    "syn-qa-00919",
+    "syn-qa-00469",
+    "syn-qa-00648",
+    "syn-qa-00756",
+    "syn-qa-00009",
+    "syn-qa-01535",
+    "syn-qa-00537",
+    "syn-qa-00048"
+   ],
+   "hits": 10,
+   "recall_at_10": 1.0,
+   "rr": 1.0,
+   "violations": {},
+   "wall_ms": 923.6,
+   "server_ms": {
+    "embed": 322.3,
+    "retrieve": 598.3,
+    "total": 920.7
+   },
+   "embedding_cached": true,
+   "est_cost_usd_uncached": 4.6e-06
+  },
+  {
+   "id": "lp03",
+   "query": "lightweight laptop for a university student in good condition",
+   "lang": "en",
+   "tags": [
+    "vague",
+    "condition"
+   ],
+   "relevant_count": 118,
+   "returned": [
+    "syn-qa-01352",
+    "syn-qa-01899",
+    "syn-qa-00709",
+    "syn-qa-01906",
+    "syn-qa-01008",
+    "syn-qa-01038",
+    "syn-qa-01631",
+    "syn-qa-01330",
+    "syn-qa-01939",
+    "syn-qa-02049"
+   ],
+   "hits": 8,
+   "recall_at_10": 0.8,
+   "rr": 1.0,
+   "violations": {
+    "syn-qa-01906": [
+     "model"
+    ],
+    "syn-qa-01038": [
+     "condition"
+    ]
+   },
+   "wall_ms": 882.2,
+   "server_ms": {
+    "embed": 323.6,
+    "retrieve": 555.4,
+    "total": 879.4
+   },
+   "embedding_cached": true,
+   "est_cost_usd_uncached": 7.2000000000000005e-06
+  },
+  {
+   "id": "lp04",
+   "query": "Dell XPS 13 like new",
+   "lang": "en",
+   "tags": [
+    "model",
+    "condition"
+   ],
+   "relevant_count": 10,
+   "returned": [
+    "syn-qa-02061",
+    "syn-qa-01992",
+    "syn-qa-00511",
+    "syn-qa-01939",
+    "syn-qa-00382",
+    "syn-qa-00735",
+    "syn-qa-00005",
+    "syn-qa-02188",
+    "syn-qa-00203",
+    "syn-qa-01038"
+   ],
+   "hits": 8,
+   "recall_at_10": 0.8,
+   "rr": 1.0,
+   "violations": {
+    "syn-qa-01939": [
+     "condition"
+    ],
+    "syn-qa-01038": [
+     "condition"
+    ]
+   },
+   "wall_ms": 817.8,
+   "server_ms": {
+    "embed": 321.7,
+    "retrieve": 493.7,
+    "total": 815.5
+   },
+   "embedding_cached": true,
+   "est_cost_usd_uncached": 4.000000000000001e-06
+  },
+  {
+   "id": "lp05",
+   "query": "MacBook Pro M4 Max 1TB",
+   "lang": "en",
+   "tags": [
+    "model",
+    "attribute"
+   ],
+   "relevant_count": 10,
+   "returned": [
+    "syn-qa-00325",
+    "syn-qa-00327",
+    "syn-qa-00319",
+    "syn-qa-00302",
+    "syn-qa-00339",
+    "syn-qa-00618",
+    "syn-qa-01223",
+    "syn-qa-01282",
+    "syn-qa-01928",
+    "syn-qa-02106"
+   ],
+   "hits": 7,
+   "recall_at_10": 0.7,
+   "rr": 1.0,
+   "violations": {
+    "syn-qa-00302": [
+     "attr:storage_gb"
+    ],
+    "syn-qa-00618": [
+     "model"
+    ],
+    "syn-qa-01928": [
+     "attr:storage_gb"
+    ]
+   },
+   "wall_ms": 829.5,
+   "server_ms": {
+    "embed": 327.6,
+    "retrieve": 499.2,
+    "total": 827.1
+   },
+   "embedding_cached": true,
+   "est_cost_usd_uncached": 4.2e-06
+  },
+  {
+   "id": "lp06",
+   "query": "لابتوب قيمنق مستعمل",
+   "lang": "ar",
+   "tags": [
+    "vague",
+    "condition"
+   ],
+   "relevant_count": 84,
+   "returned": [
+    "syn-qa-01048",
+    "syn-qa-01064",
+    "syn-qa-01234",
+    "syn-qa-00566",
+    "syn-qa-00200",
+    "syn-qa-00810",
+    "syn-qa-00723",
+    "syn-qa-00681",
+    "syn-qa-00596",
+    "syn-qa-00985"
+   ],
+   "hits": 10,
+   "recall_at_10": 1.0,
+   "rr": 1.0,
+   "violations": {},
+   "wall_ms": 825.3,
+   "server_ms": {
+    "embed": 322.4,
+    "retrieve": 500.5,
+    "total": 823.0
+   },
+   "embedding_cached": true,
+   "est_cost_usd_uncached": 4.000000000000001e-06
+  },
+  {
+   "id": "lp07",
+   "query": "ماك بوك اير للبيع",
+   "lang": "ar",
+   "tags": [
+    "model"
+   ],
+   "relevant_count": 54,
+   "returned": [
+    "syn-qa-00131",
+    "syn-qa-00216",
+    "syn-qa-01483",
+    "syn-qa-02091",
+    "syn-qa-02007",
+    "syn-qa-01743",
+    "syn-qa-01522",
+    "syn-qa-00938",
+    "syn-qa-02198",
+    "syn-qa-00362"
+   ],
+   "hits": 10,
+   "recall_at_10": 1.0,
+   "rr": 1.0,
+   "violations": {},
+   "wall_ms": 821.1,
+   "server_ms": {
+    "embed": 322.0,
+    "retrieve": 497.0,
+    "total": 819.1
+   },
+   "embedding_cached": true,
+   "est_cost_usd_uncached": 3.8000000000000005e-06
+  },
+  {
+   "id": "car01",
+   "query": "Toyota Land Cruiser 2020 or newer",
+   "lang": "en",
+   "tags": [
+    "model",
+    "attribute"
+   ],
+   "relevant_count": 9,
+   "returned": [
+    "syn-qa-01624",
+    "syn-qa-00524",
+    "syn-qa-02059",
+    "syn-qa-00786",
+    "syn-qa-00728",
+    "syn-qa-00391",
+    "syn-qa-01027",
+    "syn-qa-01651",
+    "syn-qa-00900",
+    "syn-qa-01844"
+   ],
+   "hits": 8,
+   "recall_at_10": 0.8888888888888888,
+   "rr": 1.0,
+   "violations": {
+    "syn-qa-00786": [
+     "model"
+    ],
+    "syn-qa-01844": [
+     "model"
+    ]
+   },
+   "wall_ms": 934.4,
+   "server_ms": {
+    "embed": 323.1,
+    "retrieve": 609.2,
+    "total": 932.4
+   },
+   "embedding_cached": true,
+   "est_cost_usd_uncached": 5e-06
+  },
+  {
+   "id": "car02",
+   "query": "used Nissan Patrol under 150,000 QAR",
+   "lang": "en",
+   "tags": [
+    "model",
+    "condition",
+    "price"
+   ],
+   "relevant_count": 3,
+   "returned": [
+    "syn-qa-01360",
+    "syn-qa-01528",
+    "syn-qa-00196",
+    "syn-qa-01123",
+    "syn-qa-01013",
+    "syn-qa-01066",
+    "syn-qa-01018",
+    "syn-qa-01180",
+    "syn-qa-01572",
+    "syn-qa-00481"
+   ],
+   "hits": 3,
+   "recall_at_10": 1.0,
+   "rr": 1.0,
+   "violations": {
+    "syn-qa-00196": [
+     "price"
+    ],
+    "syn-qa-01123": [
+     "price"
+    ],
+    "syn-qa-01066": [
+     "price"
+    ],
+    "syn-qa-01018": [
+     "condition",
+     "price"
+    ],
+    "syn-qa-01180": [
+     "condition",
+     "price"
+    ],
+    "syn-qa-01572": [
+     "condition",
+     "price"
+    ],
+    "syn-qa-00481": [
+     "price"
+    ]
+   },
+   "wall_ms": 869.3,
+   "server_ms": {
+    "embed": 323.5,
+    "retrieve": 542.5,
+    "total": 866.2
+   },
+   "embedding_cached": true,
+   "est_cost_usd_uncached": 5.2e-06
+  },
+  {
+   "id": "car03",
+   "query": "SUV with less than 50,000 km",
+   "lang": "en",
+   "tags": [
+    "vague",
+    "attribute"
+   ],
+   "relevant_count": 91,
+   "returned": [
+    "syn-qa-01096",
+    "syn-qa-00503",
+    "syn-qa-00027",
+    "syn-qa-02150",
+    "syn-qa-00482",
+    "syn-qa-00880",
+    "syn-qa-00923",
+    "syn-qa-00480",
+    "syn-qa-01067",
+    "syn-qa-00066"
+   ],
+   "hits": 3,
+   "recall_at_10": 0.3,
+   "rr": 0.25,
+   "violations": {
+    "syn-qa-01096": [
+     "attr:mileage_km"
+    ],
+    "syn-qa-00503": [
+     "attr:mileage_km"
+    ],
+    "syn-qa-00027": [
+     "attr:mileage_km"
+    ],
+    "syn-qa-00482": [
+     "attr:mileage_km"
+    ],
+    "syn-qa-00880": [
+     "attr:mileage_km"
+    ],
+    "syn-qa-00923": [
+     "attr:mileage_km"
+    ],
+    "syn-qa-00480": [
+     "attr:mileage_km"
+    ]
+   },
+   "wall_ms": 837.4,
+   "server_ms": {
+    "embed": 323.5,
+    "retrieve": 510.6,
+    "total": 834.4
+   },
+   "embedding_cached": true,
+   "est_cost_usd_uncached": 4.6e-06
+  },
+  {
+   "id": "car04",
+   "query": "cheap sedan for daily commute under 40k",
+   "lang": "en",
+   "tags": [
+    "vague",
+    "price"
+   ],
+   "relevant_count": 54,
+   "returned": [
+    "syn-qa-01732",
+    "syn-qa-00516",
+    "syn-qa-00952",
+    "syn-qa-00460",
+    "syn-qa-01304",
+    "syn-qa-01830",
+    "syn-qa-01274",
+    "syn-qa-01544",
+    "syn-qa-01458",
+    "syn-qa-01859"
+   ],
+   "hits": 10,
+   "recall_at_10": 1.0,
+   "rr": 1.0,
+   "violations": {},
+   "wall_ms": 822.0,
+   "server_ms": {
+    "embed": 323.3,
+    "retrieve": 495.7,
+    "total": 819.2
+   },
+   "embedding_cached": true,
+   "est_cost_usd_uncached": 5.600000000000001e-06
+  },
+  {
+   "id": "car05",
+   "query": "Tesla Model Y",
+   "lang": "en",
+   "tags": [
+    "model"
+   ],
+   "relevant_count": 11,
+   "returned": [
+    "syn-qa-01664",
+    "syn-qa-00492",
+    "syn-qa-01798",
+    "syn-qa-00038",
+    "syn-qa-01245",
+    "syn-qa-01669",
+    "syn-qa-01638",
+    "syn-qa-00229",
+    "syn-qa-00154",
+    "syn-qa-01319"
+   ],
+   "hits": 10,
+   "recall_at_10": 1.0,
+   "rr": 1.0,
+   "violations": {},
+   "wall_ms": 834.7,
+   "server_ms": {
+    "embed": 323.1,
+    "retrieve": 509.2,
+    "total": 832.5
+   },
+   "embedding_cached": true,
+   "est_cost_usd_uncached": 3.4e-06
+  },
+  {
+   "id": "car06",
+   "query": "Range Rover Sport GCC specs accident free",
+   "lang": "en",
+   "tags": [
+    "model",
+    "attribute"
+   ],
+   "relevant_count": 11,
+   "returned": [
+    "syn-qa-01022",
+    "syn-qa-00975",
+    "syn-qa-01184",
+    "syn-qa-01993",
+    "syn-qa-02113",
+    "syn-qa-00860",
+    "syn-qa-01570",
+    "syn-qa-00010",
+    "syn-qa-01969",
+    "syn-qa-00285"
+   ],
+   "hits": 8,
+   "recall_at_10": 0.8,
+   "rr": 1.0,
+   "violations": {
+    "syn-qa-00975": [
+     "attr:accident_free"
+    ],
+    "syn-qa-02113": [
+     "attr:gcc_specs"
+    ]
+   },
+   "wall_ms": 822.0,
+   "server_ms": {
+    "embed": 321.8,
+    "retrieve": 498.0,
+    "total": 820.0
+   },
+   "embedding_cached": true,
+   "est_cost_usd_uncached": 5.600000000000001e-06
+  },
+  {
+   "id": "car07",
+   "query": "لاندكروزر برادو للبيع",
+   "lang": "ar",
+   "tags": [
+    "model"
+   ],
+   "relevant_count": 13,
+   "returned": [
+    "syn-qa-02066",
+    "syn-qa-00712",
+    "syn-qa-01885",
+    "syn-qa-02131",
+    "syn-qa-01207",
+    "syn-qa-01844",
+    "syn-qa-01482",
+    "syn-qa-01651",
+    "syn-qa-01548",
+    "syn-qa-00913"
+   ],
+   "hits": 9,
+   "recall_at_10": 0.9,
+   "rr": 1.0,
+   "violations": {
+    "syn-qa-01651": [
+     "model"
+    ]
+   },
+   "wall_ms": 816.0,
+   "server_ms": {
+    "embed": 322.1,
+    "retrieve": 492.2,
+    "total": 814.5
+   },
+   "embedding_cached": true,
+   "est_cost_usd_uncached": 4.000000000000001e-06
+  },
+  {
+   "id": "car08",
+   "query": "سيارة سيدان اقتصادية اقل من 30 الف",
+   "lang": "ar",
+   "tags": [
+    "vague",
+    "price"
+   ],
+   "relevant_count": 47,
+   "returned": [
+    "syn-qa-01118",
+    "syn-qa-02153",
+    "syn-qa-01304",
+    "syn-qa-00795",
+    "syn-qa-00344",
+    "syn-qa-00093",
+    "syn-qa-01092",
+    "syn-qa-00256",
+    "syn-qa-01945",
+    "syn-qa-01544"
+   ],
+   "hits": 8,
+   "recall_at_10": 0.8,
+   "rr": 1.0,
+   "violations": {
+    "syn-qa-00344": [
+     "price"
+    ],
+    "syn-qa-00093": [
+     "price"
+    ]
+   },
+   "wall_ms": 829.4,
+   "server_ms": {
+    "embed": 331.8,
+    "retrieve": 495.5,
+    "total": 827.5
+   },
+   "embedding_cached": true,
+   "est_cost_usd_uncached": 5.2e-06
+  },
+  {
+   "id": "car09",
+   "query": "G63 AMG ممشى قليل",
+   "lang": "mixed",
+   "tags": [
+    "model",
+    "attribute",
+    "vague"
+   ],
+   "relevant_count": 6,
+   "returned": [
+    "syn-qa-01880",
+    "syn-qa-02017",
+    "syn-qa-01145",
+    "syn-qa-01479",
+    "syn-qa-02044",
+    "syn-qa-01953",
+    "syn-qa-01377",
+    "syn-qa-00906",
+    "syn-qa-00149",
+    "syn-qa-01167"
+   ],
+   "hits": 5,
+   "recall_at_10": 0.8333333333333334,
+   "rr": 1.0,
+   "violations": {
+    "syn-qa-01145": [
+     "attr:mileage_km"
+    ],
+    "syn-qa-01479": [
+     "attr:mileage_km"
+    ],
+    "syn-qa-02044": [
+     "attr:mileage_km"
+    ],
+    "syn-qa-01377": [
+     "attr:mileage_km"
+    ],
+    "syn-qa-00906": [
+     "attr:mileage_km"
+    ]
+   },
+   "wall_ms": 819.5,
+   "server_ms": {
+    "embed": 322.7,
+    "retrieve": 495.1,
+    "total": 817.9
+   },
+   "embedding_cached": true,
+   "est_cost_usd_uncached": 3.8000000000000005e-06
+  },
+  {
+   "id": "fu01",
+   "query": "IKEA bookshelf",
+   "lang": "en",
+   "tags": [
+    "item",
+    "brand"
+   ],
+   "relevant_count": 9,
+   "returned": [
+    "syn-qa-00056",
+    "syn-qa-00312",
+    "syn-qa-00931",
+    "syn-qa-00936",
+    "syn-qa-00595",
+    "syn-qa-02103",
+    "syn-qa-00185",
+    "syn-qa-01453",
+    "syn-qa-00334",
+    "syn-qa-01837"
+   ],
+   "hits": 9,
+   "recall_at_10": 1.0,
+   "rr": 1.0,
+   "violations": {
+    "syn-qa-01837": [
+     "brand"
+    ]
+   },
+   "wall_ms": 896.1,
+   "server_ms": {
+    "embed": 323.0,
+    "retrieve": 570.2,
+    "total": 893.3
+   },
+   "embedding_cached": true,
+   "est_cost_usd_uncached": 3.6000000000000003e-06
+  },
+  {
+   "id": "fu02",
+   "query": "L-shaped sofa in good condition under 2500 QAR",
+   "lang": "en",
+   "tags": [
+    "item",
+    "condition",
+    "price"
+   ],
+   "relevant_count": 7,
+   "returned": [
+    "syn-qa-01606",
+    "syn-qa-01597",
+    "syn-qa-02156",
+    "syn-qa-01530",
+    "syn-qa-00232",
+    "syn-qa-00243",
+    "syn-qa-00166",
+    "syn-qa-00689",
+    "syn-qa-01034",
+    "syn-qa-00019"
+   ],
+   "hits": 4,
+   "recall_at_10": 0.5714285714285714,
+   "rr": 0.25,
+   "violations": {
+    "syn-qa-01606": [
+     "condition"
+    ],
+    "syn-qa-01597": [
+     "price"
+    ],
+    "syn-qa-02156": [
+     "price"
+    ],
+    "syn-qa-00232": [
+     "price"
+    ],
+    "syn-qa-00243": [
+     "condition"
+    ],
+    "syn-qa-00166": [
+     "condition"
+    ]
+   },
+   "wall_ms": 872.5,
+   "server_ms": {
+    "embed": 323.1,
+    "retrieve": 547.4,
+    "total": 870.6
+   },
+   "embedding_cached": true,
+   "est_cost_usd_uncached": 6e-06
+  },
+  {
+   "id": "fu03",
+   "query": "majlis set",
+   "lang": "en",
+   "tags": [
+    "item"
+   ],
+   "relevant_count": 18,
+   "returned": [
+    "syn-qa-01998",
+    "syn-qa-01958",
+    "syn-qa-01944",
+    "syn-qa-02139",
+    "syn-qa-00816",
+    "syn-qa-00617",
+    "syn-qa-00107",
+    "syn-qa-00462",
+    "syn-qa-01679",
+    "syn-qa-00157"
+   ],
+   "hits": 10,
+   "recall_at_10": 1.0,
+   "rr": 1.0,
+   "violations": {},
+   "wall_ms": 826.5,
+   "server_ms": {
+    "embed": 321.3,
+    "retrieve": 503.4,
+    "total": 824.8
+   },
+   "embedding_cached": true,
+   "est_cost_usd_uncached": 3.2e-06
+  },
+  {
+   "id": "fu04",
+   "query": "office chair مع توصيل",
+   "lang": "mixed",
+   "tags": [
+    "item",
+    "attribute"
+   ],
+   "relevant_count": 5,
+   "returned": [
+    "syn-qa-01415",
+    "syn-qa-00097",
+    "syn-qa-00446",
+    "syn-qa-01990",
+    "syn-qa-00230",
+    "syn-qa-00024",
+    "syn-qa-01271",
+    "syn-qa-01190",
+    "syn-qa-01779",
+    "syn-qa-02135"
+   ],
+   "hits": 4,
+   "recall_at_10": 0.8,
+   "rr": 0.5,
+   "violations": {
+    "syn-qa-01415": [
+     "attr:delivery_available"
+    ],
+    "syn-qa-01990": [
+     "attr:delivery_available"
+    ],
+    "syn-qa-00230": [
+     "attr:delivery_available"
+    ],
+    "syn-qa-01271": [
+     "attr:delivery_available"
+    ],
+    "syn-qa-01190": [
+     "attr:delivery_available"
+    ],
+    "syn-qa-02135": [
+     "attr:delivery_available"
+    ]
+   },
+   "wall_ms": 825.2,
+   "server_ms": {
+    "embed": 321.7,
+    "retrieve": 501.5,
+    "total": 823.3
+   },
+   "embedding_cached": true,
+   "est_cost_usd_uncached": 4.000000000000001e-06
+  },
+  {
+   "id": "fu05",
+   "query": "كنب ثلاثي مستعمل",
+   "lang": "ar",
+   "tags": [
+    "item",
+    "condition"
+   ],
+   "relevant_count": 16,
+   "returned": [
+    "syn-qa-01635",
+    "syn-qa-02052",
+    "syn-qa-00871",
+    "syn-qa-01556",
+    "syn-qa-00314",
+    "syn-qa-00624",
+    "syn-qa-01262",
+    "syn-qa-01530",
+    "syn-qa-01736",
+    "syn-qa-00509"
+   ],
+   "hits": 8,
+   "recall_at_10": 0.8,
+   "rr": 1.0,
+   "violations": {
+    "syn-qa-01262": [
+     "condition"
+    ],
+    "syn-qa-01530": [
+     "attr:item_type"
+    ]
+   },
+   "wall_ms": 823.2,
+   "server_ms": {
+    "embed": 321.7,
+    "retrieve": 499.4,
+    "total": 821.2
+   },
+   "embedding_cached": true,
+   "est_cost_usd_uncached": 3.6000000000000003e-06
+  },
+  {
+   "id": "fu06",
+   "query": "سرير كوين مع مرتبة",
+   "lang": "ar",
+   "tags": [
+    "item"
+   ],
+   "relevant_count": 25,
+   "returned": [
+    "syn-qa-01919",
+    "syn-qa-00465",
+    "syn-qa-02027",
+    "syn-qa-01306",
+    "syn-qa-01329",
+    "syn-qa-01309",
+    "syn-qa-01892",
+    "syn-qa-01934",
+    "syn-qa-01477",
+    "syn-qa-00461"
+   ],
+   "hits": 10,
+   "recall_at_10": 1.0,
+   "rr": 1.0,
+   "violations": {},
+   "wall_ms": 828.2,
+   "server_ms": {
+    "embed": 322.1,
+    "retrieve": 503.0,
+    "total": 825.5
+   },
+   "embedding_cached": true,
+   "est_cost_usd_uncached": 3.8000000000000005e-06
+  },
+  {
+   "id": "ap01",
+   "query": "2 bedroom apartment for rent in Lusail",
+   "lang": "en",
+   "tags": [
+    "rent_sale",
+    "location",
+    "attribute"
+   ],
+   "relevant_count": 2,
+   "returned": [
+    "syn-qa-01614",
+    "syn-qa-00791",
+    "syn-qa-01162",
+    "syn-qa-00347",
+    "syn-qa-00754",
+    "syn-qa-00463",
+    "syn-qa-01609",
+    "syn-qa-01059",
+    "syn-qa-00716",
+    "syn-qa-02058"
+   ],
+   "hits": 2,
+   "recall_at_10": 1.0,
+   "rr": 1.0,
+   "violations": {
+    "syn-qa-01162": [
+     "rent_sale"
+    ],
+    "syn-qa-00347": [
+     "attr:bedrooms"
+    ],
+    "syn-qa-00754": [
+     "attr:bedrooms"
+    ],
+    "syn-qa-00463": [
+     "attr:bedrooms"
+    ],
+    "syn-qa-01609": [
+     "attr:bedrooms"
+    ],
+    "syn-qa-01059": [
+     "attr:bedrooms"
+    ],
+    "syn-qa-00716": [
+     "attr:bedrooms"
+    ],
+    "syn-qa-02058": [
+     "rent_sale"
+    ]
+   },
+   "wall_ms": 906.5,
+   "server_ms": {
+    "embed": 327.1,
+    "retrieve": 577.2,
+    "total": 904.4
+   },
+   "embedding_cached": true,
+   "est_cost_usd_uncached": 5.4e-06
+  },
+  {
+   "id": "ap02",
+   "query": "studio for rent under 5000 a month",
+   "lang": "en",
+   "tags": [
+    "rent_sale",
+    "price"
+   ],
+   "relevant_count": 33,
+   "returned": [
+    "syn-qa-00799",
+    "syn-qa-01327",
+    "syn-qa-00576",
+    "syn-qa-00191",
+    "syn-qa-02072",
+    "syn-qa-00767",
+    "syn-qa-02124",
+    "syn-qa-00261",
+    "syn-qa-02024",
+    "syn-qa-01446"
+   ],
+   "hits": 10,
+   "recall_at_10": 1.0,
+   "rr": 1.0,
+   "violations": {},
+   "wall_ms": 863.0,
+   "server_ms": {
+    "embed": 321.6,
+    "retrieve": 538.8,
+    "total": 860.6
+   },
+   "embedding_cached": true,
+   "est_cost_usd_uncached": 5.2e-06
+  },
+  {
+   "id": "ap03",
+   "query": "furnished 1BR in The Pearl",
+   "lang": "en",
+   "tags": [
+    "location",
+    "attribute"
+   ],
+   "relevant_count": 6,
+   "returned": [
+    "syn-qa-01557",
+    "syn-qa-00501",
+    "syn-qa-00145",
+    "syn-qa-00869",
+    "syn-qa-01372",
+    "syn-qa-02129",
+    "syn-qa-00721",
+    "syn-qa-00688",
+    "syn-qa-01275",
+    "syn-qa-01547"
+   ],
+   "hits": 4,
+   "recall_at_10": 0.6666666666666666,
+   "rr": 1.0,
+   "violations": {
+    "syn-qa-00869": [
+     "attr:furnished"
+    ],
+    "syn-qa-01372": [
+     "attr:bedrooms"
+    ],
+    "syn-qa-00721": [
+     "attr:bedrooms"
+    ],
+    "syn-qa-00688": [
+     "attr:bedrooms"
+    ],
+    "syn-qa-01275": [
+     "attr:bedrooms"
+    ],
+    "syn-qa-01547": [
+     "attr:bedrooms"
+    ]
+   },
+   "wall_ms": 821.7,
+   "server_ms": {
+    "embed": 322.4,
+    "retrieve": 496.9,
+    "total": 819.4
+   },
+   "embedding_cached": true,
+   "est_cost_usd_uncached": 4.4e-06
+  },
+  {
+   "id": "ap04",
+   "query": "3 bedroom apartment for sale in West Bay",
+   "lang": "en",
+   "tags": [
+    "rent_sale",
+    "location",
+    "attribute"
+   ],
+   "relevant_count": 3,
+   "returned": [
+    "syn-qa-01991",
+    "syn-qa-01950",
+    "syn-qa-00271",
+    "syn-qa-01513",
+    "syn-qa-00059",
+    "syn-qa-02195",
+    "syn-qa-00293",
+    "syn-qa-00851",
+    "syn-qa-00752",
+    "syn-qa-02079"
+   ],
+   "hits": 3,
+   "recall_at_10": 1.0,
+   "rr": 1.0,
+   "violations": {
+    "syn-qa-01513": [
+     "attr:bedrooms"
+    ],
+    "syn-qa-00059": [
+     "attr:bedrooms"
+    ],
+    "syn-qa-02195": [
+     "category"
+    ],
+    "syn-qa-00293": [
+     "attr:bedrooms"
+    ],
+    "syn-qa-00851": [
+     "attr:bedrooms"
+    ],
+    "syn-qa-00752": [
+     "attr:bedrooms"
+    ],
+    "syn-qa-02079": [
+     "attr:bedrooms"
+    ]
+   },
+   "wall_ms": 833.6,
+   "server_ms": {
+    "embed": 322.5,
+    "retrieve": 507.5,
+    "total": 830.6
+   },
+   "embedding_cached": true,
+   "est_cost_usd_uncached": 5.600000000000001e-06
+  },
+  {
+   "id": "ap05",
+   "query": "penthouse with sea view",
+   "lang": "en",
+   "tags": [
+    "attribute"
+   ],
+   "relevant_count": 4,
+   "returned": [
+    "syn-qa-00610",
+    "syn-qa-01314",
+    "syn-qa-01506",
+    "syn-qa-01808",
+    "syn-qa-01671",
+    "syn-qa-00366",
+    "syn-qa-01487",
+    "syn-qa-00444",
+    "syn-qa-00791",
+    "syn-qa-00571"
+   ],
+   "hits": 3,
+   "recall_at_10": 0.75,
+   "rr": 1.0,
+   "violations": {
+    "syn-qa-01808": [
+     "attr:amenities"
+    ],
+    "syn-qa-01671": [
+     "attr:amenities"
+    ],
+    "syn-qa-00366": [
+     "attr:amenities"
+    ],
+    "syn-qa-01487": [
+     "attr:amenities"
+    ],
+    "syn-qa-00444": [
+     "attr:amenities"
+    ],
+    "syn-qa-00791": [
+     "attr:amenities"
+    ],
+    "syn-qa-00571": [
+     "attr:amenities"
+    ]
+   },
+   "wall_ms": 821.9,
+   "server_ms": {
+    "embed": 321.9,
+    "retrieve": 496.9,
+    "total": 819.1
+   },
+   "embedding_cached": true,
+   "est_cost_usd_uncached": 4.2e-06
+  },
+  {
+   "id": "ap06",
+   "query": "شقة غرفتين للإيجار في لوسيل",
+   "lang": "ar",
+   "tags": [
+    "rent_sale",
+    "location",
+    "attribute"
+   ],
+   "relevant_count": 2,
+   "returned": [
+    "syn-qa-01226",
+    "syn-qa-01614",
+    "syn-qa-01942",
+    "syn-qa-00791",
+    "syn-qa-00426",
+    "syn-qa-01520",
+    "syn-qa-01237",
+    "syn-qa-01162",
+    "syn-qa-01836",
+    "syn-qa-00463"
+   ],
+   "hits": 2,
+   "recall_at_10": 1.0,
+   "rr": 0.5,
+   "violations": {
+    "syn-qa-01226": [
+     "rent_sale"
+    ],
+    "syn-qa-01942": [
+     "rent_sale"
+    ],
+    "syn-qa-00426": [
+     "rent_sale"
+    ],
+    "syn-qa-01520": [
+     "attr:bedrooms"
+    ],
+    "syn-qa-01237": [
+     "location"
+    ],
+    "syn-qa-01162": [
+     "rent_sale"
+    ],
+    "syn-qa-01836": [
+     "location"
+    ],
+    "syn-qa-00463": [
+     "attr:bedrooms"
+    ]
+   },
+   "wall_ms": 813.8,
+   "server_ms": {
+    "embed": 320.9,
+    "retrieve": 490.4,
+    "total": 811.5
+   },
+   "embedding_cached": true,
+   "est_cost_usd_uncached": 4.6e-06
+  },
+  {
+   "id": "ap07",
+   "query": "استوديو مفروش للإيجار",
+   "lang": "ar",
+   "tags": [
+    "rent_sale",
+    "attribute"
+   ],
+   "relevant_count": 14,
+   "returned": [
+    "syn-qa-01248",
+    "syn-qa-01267",
+    "syn-qa-01882",
+    "syn-qa-02082",
+    "syn-qa-00797",
+    "syn-qa-02119",
+    "syn-qa-02072",
+    "syn-qa-00799",
+    "syn-qa-01269",
+    "syn-qa-00899"
+   ],
+   "hits": 7,
+   "recall_at_10": 0.7,
+   "rr": 1.0,
+   "violations": {
+    "syn-qa-02072": [
+     "attr:furnished"
+    ],
+    "syn-qa-01269": [
+     "attr:furnished"
+    ],
+    "syn-qa-00899": [
+     "attr:furnished"
+    ]
+   },
+   "wall_ms": 812.2,
+   "server_ms": {
+    "embed": 321.3,
+    "retrieve": 488.4,
+    "total": 810.0
+   },
+   "embedding_cached": true,
+   "est_cost_usd_uncached": 4.000000000000001e-06
+  },
+  {
+   "id": "ap08",
+   "query": "2BR شقة للبيع in The Pearl",
+   "lang": "mixed",
+   "tags": [
+    "rent_sale",
+    "location",
+    "attribute"
+   ],
+   "relevant_count": 4,
+   "returned": [
+    "syn-qa-01300",
+    "syn-qa-01372",
+    "syn-qa-01275",
+    "syn-qa-00356",
+    "syn-qa-00684",
+    "syn-qa-01763",
+    "syn-qa-01491",
+    "syn-qa-02129",
+    "syn-qa-00145",
+    "syn-qa-01226"
+   ],
+   "hits": 4,
+   "recall_at_10": 1.0,
+   "rr": 1.0,
+   "violations": {
+    "syn-qa-00356": [
+     "attr:bedrooms"
+    ],
+    "syn-qa-01763": [
+     "attr:bedrooms"
+    ],
+    "syn-qa-01491": [
+     "attr:bedrooms"
+    ],
+    "syn-qa-02129": [
+     "attr:bedrooms"
+    ],
+    "syn-qa-00145": [
+     "attr:bedrooms"
+    ],
+    "syn-qa-01226": [
+     "location"
+    ]
+   },
+   "wall_ms": 811.6,
+   "server_ms": {
+    "embed": 321.4,
+    "retrieve": 487.9,
+    "total": 809.5
+   },
+   "embedding_cached": true,
+   "est_cost_usd_uncached": 4.4e-06
+  },
+  {
+   "id": "vi01",
+   "query": "5 bedroom villa with private pool for rent",
+   "lang": "en",
+   "tags": [
+    "rent_sale",
+    "attribute"
+   ],
+   "relevant_count": 20,
+   "returned": [
+    "syn-qa-01428",
+    "syn-qa-01809",
+    "syn-qa-01410",
+    "syn-qa-00445",
+    "syn-qa-02099",
+    "syn-qa-01839",
+    "syn-qa-01023",
+    "syn-qa-00628",
+    "syn-qa-00443",
+    "syn-qa-00848"
+   ],
+   "hits": 9,
+   "recall_at_10": 0.9,
+   "rr": 1.0,
+   "violations": {
+    "syn-qa-00628": [
+     "attr:private_pool"
+    ]
+   },
+   "wall_ms": 826.6,
+   "server_ms": {
+    "embed": 322.9,
+    "retrieve": 502.0,
+    "total": 825.0
+   },
+   "embedding_cached": true,
+   "est_cost_usd_uncached": 5.8e-06
+  },
+  {
+   "id": "vi02",
+   "query": "compound villa for rent under 15000 a month",
+   "lang": "en",
+   "tags": [
+    "rent_sale",
+    "price",
+    "attribute"
+   ],
+   "relevant_count": 9,
+   "returned": [
+    "syn-qa-01989",
+    "syn-qa-01915",
+    "syn-qa-02184",
+    "syn-qa-02190",
+    "syn-qa-00073",
+    "syn-qa-00844",
+    "syn-qa-02099",
+    "syn-qa-01077",
+    "syn-qa-01780",
+    "syn-qa-02028"
+   ],
+   "hits": 3,
+   "recall_at_10": 0.3333333333333333,
+   "rr": 0.5,
+   "violations": {
+    "syn-qa-01989": [
+     "price"
+    ],
+    "syn-qa-02190": [
+     "price"
+    ],
+    "syn-qa-00073": [
+     "price"
+    ],
+    "syn-qa-00844": [
+     "price"
+    ],
+    "syn-qa-02099": [
+     "price"
+    ],
+    "syn-qa-01780": [
+     "price"
+    ],
+    "syn-qa-02028": [
+     "price"
+    ]
+   },
+   "wall_ms": 810.4,
+   "server_ms": {
+    "embed": 320.2,
+    "retrieve": 488.4,
+    "total": 808.7
+   },
+   "embedding_cached": true,
+   "est_cost_usd_uncached": 5.8e-06
+  },
+  {
+   "id": "vi03",
+   "query": "townhouse for sale",
+   "lang": "en",
+   "tags": [
+    "rent_sale",
+    "attribute"
+   ],
+   "relevant_count": 14,
+   "returned": [
+    "syn-qa-02174",
+    "syn-qa-01825",
+    "syn-qa-00400",
+    "syn-qa-00435",
+    "syn-qa-00336",
+    "syn-qa-01470",
+    "syn-qa-00642",
+    "syn-qa-00793",
+    "syn-qa-00077",
+    "syn-qa-00762"
+   ],
+   "hits": 10,
+   "recall_at_10": 1.0,
+   "rr": 1.0,
+   "violations": {},
+   "wall_ms": 819.8,
+   "server_ms": {
+    "embed": 325.2,
+    "retrieve": 492.7,
+    "total": 818.1
+   },
+   "embedding_cached": true,
+   "est_cost_usd_uncached": 3.8000000000000005e-06
+  },
+  {
+   "id": "vi04",
+   "query": "فيلا للبيع في لوسيل",
+   "lang": "ar",
+   "tags": [
+    "rent_sale",
+    "location"
+   ],
+   "relevant_count": 23,
+   "returned": [
+    "syn-qa-01970",
+    "syn-qa-01116",
+    "syn-qa-00289",
+    "syn-qa-00077",
+    "syn-qa-00940",
+    "syn-qa-01186",
+    "syn-qa-01927",
+    "syn-qa-01511",
+    "syn-qa-00591",
+    "syn-qa-00359"
+   ],
+   "hits": 10,
+   "recall_at_10": 1.0,
+   "rr": 1.0,
+   "violations": {},
+   "wall_ms": 819.6,
+   "server_ms": {
+    "embed": 322.4,
+    "retrieve": 495.5,
+    "total": 818.1
+   },
+   "embedding_cached": true,
+   "est_cost_usd_uncached": 4.000000000000001e-06
+  },
+  {
+   "id": "vi05",
+   "query": "فيلا 6 غرف مع مسبح",
+   "lang": "ar",
+   "tags": [
+    "attribute"
+   ],
+   "relevant_count": 13,
+   "returned": [
+    "syn-qa-00587",
+    "syn-qa-01075",
+    "syn-qa-00577",
+    "syn-qa-00432",
+    "syn-qa-00071",
+    "syn-qa-01545",
+    "syn-qa-02204",
+    "syn-qa-01796",
+    "syn-qa-01302",
+    "syn-qa-01047"
+   ],
+   "hits": 8,
+   "recall_at_10": 0.8,
+   "rr": 1.0,
+   "violations": {
+    "syn-qa-01545": [
+     "attr:private_pool"
+    ],
+    "syn-qa-01047": [
+     "attr:bedrooms"
+    ]
+   },
+   "wall_ms": 816.7,
+   "server_ms": {
+    "embed": 321.0,
+    "retrieve": 493.6,
+    "total": 814.9
+   },
+   "embedding_cached": true,
+   "est_cost_usd_uncached": 3.8000000000000005e-06
+  }
+ ]
+}

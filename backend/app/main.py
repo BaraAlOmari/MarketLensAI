@@ -1,12 +1,18 @@
+import logging
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api import health
+from app.api import health, search
 from app.config import Settings, get_settings
 from app.db import create_pool
 from app.logging_setup import RequestIdMiddleware, configure_logging
+from app.providers.embeddings import get_embedding_provider
+from app.providers.query_cache import CachedQueryEmbedder
+from app.retrieval.service import SearchService
+
+logger = logging.getLogger(__name__)
 
 
 def create_app(settings: Settings | None = None) -> FastAPI:
@@ -17,6 +23,12 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     async def lifespan(app: FastAPI):
         app.state.settings = settings
         app.state.db_pool = await create_pool(settings)
+        embedder = None
+        if app.state.db_pool is not None and settings.gemini_api_key is not None:
+            embedder = CachedQueryEmbedder(app.state.db_pool, get_embedding_provider(settings))
+        else:
+            logger.warning("search disabled: needs DATABASE_URL and GEMINI_API_KEY")
+        app.state.search_service = SearchService(app.state.db_pool, embedder)
         try:
             yield
         finally:
@@ -33,6 +45,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     )
     app.add_middleware(RequestIdMiddleware)
     app.include_router(health.router)
+    app.include_router(search.router)
     return app
 
 
