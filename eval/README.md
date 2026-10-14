@@ -59,6 +59,11 @@ The same mapping must be used by query understanding (Stage 4), so the eval and 
 .venv\Scripts\python ..\eval\run.py                          # score the current system
 .venv\Scripts\python ..\eval\run.py --label "Stage 4 filters" --record   # also append a row to docs/results.md
 .venv\Scripts\python ..\eval\run.py --url http://localhost:8000          # against a running server
+.venv\Scripts\python ..\eval\run.py --no-extract                         # the Stage 3 baseline again
+.venv\Scripts\python ..\eval\run.py --concurrency 2 --extraction-timeout 60 --extraction-attempts 3
+                                                                       # fill the LLM cache after a prompt change
 ```
+
+LLM extractions are cached too (`query_extraction_cache`), keyed by a hash of the prompt, schema and catalog. A prompt or catalog change therefore re-extracts all 45 queries once (45 of the 500 free daily Flash-Lite requests). Changes to the Python mapping or guards reuse the cache and cost nothing.
 
 The first run embeds each query once (45 free-tier requests). Query vectors are cached in Postgres (`query_embedding_cache`), so later runs reproduce the same numbers without using quota.

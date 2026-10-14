@@ -56,6 +56,18 @@ class Settings(BaseSettings):
     # Paid-tier list price, used only to report what a run would cost (free tier is $0).
     embedding_price_per_mtok_usd: Decimal = Decimal("0.20")
 
+    # Query understanding (Stage 4): the LLM fills a filter form; Python maps it to SQL.
+    # Free tier for gemini-3.5-flash-lite: 15 RPM, 500 RPD (AI Studio, 2026-10-13).
+    extraction_enabled: bool = True
+    extraction_model: str = "gemini-3.5-flash-lite"
+    extraction_rpm_limit: int = Field(default=15, gt=0)
+    extraction_timeout_s: float = Field(default=20, gt=0)
+    extraction_max_attempts: int = Field(default=2, ge=1, le=8)  # interactive: one retry
+    extraction_thinking_level: str = "minimal"  # flash-lite default; minimal|low|medium|high
+    # Paid-tier list prices per 1M tokens (pricing page, 2026-10-13), for cost reporting.
+    extraction_input_price_per_mtok_usd: Decimal = Decimal("0.30")
+    extraction_output_price_per_mtok_usd: Decimal = Decimal("2.50")
+
     # Currency: QAR is the base; every listing also stores price_qar for cross-currency filters.
     base_currency: str = "QAR"
     fx_rates_to_qar: dict[str, Decimal] = Field(

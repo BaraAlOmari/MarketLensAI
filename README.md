@@ -4,7 +4,7 @@ Natural-language marketplace search: ask "Find me a used iPhone 17 in great cond
 
 The spec is in [REQUIREMENTS.md](REQUIREMENTS.md). Verified facts and decisions are in [docs/decisions.md](docs/decisions.md).
 
-**Status:** Stage 3 (eval harness and baseline) complete: 45 test queries with ground truth from the generator's facts, and a vector-only `POST /api/search` baseline at Recall@10 0.853 / MRR 0.919, with 31% of shown results breaking a constraint. See [docs/results.md](docs/results.md) and [eval/README.md](eval/README.md).
+**Status:** Stage 4 (query understanding) complete: Gemini 3.5 Flash-Lite turns each query into filters (price, condition, bedrooms, mileage, ...) applied as SQL inside the vector search. Eval: Recall@10 0.853 → 0.996, MRR 0.919 → 1.000, wrong results 31% → 1%. See [docs/results.md](docs/results.md).
 
 ## Layout
 

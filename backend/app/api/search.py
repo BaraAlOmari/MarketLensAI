@@ -3,6 +3,7 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, Request
 
+from app.currency import UnknownCurrencyError
 from app.models.search import SearchRequest, SearchResponse
 from app.providers.retry import QuotaExhaustedError
 from app.retrieval.service import SearchService, SearchUnavailableError
@@ -24,6 +25,8 @@ async def search(
         return await service.search(body)
     except SearchUnavailableError as exc:
         raise HTTPException(status_code=503, detail=str(exc)) from exc
+    except UnknownCurrencyError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
     except QuotaExhaustedError as exc:
         raise HTTPException(
             status_code=429, detail="embedding quota exhausted for today; try again later"

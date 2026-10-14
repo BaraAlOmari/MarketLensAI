@@ -43,7 +43,11 @@ class FakeService:
         if self.error:
             raise self.error
         debug = SearchDebug(
-            retrieval="vector", embedding_model="fake", embedding_cached=True, timings_ms={}
+            retrieval="vector",
+            embedding_model="fake",
+            embedding_cached=True,
+            filters_source="none",
+            timings_ms={},
         )
         return SearchResponse(
             query=request.query,
@@ -84,8 +88,29 @@ def test_rejects_blank_query_bad_limit_and_unknown_fields():
         assert client.post("/api/search", json={"query": "   "}).status_code == 422
         assert client.post("/api/search", json={"query": "x", "limit": 0}).status_code == 422
         assert client.post("/api/search", json={"query": "x", "limit": 51}).status_code == 422
-        resp = client.post("/api/search", json={"query": "x", "filters": {"max_price": 1}})
-        assert resp.status_code == 422  # filters arrive in Stage 4; never silently ignored
+        resp = client.post("/api/search", json={"query": "x", "sort": "price"})
+        assert resp.status_code == 422  # unknown fields are never silently ignored
+
+
+def test_explicit_filters_are_validated():
+    service = FakeService()
+    with client_with(service) as client:
+        ok = client.post(
+            "/api/search",
+            json={"query": "phone", "filters": {"category": "phones", "max_price": 3000,
+                                                "attributes": {"storage_gb": {"eq": 256}}}},
+        )  # fmt: skip
+        assert ok.status_code == 200
+        assert service.requests[0].filters.attributes["storage_gb"].eq == 256
+        for bad in (
+            {"max_prise": 3000},  # typo'd field
+            {"attributes": {"seller_name": {"eq": "x"}}},  # not a filterable attribute
+            {"attributes": {"year": {}}},  # no operator
+            {"attributes": {"year": {"eq": 2020, "min": 2019}}},  # conflicting operators
+            {"conditions": ["mint"]},
+        ):
+            resp = client.post("/api/search", json={"query": "phone", "filters": bad})
+            assert resp.status_code == 422, bad
 
 
 def test_unconfigured_search_is_503():

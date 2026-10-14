@@ -5,15 +5,19 @@ from typing import Any
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
+from app.models.filters import SearchFilters
 from app.models.listing import Condition, Language, ListingType, PricePeriod
 
 
 class SearchRequest(BaseModel):
-    # `filters` arrives with query understanding in Stage 4; until then unknown fields are
-    # rejected rather than silently ignored.
+    # Unknown fields are rejected rather than silently ignored.
     model_config = ConfigDict(extra="forbid")
 
     query: str = Field(min_length=1, max_length=500)
+    # Explicit filters (e.g. edited filter chips in the UI) replace LLM extraction.
+    filters: SearchFilters | None = None
+    # false: skip query understanding and search unfiltered (the Stage 3 baseline).
+    extract: bool = True
     limit: int = Field(default=10, ge=1, le=50)
     debug: bool = False
 
@@ -46,15 +50,29 @@ class ListingResult(BaseModel):
     score: float  # cosine similarity for the vector baseline (higher is closer)
 
 
+class ExtractionDebug(BaseModel):
+    model: str
+    cached: bool
+    latency_ms: float
+    input_tokens: int
+    output_tokens: int
+    thought_tokens: int
+    error: str | None  # set when extraction failed and search ran unfiltered
+    parse: dict[str, Any] | None  # the LLM's raw form, before guards and mapping
+    guard_notes: list[str] = []  # fields the guards dropped (scope, grounding) or filled
+
+
 class SearchDebug(BaseModel):
     retrieval: str
     embedding_model: str
     embedding_cached: bool
+    filters_source: str  # request | llm | none
+    extraction: ExtractionDebug | None = None
     timings_ms: dict[str, float]
 
 
 class SearchResponse(BaseModel):
     query: str
-    extracted_filters: dict[str, Any] | None = None  # filled by query understanding (Stage 4)
+    extracted_filters: dict[str, Any] | None = None  # the filters applied (LLM or request)
     results: list[ListingResult]
     debug: SearchDebug | None = None

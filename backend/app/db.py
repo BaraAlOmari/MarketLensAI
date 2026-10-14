@@ -8,6 +8,21 @@ from app.config import Settings
 
 logger = logging.getLogger(__name__)
 
+# Applied to every pooled connection. Supavisor ignores settings sent at connect, and a
+# role-level default would change behaviour for everything else using the database.
+# strict_order: when a WHERE filter rejects HNSW candidates, keep scanning (pgvector 0.8)
+# instead of returning fewer rows than asked for, and keep exact distance order.
+SESSION_SETTINGS = "SET hnsw.iterative_scan = 'strict_order';"
+
+
+async def _init_connection(conn: asyncpg.Connection) -> None:
+    await conn.execute(SESSION_SETTINGS)
+
+
+async def _reset_connection(conn: asyncpg.Connection) -> None:
+    # asyncpg's default reset (RESET ALL, ...) plus our settings, in the same round trip.
+    await conn.execute(conn.get_reset_query() + "\n" + SESSION_SETTINGS)
+
 
 async def create_pool(settings: Settings) -> asyncpg.Pool | None:
     if settings.database_url is None:
@@ -21,6 +36,8 @@ async def create_pool(settings: Settings) -> asyncpg.Pool | None:
             timeout=settings.db_connect_timeout_s,
             # Required for Supabase's transaction pooler (port 6543); harmless elsewhere.
             statement_cache_size=0,
+            init=_init_connection,
+            reset=_reset_connection,
         )
     except (OSError, asyncpg.PostgresError) as exc:
         logger.error("database pool creation failed: %s", exc.__class__.__name__)
