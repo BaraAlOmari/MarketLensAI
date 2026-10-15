@@ -102,6 +102,18 @@ Every external fact the project relies on is recorded here with its source and t
 | 2026-10-14 | Third backstop: `listing_type` from an explicit "for sale" / "for rent" / "للبيع" / "للإيجار" (only if exactly one appears, property categories only, only when the LLM left it empty). | Hybrid exposed a hidden Stage 4 miss: "townhouse for sale" had no `listing_type`, and full-text on "townhouse" promoted rentals. Vector order had hidden it. |
 | 2026-10-14 | Results carry `ranks` (`{"vector": 3, "keyword": 1}`) and the RRF `score`; debug shows `candidates` per side. | Lets the UI and the eval see why a listing is where it is. |
 
+### Stage 6: reranking
+
+| Date | Decision | Reason |
+|---|---|---|
+| 2026-10-15 | **Reranker: Gemini listwise** (`GeminiListwiseReranker`, `gemini-3.5-flash-lite` via `generateContent`, thinking `minimal`), behind a `Reranker` interface (`rerank(query, candidates, top_n)`). | User-chosen (option A of: Gemini listwise / hosted rerank API / local model). No new account; reads Arabic; local models are ruled out by the spec for free hosting. A hosted rerank API remains a drop-in through the interface. |
+| 2026-10-15 | Rerank the top **50** retrieval candidates (`RERANK_CANDIDATES`) into the top **10** (`RERANK_TOP_N`). Candidates are numbered lines (title, structured facts, price with rent period, first 160 characters of the description); the model returns numbers only. | Spec: top ~50 to top ~10. Numbers instead of listing ids keep the output short and impossible to garble into another listing. Mean 2,626 input tokens (max 8,257) per call. |
+| 2026-10-15 | **The reranker can only reorder** (`apply_ranking`): out-of-range or repeated numbers are dropped (and counted), and unranked candidates keep their retrieval order after the ranked ones. On any error, timeout or quota, the retrieval order is kept and `debug.rerank.error` says why. One candidate: no call. | Same rule as the spec's ID validation for answers: the LLM can never add a listing or undo a filter. Search never fails because of the reranker. |
+| 2026-10-15 | Rerank results are cached in `rerank_cache` (migration 004), keyed by model, prompt hash, and sha256 of the query + `top_n` + every candidate's id **and text**. | Eval re-runs cost nothing; a changed listing text never reuses a stale order. |
+| 2026-10-15 | Extraction and reranking **share one rate limiter** per Gemini model (`llm_limiter` in `app/main.py`). | They draw from the same 15 RPM / 500 RPD free quota; separate limiters would together exceed it. |
+| 2026-10-15 | **On by default** (`RERANK_ENABLED=true`); `rerank: false` per request, or `--no-rerank` in the eval, reproduces Stage 5. | Eval: Recall@10 0.996 → 1.000 (fixed `lp03`, the only vague-intent failure), at about 3× the cost per new query and +7.3 s on a cache miss. Caching hides the cost for repeated queries. Hand checks found it ignores "cheap" and slightly reduces variety (`docs/results.md`), so a price-sort hint and a per-model diversity cap are noted as follow-ups. |
+
+
 ## Verified facts
 
 ### Google Gemini API (checked 2026-10-10)

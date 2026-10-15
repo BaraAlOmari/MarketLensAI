@@ -1,0 +1,3478 @@
+{
+ "label": "Stage 6 rerank (Gemini listwise)",
+ "date": "2026-10-15 09:40 UTC",
+ "queries": 45,
+ "recall_at_10": 1.0,
+ "mrr": 1.0,
+ "zero_hit_queries": 0,
+ "short_pages": 17,
+ "empty_pages": 0,
+ "extraction": {
+  "used": 45,
+  "failed": 0,
+  "cached": 45,
+  "uncached_latency_mean_ms": null
+ },
+ "rerank": {
+  "used": 45,
+  "failed": 0,
+  "cached": 45,
+  "uncached_latency_mean_ms": null,
+  "input_tokens_mean": 2625.8444444444444
+ },
+ "latency_ms": {
+  "server_mean": 1517.431111111111,
+  "server_p95": 1490.1,
+  "wall_mean": 1520.2422222222222,
+  "cached_embeddings": 45
+ },
+ "est_cost_per_query_usd": 0.001300748888888889,
+ "groups": {
+  "lang:ar": {
+   "n": 12,
+   "recall_at_10": 1.0,
+   "mrr": 1.0
+  },
+  "lang:en": {
+   "n": 29,
+   "recall_at_10": 1.0,
+   "mrr": 1.0
+  },
+  "lang:mixed": {
+   "n": 4,
+   "recall_at_10": 1.0,
+   "mrr": 1.0
+  },
+  "tag:attribute": {
+   "n": 19,
+   "recall_at_10": 1.0,
+   "mrr": 1.0
+  },
+  "tag:brand": {
+   "n": 1,
+   "recall_at_10": 1.0,
+   "mrr": 1.0
+  },
+  "tag:condition": {
+   "n": 11,
+   "recall_at_10": 1.0,
+   "mrr": 1.0
+  },
+  "tag:currency": {
+   "n": 1,
+   "recall_at_10": 1.0,
+   "mrr": 1.0
+  },
+  "tag:item": {
+   "n": 6,
+   "recall_at_10": 1.0,
+   "mrr": 1.0
+  },
+  "tag:location": {
+   "n": 6,
+   "recall_at_10": 1.0,
+   "mrr": 1.0
+  },
+  "tag:model": {
+   "n": 18,
+   "recall_at_10": 1.0,
+   "mrr": 1.0
+  },
+  "tag:price": {
+   "n": 11,
+   "recall_at_10": 1.0,
+   "mrr": 1.0
+  },
+  "tag:rent_sale": {
+   "n": 10,
+   "recall_at_10": 1.0,
+   "mrr": 1.0
+  },
+  "tag:vague": {
+   "n": 9,
+   "recall_at_10": 1.0,
+   "mrr": 1.0
+  }
+ },
+ "failures": {
+  "wrong_results": 0,
+  "results_total": 371,
+  "by_reason": {}
+ },
+ "per_query": [
+  {
+   "id": "ph01",
+   "query": "used iPhone 15 Pro Max",
+   "lang": "en",
+   "tags": [
+    "model",
+    "condition"
+   ],
+   "relevant_count": 16,
+   "returned": [
+    "syn-qa-01983",
+    "syn-qa-00069",
+    "syn-qa-00162",
+    "syn-qa-00433",
+    "syn-qa-01659",
+    "syn-qa-01310",
+    "syn-qa-00369",
+    "syn-qa-02057",
+    "syn-qa-01560",
+    "syn-qa-00763"
+   ],
+   "hits": 10,
+   "recall_at_10": 1.0,
+   "rr": 1.0,
+   "violations": {},
+   "filters": {
+    "category": "phones",
+    "brands": [
+     "Apple"
+    ],
+    "models": [
+     "iPhone 15 Pro Max"
+    ],
+    "conditions": [
+     "like_new",
+     "good",
+     "fair",
+     "poor"
+    ]
+   },
+   "extraction": {
+    "model": "gemini-3.5-flash-lite",
+    "cached": true,
+    "latency_ms": 324.1,
+    "input_tokens": 881,
+    "output_tokens": 52,
+    "thought_tokens": 0,
+    "error": null,
+    "parse": {
+     "category": "phones",
+     "brands": [
+      "Apple"
+     ],
+     "models": [
+      "iPhone 15 Pro Max"
+     ],
+     "condition": "used"
+    },
+    "guard_notes": []
+   },
+   "rerank": {
+    "model": "gemini-3.5-flash-lite",
+    "cached": true,
+    "latency_ms": 977.8,
+    "candidates": 16,
+    "ranked": 10,
+    "invalid": 0,
+    "input_tokens": 2243,
+    "output_tokens": 55,
+    "thought_tokens": 0,
+    "error": null
+   },
+   "wall_ms": 2951.8,
+   "server_ms": {
+    "cache_lookup": 807.7,
+    "retrieve": 985.5,
+    "total": 2932.8
+   },
+   "embedding_cached": true,
+   "est_cost_usd_uncached": 0.0012089000000000002
+  },
+  {
+   "id": "ph02",
+   "query": "iPhone 16 Pro under 3000 QAR",
+   "lang": "en",
+   "tags": [
+    "model",
+    "price"
+   ],
+   "relevant_count": 13,
+   "returned": [
+    "syn-qa-01896",
+    "syn-qa-00863",
+    "syn-qa-00248",
+    "syn-qa-01370",
+    "syn-qa-01110",
+    "syn-qa-00045",
+    "syn-qa-01789",
+    "syn-qa-01693",
+    "syn-qa-00692",
+    "syn-qa-02000"
+   ],
+   "hits": 10,
+   "recall_at_10": 1.0,
+   "rr": 1.0,
+   "violations": {},
+   "filters": {
+    "category": "phones",
+    "brands": [
+     "Apple"
+    ],
+    "models": [
+     "iPhone 16 Pro"
+    ],
+    "max_price": "3000"
+   },
+   "extraction": {
+    "model": "gemini-3.5-flash-lite",
+    "cached": true,
+    "latency_ms": 324.8,
+    "input_tokens": 887,
+    "output_tokens": 80,
+    "thought_tokens": 0,
+    "error": null,
+    "parse": {
+     "category": "phones",
+     "brands": [
+      "Apple"
+     ],
+     "models": [
+      "iPhone 16 Pro"
+     ],
+     "price": {
+      "comparator": "under",
+      "amount": "3000"
+     }
+    },
+    "guard_notes": []
+   },
+   "rerank": {
+    "model": "gemini-3.5-flash-lite",
+    "cached": true,
+    "latency_ms": 326.5,
+    "candidates": 13,
+    "ranked": 10,
+    "invalid": 0,
+    "input_tokens": 1794,
+    "output_tokens": 54,
+    "thought_tokens": 0,
+    "error": null
+   },
+   "wall_ms": 1469.9,
+   "server_ms": {
+    "cache_lookup": 650.4,
+    "retrieve": 328.3,
+    "total": 1467.6
+   },
+   "embedding_cached": true,
+   "est_cost_usd_uncached": 0.0011439
+  },
+  {
+   "id": "ph03",
+   "query": "Samsung Galaxy S24 Ultra 512GB",
+   "lang": "en",
+   "tags": [
+    "model",
+    "attribute"
+   ],
+   "relevant_count": 6,
+   "returned": [
+    "syn-qa-00101",
+    "syn-qa-01450",
+    "syn-qa-01881",
+    "syn-qa-00855",
+    "syn-qa-01224",
+    "syn-qa-01817"
+   ],
+   "hits": 6,
+   "recall_at_10": 1.0,
+   "rr": 1.0,
+   "violations": {},
+   "filters": {
+    "category": "phones",
+    "brands": [
+     "Samsung"
+    ],
+    "models": [
+     "Galaxy S24 Ultra"
+    ],
+    "attributes": {
+     "storage_gb": {
+      "eq": 512
+     }
+    },
+    "keywords": [
+     "512GB"
+    ]
+   },
+   "extraction": {
+    "model": "gemini-3.5-flash-lite",
+    "cached": true,
+    "latency_ms": 326.8,
+    "input_tokens": 885,
+    "output_tokens": 72,
+    "thought_tokens": 0,
+    "error": null,
+    "parse": {
+     "category": "phones",
+     "brands": [
+      "Samsung"
+     ],
+     "models": [
+      "Galaxy S24 Ultra"
+     ],
+     "storage_gb": 512,
+     "keywords": [
+      "512GB"
+     ]
+    },
+    "guard_notes": []
+   },
+   "rerank": {
+    "model": "gemini-3.5-flash-lite",
+    "cached": true,
+    "latency_ms": 325.2,
+    "candidates": 6,
+    "ranked": 6,
+    "invalid": 0,
+    "input_tokens": 905,
+    "output_tokens": 35,
+    "thought_tokens": 0,
+    "error": null
+   },
+   "wall_ms": 1471.0,
+   "server_ms": {
+    "cache_lookup": 652.8,
+    "retrieve": 328.8,
+    "total": 1469.1
+   },
+   "embedding_cached": true,
+   "est_cost_usd_uncached": 0.0008093
+  },
+  {
+   "id": "ph04",
+   "query": "cheap android phone under 1000 riyals",
+   "lang": "en",
+   "tags": [
+    "vague",
+    "price"
+   ],
+   "relevant_count": 25,
+   "returned": [
+    "syn-qa-01238",
+    "syn-qa-00531",
+    "syn-qa-00539",
+    "syn-qa-00144",
+    "syn-qa-01786",
+    "syn-qa-01521",
+    "syn-qa-00478",
+    "syn-qa-00206",
+    "syn-qa-01432",
+    "syn-qa-00934"
+   ],
+   "hits": 10,
+   "recall_at_10": 1.0,
+   "rr": 1.0,
+   "violations": {},
+   "filters": {
+    "brands": [
+     "Google",
+     "Huawei",
+     "OnePlus",
+     "Samsung",
+     "Xiaomi"
+    ],
+    "max_price": "1000"
+   },
+   "extraction": {
+    "model": "gemini-3.5-flash-lite",
+    "cached": true,
+    "latency_ms": 323.3,
+    "input_tokens": 886,
+    "output_tokens": 75,
+    "thought_tokens": 0,
+    "error": null,
+    "parse": {
+     "brands": [
+      "Google",
+      "Huawei",
+      "OnePlus",
+      "Samsung",
+      "Xiaomi"
+     ],
+     "price": {
+      "comparator": "under",
+      "amount": "1000"
+     }
+    },
+    "guard_notes": []
+   },
+   "rerank": {
+    "model": "gemini-3.5-flash-lite",
+    "cached": true,
+    "latency_ms": 326.2,
+    "candidates": 25,
+    "ranked": 10,
+    "invalid": 0,
+    "input_tokens": 3174,
+    "output_tokens": 57,
+    "thought_tokens": 0,
+    "error": null
+   },
+   "wall_ms": 1467.6,
+   "server_ms": {
+    "cache_lookup": 648.6,
+    "retrieve": 327.5,
+    "total": 1464.7
+   },
+   "embedding_cached": true,
+   "est_cost_usd_uncached": 0.0015534
+  },
+  {
+   "id": "ph05",
+   "query": "brand new iPhone 15 Pro Max",
+   "lang": "en",
+   "tags": [
+    "model",
+    "condition"
+   ],
+   "relevant_count": 6,
+   "returned": [
+    "syn-qa-00911",
+    "syn-qa-00765",
+    "syn-qa-00039",
+    "syn-qa-01816",
+    "syn-qa-00123",
+    "syn-qa-01241"
+   ],
+   "hits": 6,
+   "recall_at_10": 1.0,
+   "rr": 1.0,
+   "violations": {},
+   "filters": {
+    "category": "phones",
+    "brands": [
+     "Apple"
+    ],
+    "models": [
+     "iPhone 15 Pro Max"
+    ],
+    "conditions": [
+     "new"
+    ]
+   },
+   "extraction": {
+    "model": "gemini-3.5-flash-lite",
+    "cached": true,
+    "latency_ms": 324.4,
+    "input_tokens": 882,
+    "output_tokens": 52,
+    "thought_tokens": 0,
+    "error": null,
+    "parse": {
+     "category": "phones",
+     "brands": [
+      "Apple"
+     ],
+     "models": [
+      "iPhone 15 Pro Max"
+     ],
+     "condition": "new"
+    },
+    "guard_notes": []
+   },
+   "rerank": {
+    "model": "gemini-3.5-flash-lite",
+    "cached": true,
+    "latency_ms": 325.3,
+    "candidates": 6,
+    "ranked": 6,
+    "invalid": 0,
+    "input_tokens": 978,
+    "output_tokens": 21,
+    "thought_tokens": 0,
+    "error": null
+   },
+   "wall_ms": 1469.2,
+   "server_ms": {
+    "cache_lookup": 648.9,
+    "retrieve": 328.2,
+    "total": 1465.7
+   },
+   "embedding_cached": true,
+   "est_cost_usd_uncached": 0.0007450999999999998
+  },
+  {
+   "id": "ph06",
+   "query": "foldable phone in like new condition",
+   "lang": "en",
+   "tags": [
+    "vague",
+    "condition"
+   ],
+   "relevant_count": 21,
+   "returned": [
+    "syn-qa-00944",
+    "syn-qa-00508",
+    "syn-qa-01492",
+    "syn-qa-01093",
+    "syn-qa-01250",
+    "syn-qa-01943",
+    "syn-qa-00422",
+    "syn-qa-00459",
+    "syn-qa-00772",
+    "syn-qa-01734"
+   ],
+   "hits": 10,
+   "recall_at_10": 1.0,
+   "rr": 1.0,
+   "violations": {},
+   "filters": {
+    "category": "phones",
+    "conditions": [
+     "new",
+     "like_new"
+    ],
+    "keywords": [
+     "foldable"
+    ]
+   },
+   "extraction": {
+    "model": "gemini-3.5-flash-lite",
+    "cached": true,
+    "latency_ms": 329.2,
+    "input_tokens": 881,
+    "output_tokens": 36,
+    "thought_tokens": 0,
+    "error": null,
+    "parse": {
+     "category": "phones",
+     "condition": "like_new",
+     "keywords": [
+      "foldable"
+     ]
+    },
+    "guard_notes": []
+   },
+   "rerank": {
+    "model": "gemini-3.5-flash-lite",
+    "cached": true,
+    "latency_ms": 327.2,
+    "candidates": 50,
+    "ranked": 10,
+    "invalid": 0,
+    "input_tokens": 5943,
+    "output_tokens": 56,
+    "thought_tokens": 0,
+    "error": null
+   },
+   "wall_ms": 1481.9,
+   "server_ms": {
+    "cache_lookup": 654.5,
+    "retrieve": 334.3,
+    "total": 1478.9
+   },
+   "embedding_cached": true,
+   "est_cost_usd_uncached": 0.0022824
+  },
+  {
+   "id": "ph07",
+   "query": "iPhone 17 Pro around $1000",
+   "lang": "en",
+   "tags": [
+    "model",
+    "price",
+    "currency"
+   ],
+   "relevant_count": 14,
+   "returned": [
+    "syn-qa-02016",
+    "syn-qa-01191",
+    "syn-qa-00078",
+    "syn-qa-01783",
+    "syn-qa-01496",
+    "syn-qa-01794",
+    "syn-qa-00839",
+    "syn-qa-01579",
+    "syn-qa-00968",
+    "syn-qa-00794"
+   ],
+   "hits": 10,
+   "recall_at_10": 1.0,
+   "rr": 1.0,
+   "violations": {},
+   "filters": {
+    "brands": [
+     "Apple"
+    ],
+    "models": [
+     "iPhone 17 Pro"
+    ],
+    "min_price": "850.00",
+    "max_price": "1150.00",
+    "currency": "USD"
+   },
+   "extraction": {
+    "model": "gemini-3.5-flash-lite",
+    "cached": true,
+    "latency_ms": 325.9,
+    "input_tokens": 885,
+    "output_tokens": 71,
+    "thought_tokens": 0,
+    "error": null,
+    "parse": {
+     "brands": [
+      "Apple"
+     ],
+     "models": [
+      "iPhone 17 Pro"
+     ],
+     "price": {
+      "comparator": "around",
+      "amount": "1000",
+      "currency": "USD"
+     }
+    },
+    "guard_notes": []
+   },
+   "rerank": {
+    "model": "gemini-3.5-flash-lite",
+    "cached": true,
+    "latency_ms": 324.4,
+    "candidates": 14,
+    "ranked": 10,
+    "invalid": 0,
+    "input_tokens": 1937,
+    "output_tokens": 72,
+    "thought_tokens": 0,
+    "error": null
+   },
+   "wall_ms": 1471.9,
+   "server_ms": {
+    "cache_lookup": 652.9,
+    "retrieve": 330.0,
+    "total": 1470.0
+   },
+   "embedding_cached": true,
+   "est_cost_usd_uncached": 0.0012085
+  },
+  {
+   "id": "ph08",
+   "query": "ايفون 16 بحالة ممتازة",
+   "lang": "ar",
+   "tags": [
+    "model",
+    "condition"
+   ],
+   "relevant_count": 8,
+   "returned": [
+    "syn-qa-02164",
+    "syn-qa-00070",
+    "syn-qa-00739",
+    "syn-qa-01371",
+    "syn-qa-00580",
+    "syn-qa-01117",
+    "syn-qa-01097",
+    "syn-qa-00006"
+   ],
+   "hits": 8,
+   "recall_at_10": 1.0,
+   "rr": 1.0,
+   "violations": {},
+   "filters": {
+    "category": "phones",
+    "brands": [
+     "Apple"
+    ],
+    "models": [
+     "iPhone 16"
+    ],
+    "conditions": [
+     "like_new",
+     "good"
+    ]
+   },
+   "extraction": {
+    "model": "gemini-3.5-flash-lite",
+    "cached": true,
+    "latency_ms": 331.0,
+    "input_tokens": 885,
+    "output_tokens": 50,
+    "thought_tokens": 0,
+    "error": null,
+    "parse": {
+     "category": "phones",
+     "brands": [
+      "Apple"
+     ],
+     "models": [
+      "iPhone 16"
+     ],
+     "condition": "great"
+    },
+    "guard_notes": []
+   },
+   "rerank": {
+    "model": "gemini-3.5-flash-lite",
+    "cached": true,
+    "latency_ms": 326.2,
+    "candidates": 8,
+    "ranked": 8,
+    "invalid": 0,
+    "input_tokens": 1213,
+    "output_tokens": 43,
+    "thought_tokens": 0,
+    "error": null
+   },
+   "wall_ms": 1474.8,
+   "server_ms": {
+    "cache_lookup": 657.8,
+    "retrieve": 327.3,
+    "total": 1472.8
+   },
+   "embedding_cached": true,
+   "est_cost_usd_uncached": 0.0008659
+  },
+  {
+   "id": "ph09",
+   "query": "سامسونج جالكسي S25 الترا جديد",
+   "lang": "ar",
+   "tags": [
+    "model",
+    "condition"
+   ],
+   "relevant_count": 2,
+   "returned": [
+    "syn-qa-00960",
+    "syn-qa-01424"
+   ],
+   "hits": 2,
+   "recall_at_10": 1.0,
+   "rr": 1.0,
+   "violations": {},
+   "filters": {
+    "category": "phones",
+    "brands": [
+     "Samsung"
+    ],
+    "models": [
+     "Galaxy S25 Ultra"
+    ],
+    "conditions": [
+     "new"
+    ],
+    "keywords": [
+     "Ultra"
+    ]
+   },
+   "extraction": {
+    "model": "gemini-3.5-flash-lite",
+    "cached": true,
+    "latency_ms": 324.2,
+    "input_tokens": 886,
+    "output_tokens": 65,
+    "thought_tokens": 0,
+    "error": null,
+    "parse": {
+     "category": "phones",
+     "brands": [
+      "Samsung"
+     ],
+     "models": [
+      "Galaxy S25 Ultra"
+     ],
+     "condition": "new",
+     "keywords": [
+      "Ultra"
+     ]
+    },
+    "guard_notes": []
+   },
+   "rerank": {
+    "model": "gemini-3.5-flash-lite",
+    "cached": true,
+    "latency_ms": 325.6,
+    "candidates": 2,
+    "ranked": 2,
+    "invalid": 0,
+    "input_tokens": 438,
+    "output_tokens": 19,
+    "thought_tokens": 0,
+    "error": null
+   },
+   "wall_ms": 1467.0,
+   "server_ms": {
+    "cache_lookup": 650.7,
+    "retrieve": 327.0,
+    "total": 1465.1
+   },
+   "embedding_cached": true,
+   "est_cost_usd_uncached": 0.0006119999999999999
+  },
+  {
+   "id": "ph10",
+   "query": "iPhone 14 نظيف أقل من 1500 ريال",
+   "lang": "mixed",
+   "tags": [
+    "model",
+    "price"
+   ],
+   "relevant_count": 16,
+   "returned": [
+    "syn-qa-01508",
+    "syn-qa-01567",
+    "syn-qa-01438",
+    "syn-qa-00172",
+    "syn-qa-01832",
+    "syn-qa-00210",
+    "syn-qa-01981",
+    "syn-qa-00121",
+    "syn-qa-01346",
+    "syn-qa-01765"
+   ],
+   "hits": 10,
+   "recall_at_10": 1.0,
+   "rr": 1.0,
+   "violations": {},
+   "filters": {
+    "category": "phones",
+    "brands": [
+     "Apple"
+    ],
+    "models": [
+     "iPhone 14"
+    ],
+    "max_price": "1500"
+   },
+   "extraction": {
+    "model": "gemini-3.5-flash-lite",
+    "cached": true,
+    "latency_ms": 325.3,
+    "input_tokens": 888,
+    "output_tokens": 79,
+    "thought_tokens": 0,
+    "error": null,
+    "parse": {
+     "category": "phones",
+     "brands": [
+      "Apple"
+     ],
+     "models": [
+      "iPhone 14"
+     ],
+     "price": {
+      "comparator": "under",
+      "amount": "1500"
+     }
+    },
+    "guard_notes": []
+   },
+   "rerank": {
+    "model": "gemini-3.5-flash-lite",
+    "cached": true,
+    "latency_ms": 325.6,
+    "candidates": 16,
+    "ranked": 10,
+    "invalid": 0,
+    "input_tokens": 2149,
+    "output_tokens": 55,
+    "thought_tokens": 0,
+    "error": null
+   },
+   "wall_ms": 1468.1,
+   "server_ms": {
+    "cache_lookup": 650.4,
+    "retrieve": 327.1,
+    "total": 1465.9
+   },
+   "embedding_cached": true,
+   "est_cost_usd_uncached": 0.0012508999999999999
+  },
+  {
+   "id": "lp01",
+   "query": "MacBook Air M4 with 16GB RAM",
+   "lang": "en",
+   "tags": [
+    "model",
+    "attribute"
+   ],
+   "relevant_count": 33,
+   "returned": [
+    "syn-qa-01692",
+    "syn-qa-01455",
+    "syn-qa-00362",
+    "syn-qa-01459",
+    "syn-qa-00710",
+    "syn-qa-00174",
+    "syn-qa-00665",
+    "syn-qa-00787",
+    "syn-qa-00017",
+    "syn-qa-01565"
+   ],
+   "hits": 10,
+   "recall_at_10": 1.0,
+   "rr": 1.0,
+   "violations": {},
+   "filters": {
+    "category": "laptops",
+    "brands": [
+     "Apple"
+    ],
+    "models": [
+     "MacBook Air 13 M4",
+     "MacBook Air 15 M4"
+    ],
+    "attributes": {
+     "ram_gb": {
+      "min": "16"
+     }
+    },
+    "keywords": [
+     "16GB",
+     "M4"
+    ]
+   },
+   "extraction": {
+    "model": "gemini-3.5-flash-lite",
+    "cached": true,
+    "latency_ms": 325.8,
+    "input_tokens": 885,
+    "output_tokens": 94,
+    "thought_tokens": 0,
+    "error": null,
+    "parse": {
+     "category": "laptops",
+     "brands": [
+      "Apple"
+     ],
+     "models": [
+      "MacBook Air 13 M4",
+      "MacBook Air 15 M4"
+     ],
+     "min_ram_gb": 16,
+     "keywords": [
+      "16GB",
+      "M4"
+     ]
+    },
+    "guard_notes": []
+   },
+   "rerank": {
+    "model": "gemini-3.5-flash-lite",
+    "cached": true,
+    "latency_ms": 325.9,
+    "candidates": 33,
+    "ranked": 7,
+    "invalid": 0,
+    "input_tokens": 4967,
+    "output_tokens": 42,
+    "thought_tokens": 0,
+    "error": null
+   },
+   "wall_ms": 1471.5,
+   "server_ms": {
+    "cache_lookup": 649.9,
+    "retrieve": 329.9,
+    "total": 1468.2
+   },
+   "embedding_cached": true,
+   "est_cost_usd_uncached": 0.0021002
+  },
+  {
+   "id": "lp02",
+   "query": "gaming laptop under 4000 QAR",
+   "lang": "en",
+   "tags": [
+    "vague",
+    "price"
+   ],
+   "relevant_count": 82,
+   "returned": [
+    "syn-qa-00177",
+    "syn-qa-01135",
+    "syn-qa-00664",
+    "syn-qa-00902",
+    "syn-qa-00648",
+    "syn-qa-01596",
+    "syn-qa-00338",
+    "syn-qa-01473",
+    "syn-qa-01451",
+    "syn-qa-00985"
+   ],
+   "hits": 10,
+   "recall_at_10": 1.0,
+   "rr": 1.0,
+   "violations": {},
+   "filters": {
+    "category": "laptops",
+    "max_price": "4000"
+   },
+   "extraction": {
+    "model": "gemini-3.5-flash-lite",
+    "cached": true,
+    "latency_ms": 328.8,
+    "input_tokens": 884,
+    "output_tokens": 49,
+    "thought_tokens": 0,
+    "error": null,
+    "parse": {
+     "category": "laptops",
+     "price": {
+      "comparator": "under",
+      "amount": "4000"
+     }
+    },
+    "guard_notes": []
+   },
+   "rerank": {
+    "model": "gemini-3.5-flash-lite",
+    "cached": true,
+    "latency_ms": 325.7,
+    "candidates": 50,
+    "ranked": 10,
+    "invalid": 0,
+    "input_tokens": 8242,
+    "output_tokens": 60,
+    "thought_tokens": 0,
+    "error": null
+   },
+   "wall_ms": 1482.6,
+   "server_ms": {
+    "cache_lookup": 655.6,
+    "retrieve": 335.9,
+    "total": 1480.2
+   },
+   "embedding_cached": true,
+   "est_cost_usd_uncached": 0.0030148999999999996
+  },
+  {
+   "id": "lp03",
+   "query": "lightweight laptop for a university student in good condition",
+   "lang": "en",
+   "tags": [
+    "vague",
+    "condition"
+   ],
+   "relevant_count": 118,
+   "returned": [
+    "syn-qa-01462",
+    "syn-qa-01008",
+    "syn-qa-00486",
+    "syn-qa-00882",
+    "syn-qa-00709",
+    "syn-qa-01139",
+    "syn-qa-00279",
+    "syn-qa-01576",
+    "syn-qa-00003",
+    "syn-qa-01352"
+   ],
+   "hits": 10,
+   "recall_at_10": 1.0,
+   "rr": 1.0,
+   "violations": {},
+   "filters": {
+    "category": "laptops",
+    "conditions": [
+     "new",
+     "like_new",
+     "good"
+    ]
+   },
+   "extraction": {
+    "model": "gemini-3.5-flash-lite",
+    "cached": true,
+    "latency_ms": 324.1,
+    "input_tokens": 884,
+    "output_tokens": 20,
+    "thought_tokens": 0,
+    "error": null,
+    "parse": {
+     "category": "laptops",
+     "condition": "good"
+    },
+    "guard_notes": []
+   },
+   "rerank": {
+    "model": "gemini-3.5-flash-lite",
+    "cached": true,
+    "latency_ms": 327.0,
+    "candidates": 50,
+    "ranked": 10,
+    "invalid": 0,
+    "input_tokens": 7263,
+    "output_tokens": 58,
+    "thought_tokens": 0,
+    "error": null
+   },
+   "wall_ms": 1472.2,
+   "server_ms": {
+    "cache_lookup": 647.9,
+    "retrieve": 333.6,
+    "total": 1470.2
+   },
+   "embedding_cached": true,
+   "est_cost_usd_uncached": 0.0026463000000000003
+  },
+  {
+   "id": "lp04",
+   "query": "Dell XPS 13 like new",
+   "lang": "en",
+   "tags": [
+    "model",
+    "condition"
+   ],
+   "relevant_count": 10,
+   "returned": [
+    "syn-qa-01992",
+    "syn-qa-00382",
+    "syn-qa-02061",
+    "syn-qa-02188",
+    "syn-qa-00511",
+    "syn-qa-00341",
+    "syn-qa-00203",
+    "syn-qa-00950",
+    "syn-qa-00735",
+    "syn-qa-00005"
+   ],
+   "hits": 10,
+   "recall_at_10": 1.0,
+   "rr": 1.0,
+   "violations": {},
+   "filters": {
+    "category": "laptops",
+    "brands": [
+     "Dell"
+    ],
+    "models": [
+     "XPS 13"
+    ],
+    "conditions": [
+     "new",
+     "like_new"
+    ]
+   },
+   "extraction": {
+    "model": "gemini-3.5-flash-lite",
+    "cached": true,
+    "latency_ms": 325.7,
+    "input_tokens": 881,
+    "output_tokens": 54,
+    "thought_tokens": 0,
+    "error": null,
+    "parse": {
+     "category": "laptops",
+     "brands": [
+      "Dell"
+     ],
+     "models": [
+      "XPS 13"
+     ],
+     "condition": "like_new"
+    },
+    "guard_notes": []
+   },
+   "rerank": {
+    "model": "gemini-3.5-flash-lite",
+    "cached": true,
+    "latency_ms": 326.0,
+    "candidates": 10,
+    "ranked": 10,
+    "invalid": 0,
+    "input_tokens": 1584,
+    "output_tokens": 52,
+    "thought_tokens": 0,
+    "error": null
+   },
+   "wall_ms": 1470.9,
+   "server_ms": {
+    "cache_lookup": 653.1,
+    "retrieve": 327.6,
+    "total": 1468.8
+   },
+   "embedding_cached": true,
+   "est_cost_usd_uncached": 0.0010084999999999998
+  },
+  {
+   "id": "lp05",
+   "query": "MacBook Pro M4 Max 1TB",
+   "lang": "en",
+   "tags": [
+    "model",
+    "attribute"
+   ],
+   "relevant_count": 10,
+   "returned": [
+    "syn-qa-00339",
+    "syn-qa-02106",
+    "syn-qa-01282",
+    "syn-qa-00325",
+    "syn-qa-01759",
+    "syn-qa-00327",
+    "syn-qa-01223",
+    "syn-qa-01230",
+    "syn-qa-00319",
+    "syn-qa-00183"
+   ],
+   "hits": 10,
+   "recall_at_10": 1.0,
+   "rr": 1.0,
+   "violations": {},
+   "filters": {
+    "category": "laptops",
+    "brands": [
+     "Apple"
+    ],
+    "models": [
+     "MacBook Pro 16 M4 Max"
+    ],
+    "attributes": {
+     "storage_gb": {
+      "eq": 1024
+     }
+    },
+    "keywords": [
+     "1TB"
+    ]
+   },
+   "extraction": {
+    "model": "gemini-3.5-flash-lite",
+    "cached": true,
+    "latency_ms": 329.4,
+    "input_tokens": 883,
+    "output_tokens": 76,
+    "thought_tokens": 0,
+    "error": null,
+    "parse": {
+     "category": "laptops",
+     "brands": [
+      "Apple"
+     ],
+     "models": [
+      "MacBook Pro 16 M4 Max"
+     ],
+     "storage_gb": 1024,
+     "keywords": [
+      "1TB"
+     ]
+    },
+    "guard_notes": []
+   },
+   "rerank": {
+    "model": "gemini-3.5-flash-lite",
+    "cached": true,
+    "latency_ms": 337.4,
+    "candidates": 10,
+    "ranked": 10,
+    "invalid": 0,
+    "input_tokens": 1653,
+    "output_tokens": 52,
+    "thought_tokens": 0,
+    "error": null
+   },
+   "wall_ms": 1492.7,
+   "server_ms": {
+    "cache_lookup": 660.4,
+    "retrieve": 329.9,
+    "total": 1490.1
+   },
+   "embedding_cached": true,
+   "est_cost_usd_uncached": 0.001085
+  },
+  {
+   "id": "lp06",
+   "query": "لابتوب قيمنق مستعمل",
+   "lang": "ar",
+   "tags": [
+    "vague",
+    "condition"
+   ],
+   "relevant_count": 84,
+   "returned": [
+    "syn-qa-00810",
+    "syn-qa-01135",
+    "syn-qa-01929",
+    "syn-qa-00338",
+    "syn-qa-00985",
+    "syn-qa-00200",
+    "syn-qa-00723",
+    "syn-qa-00776",
+    "syn-qa-01451",
+    "syn-qa-01668"
+   ],
+   "hits": 10,
+   "recall_at_10": 1.0,
+   "rr": 1.0,
+   "violations": {},
+   "filters": {
+    "category": "laptops",
+    "conditions": [
+     "like_new",
+     "good",
+     "fair",
+     "poor"
+    ]
+   },
+   "extraction": {
+    "model": "gemini-3.5-flash-lite",
+    "cached": true,
+    "latency_ms": 324.8,
+    "input_tokens": 882,
+    "output_tokens": 20,
+    "thought_tokens": 0,
+    "error": null,
+    "parse": {
+     "category": "laptops",
+     "condition": "used"
+    },
+    "guard_notes": []
+   },
+   "rerank": {
+    "model": "gemini-3.5-flash-lite",
+    "cached": true,
+    "latency_ms": 325.2,
+    "candidates": 50,
+    "ranked": 10,
+    "invalid": 0,
+    "input_tokens": 8257,
+    "output_tokens": 58,
+    "thought_tokens": 0,
+    "error": null
+   },
+   "wall_ms": 1476.7,
+   "server_ms": {
+    "cache_lookup": 652.4,
+    "retrieve": 333.1,
+    "total": 1473.0
+   },
+   "embedding_cached": true,
+   "est_cost_usd_uncached": 0.0029407
+  },
+  {
+   "id": "lp07",
+   "query": "ماك بوك اير للبيع",
+   "lang": "ar",
+   "tags": [
+    "model"
+   ],
+   "relevant_count": 54,
+   "returned": [
+    "syn-qa-00131",
+    "syn-qa-00216",
+    "syn-qa-02091",
+    "syn-qa-00917",
+    "syn-qa-01835",
+    "syn-qa-00731",
+    "syn-qa-01351",
+    "syn-qa-00258",
+    "syn-qa-01247",
+    "syn-qa-01828"
+   ],
+   "hits": 10,
+   "recall_at_10": 1.0,
+   "rr": 1.0,
+   "violations": {},
+   "filters": {
+    "category": "laptops",
+    "brands": [
+     "Apple"
+    ],
+    "models": [
+     "MacBook Air 13 M2",
+     "MacBook Air 13 M4",
+     "MacBook Air 15 M4"
+    ]
+   },
+   "extraction": {
+    "model": "gemini-3.5-flash-lite",
+    "cached": true,
+    "latency_ms": 324.3,
+    "input_tokens": 882,
+    "output_tokens": 81,
+    "thought_tokens": 0,
+    "error": null,
+    "parse": {
+     "category": "laptops",
+     "brands": [
+      "Apple"
+     ],
+     "models": [
+      "MacBook Air 13 M2",
+      "MacBook Air 13 M4",
+      "MacBook Air 15 M4"
+     ],
+     "listing_type": "sale"
+    },
+    "guard_notes": [
+     "listing_type:not for laptops"
+    ]
+   },
+   "rerank": {
+    "model": "gemini-3.5-flash-lite",
+    "cached": true,
+    "latency_ms": 325.7,
+    "candidates": 50,
+    "ranked": 10,
+    "invalid": 0,
+    "input_tokens": 7496,
+    "output_tokens": 58,
+    "thought_tokens": 0,
+    "error": null
+   },
+   "wall_ms": 1474.6,
+   "server_ms": {
+    "cache_lookup": 650.7,
+    "retrieve": 332.7,
+    "total": 1471.9
+   },
+   "embedding_cached": true,
+   "est_cost_usd_uncached": 0.0028647000000000004
+  },
+  {
+   "id": "car01",
+   "query": "Toyota Land Cruiser 2020 or newer",
+   "lang": "en",
+   "tags": [
+    "model",
+    "attribute"
+   ],
+   "relevant_count": 9,
+   "returned": [
+    "syn-qa-01624",
+    "syn-qa-00391",
+    "syn-qa-02059",
+    "syn-qa-00900",
+    "syn-qa-00728",
+    "syn-qa-00524",
+    "syn-qa-00276",
+    "syn-qa-01027",
+    "syn-qa-01651"
+   ],
+   "hits": 9,
+   "recall_at_10": 1.0,
+   "rr": 1.0,
+   "violations": {},
+   "filters": {
+    "category": "cars",
+    "brands": [
+     "Toyota"
+    ],
+    "models": [
+     "Land Cruiser"
+    ],
+    "attributes": {
+     "year": {
+      "min": "2020"
+     }
+    }
+   },
+   "extraction": {
+    "model": "gemini-3.5-flash-lite",
+    "cached": true,
+    "latency_ms": 324.7,
+    "input_tokens": 884,
+    "output_tokens": 52,
+    "thought_tokens": 0,
+    "error": null,
+    "parse": {
+     "category": "cars",
+     "brands": [
+      "Toyota"
+     ],
+     "models": [
+      "Land Cruiser"
+     ],
+     "min_year": 2020
+    },
+    "guard_notes": []
+   },
+   "rerank": {
+    "model": "gemini-3.5-flash-lite",
+    "cached": true,
+    "latency_ms": 325.2,
+    "candidates": 9,
+    "ranked": 9,
+    "invalid": 0,
+    "input_tokens": 1399,
+    "output_tokens": 48,
+    "thought_tokens": 0,
+    "error": null
+   },
+   "wall_ms": 1467.6,
+   "server_ms": {
+    "cache_lookup": 650.0,
+    "retrieve": 327.8,
+    "total": 1465.5
+   },
+   "embedding_cached": true,
+   "est_cost_usd_uncached": 0.0009399
+  },
+  {
+   "id": "car02",
+   "query": "used Nissan Patrol under 150,000 QAR",
+   "lang": "en",
+   "tags": [
+    "model",
+    "condition",
+    "price"
+   ],
+   "relevant_count": 3,
+   "returned": [
+    "syn-qa-01528",
+    "syn-qa-01013",
+    "syn-qa-01360"
+   ],
+   "hits": 3,
+   "recall_at_10": 1.0,
+   "rr": 1.0,
+   "violations": {},
+   "filters": {
+    "category": "cars",
+    "brands": [
+     "Nissan"
+    ],
+    "models": [
+     "Patrol"
+    ],
+    "conditions": [
+     "like_new",
+     "good",
+     "fair",
+     "poor"
+    ],
+    "max_price": "150000"
+   },
+   "extraction": {
+    "model": "gemini-3.5-flash-lite",
+    "cached": true,
+    "latency_ms": 326.3,
+    "input_tokens": 888,
+    "output_tokens": 87,
+    "thought_tokens": 0,
+    "error": null,
+    "parse": {
+     "category": "cars",
+     "brands": [
+      "Nissan"
+     ],
+     "models": [
+      "Patrol"
+     ],
+     "condition": "used",
+     "price": {
+      "comparator": "under",
+      "amount": "150000"
+     }
+    },
+    "guard_notes": []
+   },
+   "rerank": {
+    "model": "gemini-3.5-flash-lite",
+    "cached": true,
+    "latency_ms": 331.8,
+    "candidates": 3,
+    "ranked": 3,
+    "invalid": 0,
+    "input_tokens": 595,
+    "output_tokens": 23,
+    "thought_tokens": 0,
+    "error": null
+   },
+   "wall_ms": 1474.2,
+   "server_ms": {
+    "cache_lookup": 650.9,
+    "retrieve": 327.7,
+    "total": 1472.4
+   },
+   "embedding_cached": true,
+   "est_cost_usd_uncached": 0.0007251
+  },
+  {
+   "id": "car03",
+   "query": "SUV with less than 50,000 km",
+   "lang": "en",
+   "tags": [
+    "vague",
+    "attribute"
+   ],
+   "relevant_count": 91,
+   "returned": [
+    "syn-qa-02150",
+    "syn-qa-01482",
+    "syn-qa-00728",
+    "syn-qa-00918",
+    "syn-qa-01708",
+    "syn-qa-00916",
+    "syn-qa-01067",
+    "syn-qa-01349",
+    "syn-qa-00066",
+    "syn-qa-02055"
+   ],
+   "hits": 10,
+   "recall_at_10": 1.0,
+   "rr": 1.0,
+   "violations": {},
+   "filters": {
+    "category": "cars",
+    "attributes": {
+     "mileage_km": {
+      "max": "50000"
+     }
+    }
+   },
+   "extraction": {
+    "model": "gemini-3.5-flash-lite",
+    "cached": true,
+    "latency_ms": 325.6,
+    "input_tokens": 886,
+    "output_tokens": 27,
+    "thought_tokens": 0,
+    "error": null,
+    "parse": {
+     "category": "cars",
+     "max_mileage_km": 50000
+    },
+    "guard_notes": []
+   },
+   "rerank": {
+    "model": "gemini-3.5-flash-lite",
+    "cached": true,
+    "latency_ms": 328.8,
+    "candidates": 50,
+    "ranked": 10,
+    "invalid": 0,
+    "input_tokens": 6801,
+    "output_tokens": 55,
+    "thought_tokens": 0,
+    "error": null
+   },
+   "wall_ms": 1481.1,
+   "server_ms": {
+    "cache_lookup": 651.3,
+    "retrieve": 336.6,
+    "total": 1479.2
+   },
+   "embedding_cached": true,
+   "est_cost_usd_uncached": 0.0025156999999999996
+  },
+  {
+   "id": "car04",
+   "query": "cheap sedan for daily commute under 40k",
+   "lang": "en",
+   "tags": [
+    "vague",
+    "price"
+   ],
+   "relevant_count": 54,
+   "returned": [
+    "syn-qa-00952",
+    "syn-qa-00460",
+    "syn-qa-00437",
+    "syn-qa-00451",
+    "syn-qa-01092",
+    "syn-qa-01732",
+    "syn-qa-01274",
+    "syn-qa-00538",
+    "syn-qa-01458",
+    "syn-qa-00471"
+   ],
+   "hits": 10,
+   "recall_at_10": 1.0,
+   "rr": 1.0,
+   "violations": {},
+   "filters": {
+    "category": "cars",
+    "max_price": "40000"
+   },
+   "extraction": {
+    "model": "gemini-3.5-flash-lite",
+    "cached": true,
+    "latency_ms": 325.2,
+    "input_tokens": 884,
+    "output_tokens": 49,
+    "thought_tokens": 0,
+    "error": null,
+    "parse": {
+     "category": "cars",
+     "price": {
+      "comparator": "under",
+      "amount": "40000"
+     }
+    },
+    "guard_notes": []
+   },
+   "rerank": {
+    "model": "gemini-3.5-flash-lite",
+    "cached": true,
+    "latency_ms": 327.0,
+    "candidates": 50,
+    "ranked": 10,
+    "invalid": 0,
+    "input_tokens": 6924,
+    "output_tokens": 56,
+    "thought_tokens": 0,
+    "error": null
+   },
+   "wall_ms": 1470.2,
+   "server_ms": {
+    "cache_lookup": 650.4,
+    "retrieve": 328.9,
+    "total": 1467.7
+   },
+   "embedding_cached": true,
+   "est_cost_usd_uncached": 0.0026105
+  },
+  {
+   "id": "car05",
+   "query": "Tesla Model Y",
+   "lang": "en",
+   "tags": [
+    "model"
+   ],
+   "relevant_count": 11,
+   "returned": [
+    "syn-qa-00492",
+    "syn-qa-01245",
+    "syn-qa-00229",
+    "syn-qa-01664",
+    "syn-qa-00948",
+    "syn-qa-01638",
+    "syn-qa-01798",
+    "syn-qa-00038",
+    "syn-qa-01319",
+    "syn-qa-00154"
+   ],
+   "hits": 10,
+   "recall_at_10": 1.0,
+   "rr": 1.0,
+   "violations": {},
+   "filters": {
+    "models": [
+     "Model Y"
+    ]
+   },
+   "extraction": {
+    "model": "gemini-3.5-flash-lite",
+    "cached": true,
+    "latency_ms": 326.8,
+    "input_tokens": 877,
+    "output_tokens": 27,
+    "thought_tokens": 0,
+    "error": null,
+    "parse": {
+     "models": [
+      "Model Y"
+     ],
+     "bedrooms": 0
+    },
+    "guard_notes": [
+     "bedrooms:not for unknown category"
+    ]
+   },
+   "rerank": {
+    "model": "gemini-3.5-flash-lite",
+    "cached": true,
+    "latency_ms": 325.7,
+    "candidates": 11,
+    "ranked": 10,
+    "invalid": 0,
+    "input_tokens": 1661,
+    "output_tokens": 38,
+    "thought_tokens": 0,
+    "error": null
+   },
+   "wall_ms": 1471.7,
+   "server_ms": {
+    "cache_lookup": 650.8,
+    "retrieve": 329.4,
+    "total": 1468.1
+   },
+   "embedding_cached": true,
+   "est_cost_usd_uncached": 0.0009272999999999999
+  },
+  {
+   "id": "car06",
+   "query": "Range Rover Sport GCC specs accident free",
+   "lang": "en",
+   "tags": [
+    "model",
+    "attribute"
+   ],
+   "relevant_count": 11,
+   "returned": [
+    "syn-qa-01022",
+    "syn-qa-01184",
+    "syn-qa-01993",
+    "syn-qa-00860",
+    "syn-qa-01570",
+    "syn-qa-00010",
+    "syn-qa-01969",
+    "syn-qa-00285",
+    "syn-qa-01708",
+    "syn-qa-01827"
+   ],
+   "hits": 10,
+   "recall_at_10": 1.0,
+   "rr": 1.0,
+   "violations": {},
+   "filters": {
+    "category": "cars",
+    "models": [
+     "Range Rover Sport"
+    ],
+    "attributes": {
+     "gcc_specs": {
+      "eq": true
+     },
+     "accident_free": {
+      "eq": true
+     }
+    }
+   },
+   "extraction": {
+    "model": "gemini-3.5-flash-lite",
+    "cached": true,
+    "latency_ms": 323.6,
+    "input_tokens": 881,
+    "output_tokens": 44,
+    "thought_tokens": 0,
+    "error": null,
+    "parse": {
+     "category": "cars",
+     "models": [
+      "Range Rover Sport"
+     ],
+     "gcc_specs": true,
+     "accident_free": true
+    },
+    "guard_notes": []
+   },
+   "rerank": {
+    "model": "gemini-3.5-flash-lite",
+    "cached": true,
+    "latency_ms": 325.7,
+    "candidates": 11,
+    "ranked": 10,
+    "invalid": 0,
+    "input_tokens": 1665,
+    "output_tokens": 57,
+    "thought_tokens": 0,
+    "error": null
+   },
+   "wall_ms": 1466.8,
+   "server_ms": {
+    "cache_lookup": 648.4,
+    "retrieve": 327.3,
+    "total": 1463.6
+   },
+   "embedding_cached": true,
+   "est_cost_usd_uncached": 0.0010219
+  },
+  {
+   "id": "car07",
+   "query": "لاندكروزر برادو للبيع",
+   "lang": "ar",
+   "tags": [
+    "model"
+   ],
+   "relevant_count": 13,
+   "returned": [
+    "syn-qa-00712",
+    "syn-qa-00861",
+    "syn-qa-01482",
+    "syn-qa-00970",
+    "syn-qa-01844",
+    "syn-qa-01207",
+    "syn-qa-00880",
+    "syn-qa-00786",
+    "syn-qa-02131",
+    "syn-qa-01885"
+   ],
+   "hits": 10,
+   "recall_at_10": 1.0,
+   "rr": 1.0,
+   "violations": {},
+   "filters": {
+    "category": "cars",
+    "models": [
+     "Land Cruiser Prado"
+    ]
+   },
+   "extraction": {
+    "model": "gemini-3.5-flash-lite",
+    "cached": true,
+    "latency_ms": 325.3,
+    "input_tokens": 883,
+    "output_tokens": 37,
+    "thought_tokens": 0,
+    "error": null,
+    "parse": {
+     "category": "cars",
+     "models": [
+      "Land Cruiser Prado"
+     ],
+     "listing_type": "sale"
+    },
+    "guard_notes": [
+     "listing_type:not for cars"
+    ]
+   },
+   "rerank": {
+    "model": "gemini-3.5-flash-lite",
+    "cached": true,
+    "latency_ms": 325.6,
+    "candidates": 13,
+    "ranked": 10,
+    "invalid": 0,
+    "input_tokens": 1944,
+    "output_tokens": 67,
+    "thought_tokens": 0,
+    "error": null
+   },
+   "wall_ms": 1474.6,
+   "server_ms": {
+    "cache_lookup": 654.5,
+    "retrieve": 329.7,
+    "total": 1472.1
+   },
+   "embedding_cached": true,
+   "est_cost_usd_uncached": 0.0011121
+  },
+  {
+   "id": "car08",
+   "query": "سيارة سيدان اقتصادية اقل من 30 الف",
+   "lang": "ar",
+   "tags": [
+    "vague",
+    "price"
+   ],
+   "relevant_count": 47,
+   "returned": [
+    "syn-qa-01092",
+    "syn-qa-00437",
+    "syn-qa-00451",
+    "syn-qa-01304",
+    "syn-qa-01544",
+    "syn-qa-00094",
+    "syn-qa-00220",
+    "syn-qa-00719",
+    "syn-qa-00813",
+    "syn-qa-01118"
+   ],
+   "hits": 10,
+   "recall_at_10": 1.0,
+   "rr": 1.0,
+   "violations": {},
+   "filters": {
+    "category": "cars",
+    "max_price": "30000"
+   },
+   "extraction": {
+    "model": "gemini-3.5-flash-lite",
+    "cached": true,
+    "latency_ms": 325.5,
+    "input_tokens": 887,
+    "output_tokens": 49,
+    "thought_tokens": 0,
+    "error": null,
+    "parse": {
+     "category": "cars",
+     "price": {
+      "comparator": "under",
+      "amount": "30000"
+     }
+    },
+    "guard_notes": []
+   },
+   "rerank": {
+    "model": "gemini-3.5-flash-lite",
+    "cached": true,
+    "latency_ms": 325.0,
+    "candidates": 50,
+    "ranked": 10,
+    "invalid": 0,
+    "input_tokens": 7112,
+    "output_tokens": 39,
+    "thought_tokens": 0,
+    "error": null
+   },
+   "wall_ms": 1471.4,
+   "server_ms": {
+    "cache_lookup": 651.4,
+    "retrieve": 330.6,
+    "total": 1468.8
+   },
+   "embedding_cached": true,
+   "est_cost_usd_uncached": 0.0026249
+  },
+  {
+   "id": "car09",
+   "query": "G63 AMG ممشى قليل",
+   "lang": "mixed",
+   "tags": [
+    "model",
+    "attribute",
+    "vague"
+   ],
+   "relevant_count": 6,
+   "returned": [
+    "syn-qa-01953",
+    "syn-qa-01781",
+    "syn-qa-01880",
+    "syn-qa-00149",
+    "syn-qa-02017",
+    "syn-qa-01167"
+   ],
+   "hits": 6,
+   "recall_at_10": 1.0,
+   "rr": 1.0,
+   "violations": {},
+   "filters": {
+    "category": "cars",
+    "models": [
+     "G 63 AMG"
+    ],
+    "attributes": {
+     "mileage_km": {
+      "max": "50000"
+     }
+    }
+   },
+   "extraction": {
+    "model": "gemini-3.5-flash-lite",
+    "cached": true,
+    "latency_ms": 326.6,
+    "input_tokens": 882,
+    "output_tokens": 38,
+    "thought_tokens": 0,
+    "error": null,
+    "parse": {
+     "category": "cars",
+     "models": [
+      "G 63 AMG"
+     ],
+     "low_mileage": true
+    },
+    "guard_notes": []
+   },
+   "rerank": {
+    "model": "gemini-3.5-flash-lite",
+    "cached": true,
+    "latency_ms": 332.9,
+    "candidates": 6,
+    "ranked": 6,
+    "invalid": 0,
+    "input_tokens": 1015,
+    "output_tokens": 35,
+    "thought_tokens": 0,
+    "error": null
+   },
+   "wall_ms": 1477.6,
+   "server_ms": {
+    "cache_lookup": 652.3,
+    "retrieve": 328.6,
+    "total": 1475.9
+   },
+   "embedding_cached": true,
+   "est_cost_usd_uncached": 0.0007553999999999999
+  },
+  {
+   "id": "fu01",
+   "query": "IKEA bookshelf",
+   "lang": "en",
+   "tags": [
+    "item",
+    "brand"
+   ],
+   "relevant_count": 9,
+   "returned": [
+    "syn-qa-00056",
+    "syn-qa-00931",
+    "syn-qa-02103",
+    "syn-qa-00936",
+    "syn-qa-00312",
+    "syn-qa-00595",
+    "syn-qa-00185",
+    "syn-qa-00334",
+    "syn-qa-01453"
+   ],
+   "hits": 9,
+   "recall_at_10": 1.0,
+   "rr": 1.0,
+   "violations": {},
+   "filters": {
+    "category": "furniture",
+    "brands": [
+     "IKEA"
+    ],
+    "attributes": {
+     "item_type": {
+      "any_of": [
+       "bookshelf"
+      ]
+     }
+    }
+   },
+   "extraction": {
+    "model": "gemini-3.5-flash-lite",
+    "cached": true,
+    "latency_ms": 327.7,
+    "input_tokens": 877,
+    "output_tokens": 43,
+    "thought_tokens": 0,
+    "error": null,
+    "parse": {
+     "category": "furniture",
+     "brands": [
+      "IKEA"
+     ],
+     "item_types": [
+      "bookshelf"
+     ]
+    },
+    "guard_notes": []
+   },
+   "rerank": {
+    "model": "gemini-3.5-flash-lite",
+    "cached": true,
+    "latency_ms": 325.6,
+    "candidates": 9,
+    "ranked": 9,
+    "invalid": 0,
+    "input_tokens": 884,
+    "output_tokens": 48,
+    "thought_tokens": 0,
+    "error": null
+   },
+   "wall_ms": 1474.0,
+   "server_ms": {
+    "cache_lookup": 651.8,
+    "retrieve": 332.9,
+    "total": 1472.0
+   },
+   "embedding_cached": true,
+   "est_cost_usd_uncached": 0.0007593999999999999
+  },
+  {
+   "id": "fu02",
+   "query": "L-shaped sofa in good condition under 2500 QAR",
+   "lang": "en",
+   "tags": [
+    "item",
+    "condition",
+    "price"
+   ],
+   "relevant_count": 7,
+   "returned": [
+    "syn-qa-01530",
+    "syn-qa-00019",
+    "syn-qa-00383",
+    "syn-qa-00689",
+    "syn-qa-01034",
+    "syn-qa-00785",
+    "syn-qa-00136"
+   ],
+   "hits": 7,
+   "recall_at_10": 1.0,
+   "rr": 1.0,
+   "violations": {},
+   "filters": {
+    "category": "furniture",
+    "conditions": [
+     "new",
+     "like_new",
+     "good"
+    ],
+    "max_price": "2500",
+    "attributes": {
+     "item_type": {
+      "any_of": [
+       "L-shaped sofa"
+      ]
+     }
+    }
+   },
+   "extraction": {
+    "model": "gemini-3.5-flash-lite",
+    "cached": true,
+    "latency_ms": 324.8,
+    "input_tokens": 889,
+    "output_tokens": 75,
+    "thought_tokens": 0,
+    "error": null,
+    "parse": {
+     "category": "furniture",
+     "item_types": [
+      "L-shaped sofa"
+     ],
+     "condition": "good",
+     "price": {
+      "comparator": "under",
+      "amount": "2500"
+     }
+    },
+    "guard_notes": []
+   },
+   "rerank": {
+    "model": "gemini-3.5-flash-lite",
+    "cached": true,
+    "latency_ms": 325.1,
+    "candidates": 7,
+    "ranked": 7,
+    "invalid": 0,
+    "input_tokens": 894,
+    "output_tokens": 39,
+    "thought_tokens": 0,
+    "error": null
+   },
+   "wall_ms": 1467.4,
+   "server_ms": {
+    "cache_lookup": 649.8,
+    "retrieve": 328.6,
+    "total": 1465.6
+   },
+   "embedding_cached": true,
+   "est_cost_usd_uncached": 0.0008259
+  },
+  {
+   "id": "fu03",
+   "query": "majlis set",
+   "lang": "en",
+   "tags": [
+    "item"
+   ],
+   "relevant_count": 18,
+   "returned": [
+    "syn-qa-01998",
+    "syn-qa-01958",
+    "syn-qa-01944",
+    "syn-qa-02139",
+    "syn-qa-00816",
+    "syn-qa-00617",
+    "syn-qa-00107",
+    "syn-qa-00462",
+    "syn-qa-01679",
+    "syn-qa-00157"
+   ],
+   "hits": 10,
+   "recall_at_10": 1.0,
+   "rr": 1.0,
+   "violations": {},
+   "filters": {
+    "category": "furniture",
+    "attributes": {
+     "item_type": {
+      "any_of": [
+       "majlis set"
+      ]
+     }
+    }
+   },
+   "extraction": {
+    "model": "gemini-3.5-flash-lite",
+    "cached": true,
+    "latency_ms": 327.2,
+    "input_tokens": 877,
+    "output_tokens": 29,
+    "thought_tokens": 0,
+    "error": null,
+    "parse": {
+     "category": "furniture",
+     "item_types": [
+      "majlis set"
+     ]
+    },
+    "guard_notes": []
+   },
+   "rerank": {
+    "model": "gemini-3.5-flash-lite",
+    "cached": true,
+    "latency_ms": 328.8,
+    "candidates": 18,
+    "ranked": 10,
+    "invalid": 0,
+    "input_tokens": 1707,
+    "output_tokens": 52,
+    "thought_tokens": 0,
+    "error": null
+   },
+   "wall_ms": 1480.5,
+   "server_ms": {
+    "cache_lookup": 656.6,
+    "retrieve": 327.7,
+    "total": 1477.6
+   },
+   "embedding_cached": true,
+   "est_cost_usd_uncached": 0.0009809
+  },
+  {
+   "id": "fu04",
+   "query": "office chair مع توصيل",
+   "lang": "mixed",
+   "tags": [
+    "item",
+    "attribute"
+   ],
+   "relevant_count": 5,
+   "returned": [
+    "syn-qa-00446",
+    "syn-qa-00024",
+    "syn-qa-00536",
+    "syn-qa-00097",
+    "syn-qa-01779"
+   ],
+   "hits": 5,
+   "recall_at_10": 1.0,
+   "rr": 1.0,
+   "violations": {},
+   "filters": {
+    "category": "furniture",
+    "attributes": {
+     "item_type": {
+      "any_of": [
+       "office chair"
+      ]
+     },
+     "delivery_available": {
+      "eq": true
+     }
+    }
+   },
+   "extraction": {
+    "model": "gemini-3.5-flash-lite",
+    "cached": true,
+    "latency_ms": 328.4,
+    "input_tokens": 879,
+    "output_tokens": 36,
+    "thought_tokens": 0,
+    "error": null,
+    "parse": {
+     "category": "furniture",
+     "item_types": [
+      "office chair"
+     ],
+     "delivery_available": true
+    },
+    "guard_notes": []
+   },
+   "rerank": {
+    "model": "gemini-3.5-flash-lite",
+    "cached": true,
+    "latency_ms": 330.4,
+    "candidates": 5,
+    "ranked": 5,
+    "invalid": 0,
+    "input_tokens": 563,
+    "output_tokens": 31,
+    "thought_tokens": 0,
+    "error": null
+   },
+   "wall_ms": 1486.5,
+   "server_ms": {
+    "cache_lookup": 657.9,
+    "retrieve": 331.9,
+    "total": 1484.4
+   },
+   "embedding_cached": true,
+   "est_cost_usd_uncached": 0.0006041
+  },
+  {
+   "id": "fu05",
+   "query": "كنب ثلاثي مستعمل",
+   "lang": "ar",
+   "tags": [
+    "item",
+    "condition"
+   ],
+   "relevant_count": 16,
+   "returned": [
+    "syn-qa-01635",
+    "syn-qa-00231",
+    "syn-qa-01673",
+    "syn-qa-01046",
+    "syn-qa-00871",
+    "syn-qa-00509",
+    "syn-qa-01736",
+    "syn-qa-00635",
+    "syn-qa-01433",
+    "syn-qa-02052"
+   ],
+   "hits": 10,
+   "recall_at_10": 1.0,
+   "rr": 1.0,
+   "violations": {},
+   "filters": {
+    "category": "furniture",
+    "conditions": [
+     "like_new",
+     "good",
+     "fair",
+     "poor"
+    ],
+    "attributes": {
+     "item_type": {
+      "any_of": [
+       "3-seater sofa"
+      ]
+     }
+    }
+   },
+   "extraction": {
+    "model": "gemini-3.5-flash-lite",
+    "cached": true,
+    "latency_ms": 326.2,
+    "input_tokens": 880,
+    "output_tokens": 38,
+    "thought_tokens": 0,
+    "error": null,
+    "parse": {
+     "category": "furniture",
+     "item_types": [
+      "3-seater sofa"
+     ],
+     "condition": "used"
+    },
+    "guard_notes": []
+   },
+   "rerank": {
+    "model": "gemini-3.5-flash-lite",
+    "cached": true,
+    "latency_ms": 325.5,
+    "candidates": 16,
+    "ranked": 10,
+    "invalid": 0,
+    "input_tokens": 1472,
+    "output_tokens": 55,
+    "thought_tokens": 0,
+    "error": null
+   },
+   "wall_ms": 1470.2,
+   "server_ms": {
+    "cache_lookup": 652.3,
+    "retrieve": 327.6,
+    "total": 1468.1
+   },
+   "embedding_cached": true,
+   "est_cost_usd_uncached": 0.0009417000000000001
+  },
+  {
+   "id": "fu06",
+   "query": "سرير كوين مع مرتبة",
+   "lang": "ar",
+   "tags": [
+    "item"
+   ],
+   "relevant_count": 25,
+   "returned": [
+    "syn-qa-01919",
+    "syn-qa-02027",
+    "syn-qa-01309",
+    "syn-qa-01477",
+    "syn-qa-00865",
+    "syn-qa-02107",
+    "syn-qa-00650",
+    "syn-qa-00252",
+    "syn-qa-01306",
+    "syn-qa-00465"
+   ],
+   "hits": 10,
+   "recall_at_10": 1.0,
+   "rr": 1.0,
+   "violations": {},
+   "filters": {
+    "category": "furniture",
+    "attributes": {
+     "item_type": {
+      "any_of": [
+       "queen bed with mattress"
+      ]
+     }
+    }
+   },
+   "extraction": {
+    "model": "gemini-3.5-flash-lite",
+    "cached": true,
+    "latency_ms": 327.4,
+    "input_tokens": 881,
+    "output_tokens": 30,
+    "thought_tokens": 0,
+    "error": null,
+    "parse": {
+     "category": "furniture",
+     "item_types": [
+      "queen bed with mattress"
+     ]
+    },
+    "guard_notes": []
+   },
+   "rerank": {
+    "model": "gemini-3.5-flash-lite",
+    "cached": true,
+    "latency_ms": 328.2,
+    "candidates": 25,
+    "ranked": 10,
+    "invalid": 0,
+    "input_tokens": 2609,
+    "output_tokens": 55,
+    "thought_tokens": 0,
+    "error": null
+   },
+   "wall_ms": 1476.2,
+   "server_ms": {
+    "cache_lookup": 652.3,
+    "retrieve": 330.2,
+    "total": 1474.1
+   },
+   "embedding_cached": true,
+   "est_cost_usd_uncached": 0.0012633
+  },
+  {
+   "id": "ap01",
+   "query": "2 bedroom apartment for rent in Lusail",
+   "lang": "en",
+   "tags": [
+    "rent_sale",
+    "location",
+    "attribute"
+   ],
+   "relevant_count": 2,
+   "returned": [
+    "syn-qa-01614",
+    "syn-qa-00791"
+   ],
+   "hits": 2,
+   "recall_at_10": 1.0,
+   "rr": 1.0,
+   "violations": {},
+   "filters": {
+    "category": "apartments",
+    "listing_type": "rent",
+    "location": "Lusail",
+    "attributes": {
+     "bedrooms": {
+      "eq": 2
+     }
+    }
+   },
+   "extraction": {
+    "model": "gemini-3.5-flash-lite",
+    "cached": true,
+    "latency_ms": 325.8,
+    "input_tokens": 882,
+    "output_tokens": 39,
+    "thought_tokens": 0,
+    "error": null,
+    "parse": {
+     "category": "apartments",
+     "listing_type": "rent",
+     "bedrooms": 2,
+     "location": "Lusail"
+    },
+    "guard_notes": []
+   },
+   "rerank": {
+    "model": "gemini-3.5-flash-lite",
+    "cached": true,
+    "latency_ms": 326.8,
+    "candidates": 2,
+    "ranked": 2,
+    "invalid": 0,
+    "input_tokens": 421,
+    "output_tokens": 19,
+    "thought_tokens": 0,
+    "error": null
+   },
+   "wall_ms": 2128.6,
+   "server_ms": {
+    "cache_lookup": 652.1,
+    "retrieve": 985.8,
+    "total": 2126.7
+   },
+   "embedding_cached": true,
+   "est_cost_usd_uncached": 0.0005413
+  },
+  {
+   "id": "ap02",
+   "query": "studio for rent under 5000 a month",
+   "lang": "en",
+   "tags": [
+    "rent_sale",
+    "price"
+   ],
+   "relevant_count": 33,
+   "returned": [
+    "syn-qa-00799",
+    "syn-qa-00576",
+    "syn-qa-01327",
+    "syn-qa-00191",
+    "syn-qa-02072",
+    "syn-qa-00767",
+    "syn-qa-02124",
+    "syn-qa-00261",
+    "syn-qa-02024",
+    "syn-qa-01446"
+   ],
+   "hits": 10,
+   "recall_at_10": 1.0,
+   "rr": 1.0,
+   "violations": {},
+   "filters": {
+    "category": "apartments",
+    "max_price": "5000",
+    "price_period": "month",
+    "listing_type": "rent",
+    "attributes": {
+     "property_type": {
+      "eq": "studio"
+     }
+    }
+   },
+   "extraction": {
+    "model": "gemini-3.5-flash-lite",
+    "cached": true,
+    "latency_ms": 327.6,
+    "input_tokens": 885,
+    "output_tokens": 43,
+    "thought_tokens": 0,
+    "error": null,
+    "parse": {
+     "category": "apartments",
+     "property_type": "studio",
+     "storage_gb": 5000,
+     "delivery_available": true
+    },
+    "guard_notes": [
+     "storage_gb:not for apartments",
+     "delivery_available:not for apartments",
+     "price:filled from query",
+     "listing_type:filled from query"
+    ]
+   },
+   "rerank": {
+    "model": "gemini-3.5-flash-lite",
+    "cached": true,
+    "latency_ms": 326.9,
+    "candidates": 33,
+    "ranked": 10,
+    "invalid": 0,
+    "input_tokens": 4386,
+    "output_tokens": 34,
+    "thought_tokens": 0,
+    "error": null
+   },
+   "wall_ms": 1471.0,
+   "server_ms": {
+    "cache_lookup": 652.0,
+    "retrieve": 327.3,
+    "total": 1468.7
+   },
+   "embedding_cached": true,
+   "est_cost_usd_uncached": 0.001779
+  },
+  {
+   "id": "ap03",
+   "query": "furnished 1BR in The Pearl",
+   "lang": "en",
+   "tags": [
+    "location",
+    "attribute"
+   ],
+   "relevant_count": 6,
+   "returned": [
+    "syn-qa-01557",
+    "syn-qa-00501",
+    "syn-qa-00145",
+    "syn-qa-02129",
+    "syn-qa-01491",
+    "syn-qa-01763"
+   ],
+   "hits": 6,
+   "recall_at_10": 1.0,
+   "rr": 1.0,
+   "violations": {},
+   "filters": {
+    "category": "apartments",
+    "location": "The Pearl",
+    "attributes": {
+     "bedrooms": {
+      "eq": 1
+     },
+     "furnished": {
+      "eq": "furnished"
+     }
+    }
+   },
+   "extraction": {
+    "model": "gemini-3.5-flash-lite",
+    "cached": true,
+    "latency_ms": 324.3,
+    "input_tokens": 881,
+    "output_tokens": 37,
+    "thought_tokens": 0,
+    "error": null,
+    "parse": {
+     "category": "apartments",
+     "bedrooms": 1,
+     "location": "The Pearl",
+     "furnished": "furnished"
+    },
+    "guard_notes": []
+   },
+   "rerank": {
+    "model": "gemini-3.5-flash-lite",
+    "cached": true,
+    "latency_ms": 328.2,
+    "candidates": 6,
+    "ranked": 6,
+    "invalid": 0,
+    "input_tokens": 875,
+    "output_tokens": 21,
+    "thought_tokens": 0,
+    "error": null
+   },
+   "wall_ms": 1473.4,
+   "server_ms": {
+    "cache_lookup": 651.7,
+    "retrieve": 327.4,
+    "total": 1470.0
+   },
+   "embedding_cached": true,
+   "est_cost_usd_uncached": 0.0006762
+  },
+  {
+   "id": "ap04",
+   "query": "3 bedroom apartment for sale in West Bay",
+   "lang": "en",
+   "tags": [
+    "rent_sale",
+    "location",
+    "attribute"
+   ],
+   "relevant_count": 3,
+   "returned": [
+    "syn-qa-01991",
+    "syn-qa-01950",
+    "syn-qa-00271"
+   ],
+   "hits": 3,
+   "recall_at_10": 1.0,
+   "rr": 1.0,
+   "violations": {},
+   "filters": {
+    "category": "apartments",
+    "listing_type": "sale",
+    "location": "West Bay",
+    "attributes": {
+     "bedrooms": {
+      "eq": 3
+     }
+    }
+   },
+   "extraction": {
+    "model": "gemini-3.5-flash-lite",
+    "cached": true,
+    "latency_ms": 326.2,
+    "input_tokens": 882,
+    "output_tokens": 39,
+    "thought_tokens": 0,
+    "error": null,
+    "parse": {
+     "category": "apartments",
+     "listing_type": "sale",
+     "bedrooms": 3,
+     "location": "West Bay"
+    },
+    "guard_notes": []
+   },
+   "rerank": {
+    "model": "gemini-3.5-flash-lite",
+    "cached": true,
+    "latency_ms": 325.0,
+    "candidates": 3,
+    "ranked": 3,
+    "invalid": 0,
+    "input_tokens": 550,
+    "output_tokens": 12,
+    "thought_tokens": 0,
+    "error": null
+   },
+   "wall_ms": 1468.0,
+   "server_ms": {
+    "cache_lookup": 651.0,
+    "retrieve": 326.9,
+    "total": 1464.9
+   },
+   "embedding_cached": true,
+   "est_cost_usd_uncached": 0.0005627
+  },
+  {
+   "id": "ap05",
+   "query": "penthouse with sea view",
+   "lang": "en",
+   "tags": [
+    "attribute"
+   ],
+   "relevant_count": 4,
+   "returned": [
+    "syn-qa-00610",
+    "syn-qa-01314",
+    "syn-qa-01506",
+    "syn-qa-01740"
+   ],
+   "hits": 4,
+   "recall_at_10": 1.0,
+   "rr": 1.0,
+   "violations": {},
+   "filters": {
+    "category": "apartments",
+    "attributes": {
+     "property_type": {
+      "eq": "penthouse"
+     },
+     "amenities": {
+      "contains": [
+       "sea view"
+      ]
+     }
+    }
+   },
+   "extraction": {
+    "model": "gemini-3.5-flash-lite",
+    "cached": true,
+    "latency_ms": 324.3,
+    "input_tokens": 879,
+    "output_tokens": 39,
+    "thought_tokens": 0,
+    "error": null,
+    "parse": {
+     "category": "apartments",
+     "property_type": "penthouse",
+     "amenities": [
+      "sea view"
+     ]
+    },
+    "guard_notes": []
+   },
+   "rerank": {
+    "model": "gemini-3.5-flash-lite",
+    "cached": true,
+    "latency_ms": 326.1,
+    "candidates": 4,
+    "ranked": 4,
+    "invalid": 0,
+    "input_tokens": 663,
+    "output_tokens": 27,
+    "thought_tokens": 0,
+    "error": null
+   },
+   "wall_ms": 1468.8,
+   "server_ms": {
+    "cache_lookup": 648.1,
+    "retrieve": 328.1,
+    "total": 1465.6
+   },
+   "embedding_cached": true,
+   "est_cost_usd_uncached": 0.0006318
+  },
+  {
+   "id": "ap06",
+   "query": "شقة غرفتين للإيجار في لوسيل",
+   "lang": "ar",
+   "tags": [
+    "rent_sale",
+    "location",
+    "attribute"
+   ],
+   "relevant_count": 2,
+   "returned": [
+    "syn-qa-01614",
+    "syn-qa-00791"
+   ],
+   "hits": 2,
+   "recall_at_10": 1.0,
+   "rr": 1.0,
+   "violations": {},
+   "filters": {
+    "category": "apartments",
+    "listing_type": "rent",
+    "location": "Lusail",
+    "attributes": {
+     "bedrooms": {
+      "eq": 2
+     }
+    },
+    "keywords": [
+     "شقة"
+    ]
+   },
+   "extraction": {
+    "model": "gemini-3.5-flash-lite",
+    "cached": true,
+    "latency_ms": 323.6,
+    "input_tokens": 886,
+    "output_tokens": 92,
+    "thought_tokens": 0,
+    "error": null,
+    "parse": {
+     "category": "apartments",
+     "listing_type": "rent",
+     "location": "Lusail",
+     "private_pool": false,
+     "low_mileage": false,
+     "gcc_specs": false,
+     "accident_free": false,
+     "delivery_available": false,
+     "keywords": [
+      "شقة"
+     ]
+    },
+    "guard_notes": [
+     "bedrooms:filled from query"
+    ]
+   },
+   "rerank": {
+    "model": "gemini-3.5-flash-lite",
+    "cached": true,
+    "latency_ms": 325.2,
+    "candidates": 2,
+    "ranked": 2,
+    "invalid": 0,
+    "input_tokens": 424,
+    "output_tokens": 14,
+    "thought_tokens": 0,
+    "error": null
+   },
+   "wall_ms": 1465.7,
+   "server_ms": {
+    "cache_lookup": 648.9,
+    "retrieve": 327.2,
+    "total": 1463.3
+   },
+   "embedding_cached": true,
+   "est_cost_usd_uncached": 0.0006626
+  },
+  {
+   "id": "ap07",
+   "query": "استوديو مفروش للإيجار",
+   "lang": "ar",
+   "tags": [
+    "rent_sale",
+    "attribute"
+   ],
+   "relevant_count": 14,
+   "returned": [
+    "syn-qa-01248",
+    "syn-qa-01267",
+    "syn-qa-00797",
+    "syn-qa-02082",
+    "syn-qa-01882",
+    "syn-qa-00799",
+    "syn-qa-01327",
+    "syn-qa-00767",
+    "syn-qa-00295",
+    "syn-qa-00721"
+   ],
+   "hits": 10,
+   "recall_at_10": 1.0,
+   "rr": 1.0,
+   "violations": {},
+   "filters": {
+    "category": "apartments",
+    "listing_type": "rent",
+    "attributes": {
+     "property_type": {
+      "eq": "studio"
+     },
+     "furnished": {
+      "eq": "furnished"
+     }
+    },
+    "keywords": [
+     "مفروش"
+    ]
+   },
+   "extraction": {
+    "model": "gemini-3.5-flash-lite",
+    "cached": true,
+    "latency_ms": 325.0,
+    "input_tokens": 882,
+    "output_tokens": 85,
+    "thought_tokens": 0,
+    "error": null,
+    "parse": {
+     "category": "apartments",
+     "property_type": "studio",
+     "furnished": "furnished",
+     "low_mileage": false,
+     "gcc_specs": false,
+     "accident_free": false,
+     "delivery_available": false,
+     "keywords": [
+      "مفروش"
+     ]
+    },
+    "guard_notes": [
+     "listing_type:filled from query"
+    ]
+   },
+   "rerank": {
+    "model": "gemini-3.5-flash-lite",
+    "cached": true,
+    "latency_ms": 324.4,
+    "candidates": 14,
+    "ranked": 10,
+    "invalid": 0,
+    "input_tokens": 1906,
+    "output_tokens": 54,
+    "thought_tokens": 0,
+    "error": null
+   },
+   "wall_ms": 1471.7,
+   "server_ms": {
+    "cache_lookup": 652.7,
+    "retrieve": 328.2,
+    "total": 1468.7
+   },
+   "embedding_cached": true,
+   "est_cost_usd_uncached": 0.0011879
+  },
+  {
+   "id": "ap08",
+   "query": "2BR شقة للبيع in The Pearl",
+   "lang": "mixed",
+   "tags": [
+    "rent_sale",
+    "location",
+    "attribute"
+   ],
+   "relevant_count": 4,
+   "returned": [
+    "syn-qa-01300",
+    "syn-qa-01372",
+    "syn-qa-00684",
+    "syn-qa-01275"
+   ],
+   "hits": 4,
+   "recall_at_10": 1.0,
+   "rr": 1.0,
+   "violations": {},
+   "filters": {
+    "category": "apartments",
+    "listing_type": "sale",
+    "location": "The Pearl",
+    "attributes": {
+     "bedrooms": {
+      "eq": 2
+     }
+    }
+   },
+   "extraction": {
+    "model": "gemini-3.5-flash-lite",
+    "cached": true,
+    "latency_ms": 326.5,
+    "input_tokens": 883,
+    "output_tokens": 39,
+    "thought_tokens": 0,
+    "error": null,
+    "parse": {
+     "category": "apartments",
+     "listing_type": "sale",
+     "bedrooms": 2,
+     "location": "The Pearl"
+    },
+    "guard_notes": []
+   },
+   "rerank": {
+    "model": "gemini-3.5-flash-lite",
+    "cached": true,
+    "latency_ms": 324.2,
+    "candidates": 4,
+    "ranked": 4,
+    "invalid": 0,
+    "input_tokens": 749,
+    "output_tokens": 27,
+    "thought_tokens": 0,
+    "error": null
+   },
+   "wall_ms": 1467.1,
+   "server_ms": {
+    "cache_lookup": 652.5,
+    "retrieve": 326.5,
+    "total": 1465.0
+   },
+   "embedding_cached": true,
+   "est_cost_usd_uncached": 0.000659
+  },
+  {
+   "id": "vi01",
+   "query": "5 bedroom villa with private pool for rent",
+   "lang": "en",
+   "tags": [
+    "rent_sale",
+    "attribute"
+   ],
+   "relevant_count": 20,
+   "returned": [
+    "syn-qa-01428",
+    "syn-qa-01809",
+    "syn-qa-01410",
+    "syn-qa-00445",
+    "syn-qa-02099",
+    "syn-qa-01839",
+    "syn-qa-01023",
+    "syn-qa-00443",
+    "syn-qa-00848",
+    "syn-qa-00657"
+   ],
+   "hits": 10,
+   "recall_at_10": 1.0,
+   "rr": 1.0,
+   "violations": {},
+   "filters": {
+    "category": "villas",
+    "listing_type": "rent",
+    "attributes": {
+     "bedrooms": {
+      "eq": 5
+     },
+     "private_pool": {
+      "eq": true
+     }
+    }
+   },
+   "extraction": {
+    "model": "gemini-3.5-flash-lite",
+    "cached": true,
+    "latency_ms": 325.7,
+    "input_tokens": 882,
+    "output_tokens": 38,
+    "thought_tokens": 0,
+    "error": null,
+    "parse": {
+     "category": "villas",
+     "listing_type": "rent",
+     "bedrooms": 5,
+     "private_pool": true
+    },
+    "guard_notes": []
+   },
+   "rerank": {
+    "model": "gemini-3.5-flash-lite",
+    "cached": true,
+    "latency_ms": 328.2,
+    "candidates": 20,
+    "ranked": 10,
+    "invalid": 0,
+    "input_tokens": 2736,
+    "output_tokens": 52,
+    "thought_tokens": 0,
+    "error": null
+   },
+   "wall_ms": 1472.1,
+   "server_ms": {
+    "cache_lookup": 651.1,
+    "retrieve": 327.8,
+    "total": 1470.2
+   },
+   "embedding_cached": true,
+   "est_cost_usd_uncached": 0.0013162
+  },
+  {
+   "id": "vi02",
+   "query": "compound villa for rent under 15000 a month",
+   "lang": "en",
+   "tags": [
+    "rent_sale",
+    "price",
+    "attribute"
+   ],
+   "relevant_count": 9,
+   "returned": [
+    "syn-qa-01915",
+    "syn-qa-00190",
+    "syn-qa-01497",
+    "syn-qa-00397",
+    "syn-qa-02184",
+    "syn-qa-01626",
+    "syn-qa-01192",
+    "syn-qa-00745",
+    "syn-qa-01077"
+   ],
+   "hits": 9,
+   "recall_at_10": 1.0,
+   "rr": 1.0,
+   "violations": {},
+   "filters": {
+    "category": "villas",
+    "max_price": "15000",
+    "price_period": "month",
+    "listing_type": "rent",
+    "attributes": {
+     "property_type": {
+      "eq": "compound villa"
+     }
+    },
+    "keywords": [
+     "15000"
+    ]
+   },
+   "extraction": {
+    "model": "gemini-3.5-flash-lite",
+    "cached": true,
+    "latency_ms": 328.7,
+    "input_tokens": 887,
+    "output_tokens": 115,
+    "thought_tokens": 0,
+    "error": null,
+    "parse": {
+     "category": "villas",
+     "listing_type": "rent",
+     "property_type": "compound villa",
+     "max_area_sqm": 15000,
+     "max_mileage_km": 15000,
+     "storage_gb": 15000,
+     "min_ram_gb": 15000,
+     "keywords": [
+      "15000"
+     ]
+    },
+    "guard_notes": [
+     "max_mileage_km:not for villas",
+     "storage_gb:not for villas",
+     "min_ram_gb:not for villas",
+     "max_area_sqm:area not written with sqm/متر",
+     "price:filled from query"
+    ]
+   },
+   "rerank": {
+    "model": "gemini-3.5-flash-lite",
+    "cached": true,
+    "latency_ms": 326.1,
+    "candidates": 9,
+    "ranked": 9,
+    "invalid": 0,
+    "input_tokens": 1343,
+    "output_tokens": 48,
+    "thought_tokens": 0,
+    "error": null
+   },
+   "wall_ms": 1469.8,
+   "server_ms": {
+    "cache_lookup": 652.3,
+    "retrieve": 327.9,
+    "total": 1468.0
+   },
+   "embedding_cached": true,
+   "est_cost_usd_uncached": 0.0010823
+  },
+  {
+   "id": "vi03",
+   "query": "townhouse for sale",
+   "lang": "en",
+   "tags": [
+    "rent_sale",
+    "attribute"
+   ],
+   "relevant_count": 14,
+   "returned": [
+    "syn-qa-02174",
+    "syn-qa-01825",
+    "syn-qa-00400",
+    "syn-qa-00336",
+    "syn-qa-00435",
+    "syn-qa-01470",
+    "syn-qa-00642",
+    "syn-qa-00738",
+    "syn-qa-00793",
+    "syn-qa-00563"
+   ],
+   "hits": 10,
+   "recall_at_10": 1.0,
+   "rr": 1.0,
+   "violations": {},
+   "filters": {
+    "category": "villas",
+    "listing_type": "sale",
+    "attributes": {
+     "property_type": {
+      "eq": "townhouse"
+     }
+    },
+    "keywords": [
+     "townhouse"
+    ]
+   },
+   "extraction": {
+    "model": "gemini-3.5-flash-lite",
+    "cached": true,
+    "latency_ms": 326.1,
+    "input_tokens": 878,
+    "output_tokens": 66,
+    "thought_tokens": 0,
+    "error": null,
+    "parse": {
+     "category": "villas",
+     "property_type": "townhouse",
+     "gcc_specs": false,
+     "accident_free": false,
+     "delivery_available": false,
+     "keywords": [
+      "townhouse"
+     ]
+    },
+    "guard_notes": [
+     "listing_type:filled from query"
+    ]
+   },
+   "rerank": {
+    "model": "gemini-3.5-flash-lite",
+    "cached": true,
+    "latency_ms": 326.5,
+    "candidates": 14,
+    "ranked": 10,
+    "invalid": 0,
+    "input_tokens": 1913,
+    "output_tokens": 52,
+    "thought_tokens": 0,
+    "error": null
+   },
+   "wall_ms": 1471.9,
+   "server_ms": {
+    "cache_lookup": 649.8,
+    "retrieve": 327.1,
+    "total": 1469.0
+   },
+   "embedding_cached": true,
+   "est_cost_usd_uncached": 0.0011361000000000001
+  },
+  {
+   "id": "vi04",
+   "query": "فيلا للبيع في لوسيل",
+   "lang": "ar",
+   "tags": [
+    "rent_sale",
+    "location"
+   ],
+   "relevant_count": 23,
+   "returned": [
+    "syn-qa-01970",
+    "syn-qa-00940",
+    "syn-qa-01116",
+    "syn-qa-00591",
+    "syn-qa-01419",
+    "syn-qa-00337",
+    "syn-qa-00287",
+    "syn-qa-01186",
+    "syn-qa-01927",
+    "syn-qa-00289"
+   ],
+   "hits": 10,
+   "recall_at_10": 1.0,
+   "rr": 1.0,
+   "violations": {},
+   "filters": {
+    "category": "villas",
+    "listing_type": "sale",
+    "location": "Lusail"
+   },
+   "extraction": {
+    "model": "gemini-3.5-flash-lite",
+    "cached": true,
+    "latency_ms": 325.2,
+    "input_tokens": 882,
+    "output_tokens": 31,
+    "thought_tokens": 0,
+    "error": null,
+    "parse": {
+     "category": "villas",
+     "listing_type": "sale",
+     "location": "Lusail"
+    },
+    "guard_notes": []
+   },
+   "rerank": {
+    "model": "gemini-3.5-flash-lite",
+    "cached": true,
+    "latency_ms": 328.6,
+    "candidates": 23,
+    "ranked": 10,
+    "invalid": 0,
+    "input_tokens": 2933,
+    "output_tokens": 54,
+    "thought_tokens": 0,
+    "error": null
+   },
+   "wall_ms": 1470.5,
+   "server_ms": {
+    "cache_lookup": 650.2,
+    "retrieve": 327.8,
+    "total": 1468.1
+   },
+   "embedding_cached": true,
+   "est_cost_usd_uncached": 0.0013609999999999998
+  },
+  {
+   "id": "vi05",
+   "query": "فيلا 6 غرف مع مسبح",
+   "lang": "ar",
+   "tags": [
+    "attribute"
+   ],
+   "relevant_count": 13,
+   "returned": [
+    "syn-qa-00587",
+    "syn-qa-01075",
+    "syn-qa-00577",
+    "syn-qa-00432",
+    "syn-qa-00071",
+    "syn-qa-02204",
+    "syn-qa-01796",
+    "syn-qa-01302",
+    "syn-qa-00835",
+    "syn-qa-00217"
+   ],
+   "hits": 10,
+   "recall_at_10": 1.0,
+   "rr": 1.0,
+   "violations": {},
+   "filters": {
+    "category": "villas",
+    "attributes": {
+     "bedrooms": {
+      "eq": 6
+     },
+     "private_pool": {
+      "eq": true
+     }
+    }
+   },
+   "extraction": {
+    "model": "gemini-3.5-flash-lite",
+    "cached": true,
+    "latency_ms": 325.6,
+    "input_tokens": 884,
+    "output_tokens": 28,
+    "thought_tokens": 0,
+    "error": null,
+    "parse": {
+     "category": "villas",
+     "bedrooms": 6,
+     "private_pool": true
+    },
+    "guard_notes": []
+   },
+   "rerank": {
+    "model": "gemini-3.5-flash-lite",
+    "cached": true,
+    "latency_ms": 324.7,
+    "candidates": 13,
+    "ranked": 10,
+    "invalid": 0,
+    "input_tokens": 1783,
+    "output_tokens": 46,
+    "thought_tokens": 0,
+    "error": null
+   },
+   "wall_ms": 1467.9,
+   "server_ms": {
+    "cache_lookup": 650.4,
+    "retrieve": 327.2,
+    "total": 1466.1
+   },
+   "embedding_cached": true,
+   "est_cost_usd_uncached": 0.0009889
+  }
+ ]
+}

@@ -13,6 +13,7 @@ Recall@10 counts the share of relevant listings found in the top 10 (denominator
 | 2026-10-13 | Stage 3 baseline (vector only) | 0.853 | 0.919 | 31% | 0/45 | 891 / 921 | $0.0000046 | [report](../eval/results/2026-10-13-stage-3-baseline-vector-only.md) |
 | 2026-10-14 | Stage 4 query understanding | 0.996 | 1.000 | 1% | 0/45 | 1168 / 1146 | $0.000402 | [report](../eval/results/2026-10-14-stage-4-query-understanding.md) |
 | 2026-10-14 | Stage 5 hybrid (vector + full-text, RRF) | 0.996 | 1.000 | 1% | 0/45 | 1177 / 1159 | $0.000402 | [report](../eval/results/2026-10-14-stage-5-hybrid-vector-full-text-rrf.md) |
+| 2026-10-15 | Stage 6 rerank (Gemini listwise) | 1.000 | 1.000 | 0% | 0/45 | 1517 / 1490 | $0.001301 | [report](../eval/results/2026-10-15-stage-6-rerank-gemini-listwise.md) |
 <!-- runs:end -->
 
 ## Stage 3 baseline: vector search only
@@ -135,3 +136,35 @@ Each search now takes the top 50 by vector distance and the top 50 by Postgres f
 ### Takeaway
 
 On this eval, hybrid retrieval adds no measurable recall: the hard constraints are already exact filters, and vector search ranks well inside them. It helps where an exact token matters but is not a filter (listings that state "512GB" or "16GB" outright now come first), at a small cost for listings written only in the other language. This dataset is synthetic with clean facts. On real listings, where specs are often missing from the structured fields and exist only in the text, the full-text side should matter more. Stage 6 (reranking) is the next place to look for gains in ordering.
+
+## Stage 6: reranking (Gemini listwise)
+
+After hybrid retrieval, the top candidates (up to 50, mean 18.6 after filters) go to `gemini-3.5-flash-lite` in one call. Each candidate is one numbered line (title, structured facts, price, start of the description). The model returns candidate numbers, best first, at most 10. Code keeps only valid, unique numbers; candidates it leaves out keep their retrieval order after the ranked ones. The reranker can only reorder; it cannot add a listing or undo a filter. Switchable with `RERANK_ENABLED` or `rerank: false` per request. Report: [eval/results/2026-10-15-stage-6-rerank-gemini-listwise.md](../eval/results/2026-10-15-stage-6-rerank-gemini-listwise.md).
+
+### With and without
+
+| | Rerank off (= Stage 5) | Rerank on |
+|---|---|---|
+| Recall@10 | 0.996 | **1.000** |
+| MRR | 1.000 | 1.000 |
+| Wrong in top 10 | 1% (2 results) | **0%** |
+| Server latency, all cached (mean / p95) | 1,159 / 1,289 ms ([report](../eval/results/2026-10-15-stage-6-variant-rerank-off.md)) | 1,517 / 1,490 ms |
+| Server latency, new query | ≈ 9.6 s (extraction + embedding, measured 2026-10-14) | ≈ 17 s estimated: the rerank call (**7.3 s mean**, measured 2026-10-15) runs after retrieval, so it adds to the 9.6 s instead of overlapping it. With extraction cached: 8.6 s mean, 17.0 s p95. |
+| LLM calls per new query | 1 (extraction) | 2 (extraction + rerank), both from the same 500/day free quota |
+| Input tokens for the rerank call | – | 2,626 mean, 8,257 max (50 candidates) |
+| Est. cost per new query, paid tier | $0.0004 | **$0.0013** (about 3×) |
+| Invalid candidate numbers returned | – | 0 of 45 calls |
+
+### Which queries changed
+
+- **Improved: `lp03`** "lightweight laptop for a university student in good condition", Recall@10 0.80 → 1.00. Before: IdeaPad Slim 5, Pavilion 15 (a heavy 15-inch laptop, not relevant), XPS 13 and others. After: Surface Laptop 7 (it was at vector rank 34) and Zenbook 14 OLEDs. This is exactly the case reranking is for: intent words with no filter behind them, which vector similarity alone ranked poorly.
+- **Regressed by the metrics: none.** No query lost recall or MRR.
+- **Reordered: 35 of 45 top 10s,** invisible to Recall/MRR because the reordered listings were already relevant. Checked by hand:
+  - **"Cheap" is not honoured.** For `car04` "cheap sedan for daily commute under 40k", the cheapest car (6,550 QAR) went from #1 to #6, and #1 is now 33,500 QAR. `ph04` "cheap android phone under 1000 riyals" shows the same pattern. Sorting by price is something code should do deterministically (a soft "sort by price" hint from the extraction), not something to trust an LLM reranker with.
+  - **Mileage helped slightly.** For `car03` "SUV with less than 50,000 km", lower-mileage cars moved up (24,200 / 41,100 / 24,300 km at the top instead of 24,200 / 47,500 / 49,400).
+  - **Less variety.** On queries with models, the top 10 averaged 2.15 distinct models before and 1.92 after. For `lp03` it is now 8 Zenbook 14 OLEDs out of 10: all relevant, but a shopper would want more choice.
+  - Fully constrained queries (`ap05` penthouse with sea view, `vi01` 5-bedroom villa with pool) kept the same top results.
+
+### Takeaway
+
+The reranker earns its place on vague-intent queries, the one kind the filters and keyword search cannot handle: it fixed the last failing query. Everywhere else it reshuffles results that were already correct, and it does not apply soft preferences such as "cheap". It roughly triples the cost of a new query and adds about 7 s on today's free tier. Cached queries pay only about 0.35 s more (one extra lookup). Kept **on by default**, because the pipeline in the spec includes it and caching hides the cost for repeated queries. `RERANK_ENABLED=false` is the switch if interactive latency matters more than vague-query quality. Natural follow-ups (not done): a deterministic "sort by price" hint for "cheap" and "cheapest", and a diversity cap such as at most 3 listings per model in the top 10.

@@ -4,6 +4,8 @@ Stage 4: understand the query (cached LLM extraction -> SearchFilters). If extra
 search still runs, unfiltered.
 Stage 5: retrieve with hybrid search (vector + full-text, fused with RRF), both sides under
 the same filters. `retrieval="vector"` gives the Stage 4 behaviour.
+Stage 6: an LLM reranks the top candidates (cached; on failure the retrieval order stays).
+`rerank=false` gives the Stage 5 behaviour.
 
 Round trips matter (~300 ms each from the dev machine to Supabase): when both the query
 embedding and the extraction are cached, lookups and search share one connection. On a miss,
@@ -21,6 +23,7 @@ from app.models.filters import SearchFilters
 from app.models.search import (
     ExtractionDebug,
     ListingResult,
+    RerankDebug,
     SearchDebug,
     SearchRequest,
     SearchResponse,
@@ -28,6 +31,7 @@ from app.models.search import (
 from app.providers.query_cache import CachedQueryEmbedder, QueryVector
 from app.retrieval import hybrid
 from app.retrieval.filters_sql import build_where
+from app.retrieval.reranking import CachedReranker, RerankOutcome
 from app.retrieval.rrf import RRF_K
 from app.retrieval.understanding import QueryUnderstanding, Understanding
 from app.retrieval.vector import FIRST_FILTER_PARAM, vector_search
@@ -68,6 +72,9 @@ class SearchService:
         hybrid_candidates: int = 50,
         hybrid_keywords: str = "llm",
         rrf_k: int = RRF_K,
+        reranker: CachedReranker | None = None,
+        rerank_candidates: int = 50,
+        rerank_top_n: int = 10,
     ) -> None:
         self.pool = pool
         self.embedder = embedder
@@ -77,6 +84,9 @@ class SearchService:
         self.hybrid_candidates = hybrid_candidates
         self.rrf_k = rrf_k
         self.hybrid_keywords = hybrid_keywords
+        self.reranker = reranker
+        self.rerank_candidates = rerank_candidates
+        self.rerank_top_n = rerank_top_n
 
     def _keyword_text(self, query: str, filters: SearchFilters | None) -> str:
         """Text for the full-text side. "llm": the extracted exact tokens; words the filters
@@ -131,6 +141,11 @@ class SearchService:
         use_llm = request.filters is None and request.extract and self.understanding is not None
         mode = request.retrieval or self.retrieval_mode
         query, limit = request.query, request.limit
+        rerank_on = self.reranker is not None and request.rerank is not False
+        # With reranking, retrieve a deeper pool; the reranker orders it, the page is cut after.
+        depth = max(limit, self.rerank_candidates) if rerank_on else limit
+        top_n = max(limit, self.rerank_top_n)
+        reranked: RerankOutcome | None = None
         timings: dict[str, float] = {}
         t0 = time.perf_counter()
 
@@ -145,8 +160,10 @@ class SearchService:
             if vector is not None and (understood is not None or not use_llm):
                 filters = request.filters or (understood.filters if understood else None)
                 t1 = time.perf_counter()
-                found = await self._retrieve(conn, mode, query, vector, filters, limit)
+                found = await self._retrieve(conn, mode, query, vector, filters, depth)
                 timings["retrieve"] = _ms(time.perf_counter() - t1)
+                if rerank_on and len(found[0]) > 1:
+                    reranked = await self.reranker.lookup(conn, query, found[0], top_n)
 
         if found is None:
             t1 = time.perf_counter()
@@ -165,11 +182,18 @@ class SearchService:
             filters = request.filters or (understood.filters if understood else None)
             t2 = time.perf_counter()
             async with self.pool.acquire() as conn:
-                found = await self._retrieve(conn, mode, query, vector, filters, limit)
+                found = await self._retrieve(conn, mode, query, vector, filters, depth)
+                if rerank_on and len(found[0]) > 1:
+                    reranked = await self.reranker.lookup(conn, query, found[0], top_n)
             timings["retrieve"] = _ms(time.perf_counter() - t2)
 
+        pool_results, candidates = found
+        if rerank_on and len(pool_results) > 1 and reranked is None:  # 1 = nothing to order
+            t3 = time.perf_counter()
+            reranked = await self.reranker.rerank_and_store(query, pool_results, top_n)
+            timings["rerank"] = _ms(time.perf_counter() - t3)
+        results = (reranked.results if reranked else pool_results)[:limit]
         timings["total"] = _ms(time.perf_counter() - t0)
-        results, candidates = found
         applied = filters is not None and not filters.is_empty()
         logger.info(
             "search done",
@@ -178,6 +202,8 @@ class SearchService:
                 "embedding_cached": vector.cached,
                 "extraction_cached": understood.cached if understood else None,
                 "extraction_error": understood.error if understood else None,
+                "rerank_cached": reranked.cached if reranked else None,
+                "rerank_error": reranked.error if reranked else None,
                 "timings_ms": timings,
             }},
         )  # fmt: skip
@@ -199,8 +225,9 @@ class SearchService:
                     if understood.parse
                     else None,
                 )
+            stages = f"{mode}+filters" if applied else mode
             debug = SearchDebug(
-                retrieval=f"{mode}+filters" if applied else mode,
+                retrieval=f"{stages}+rerank" if reranked is not None else stages,
                 embedding_model=self.embedder.model,
                 embedding_cached=vector.cached,
                 filters_source="request"
@@ -210,6 +237,20 @@ class SearchService:
                 else "none",
                 extraction=extraction,
                 candidates=candidates,
+                rerank=RerankDebug(
+                    model=self.reranker.model,
+                    cached=reranked.cached,
+                    latency_ms=reranked.latency_ms,
+                    candidates=len(pool_results),
+                    ranked=reranked.ranked,
+                    invalid=reranked.invalid,
+                    input_tokens=reranked.input_tokens,
+                    output_tokens=reranked.output_tokens,
+                    thought_tokens=reranked.thought_tokens,
+                    error=reranked.error,
+                )
+                if reranked is not None
+                else None,
                 timings_ms=timings,
             )
         return SearchResponse(

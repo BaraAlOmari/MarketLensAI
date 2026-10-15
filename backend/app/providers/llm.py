@@ -250,13 +250,15 @@ class GeminiLLMProvider(LLMProvider):
         *,
         rpm_limit: int,
         thinking_level: str = "minimal",
+        limiter: SlidingWindowLimiter | None = None,
     ) -> None:
         self.client = client
         self.model = client.model
         self.catalog = catalog
         self.schema = parse_schema(catalog, currencies)
         self.thinking_level = thinking_level
-        self._limiter = SlidingWindowLimiter(max(1, int(rpm_limit * 0.9)))
+        # Share the limiter with anything else calling the same model (the reranker).
+        self._limiter = limiter or SlidingWindowLimiter(max(1, int(rpm_limit * 0.9)))
         blob = SYSTEM + json.dumps(self.schema, sort_keys=True, ensure_ascii=False)
         blob += thinking_level + getattr(client, "api", "")  # a different API is a new cache
         self._prompt_hash = hashlib.sha256(blob.encode()).hexdigest()[:16]

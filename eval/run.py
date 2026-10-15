@@ -7,8 +7,9 @@ the first run the numbers reproduce exactly without spending quota.
 Usage (from backend/):
     .venv/Scripts/python ../eval/run.py                              # print scores
     .venv/Scripts/python ../eval/run.py --label "Stage 4 filters" --record   # + docs/results.md
-    .venv/Scripts/python ../eval/run.py --no-extract --retrieval vector   # Stage 3 baseline
-    .venv/Scripts/python ../eval/run.py --retrieval vector           # Stage 4 (no keyword search)
+    .venv/Scripts/python ../eval/run.py --no-extract --retrieval vector --no-rerank  # Stage 3
+    .venv/Scripts/python ../eval/run.py --retrieval vector --no-rerank   # Stage 4
+    .venv/Scripts/python ../eval/run.py --no-rerank                  # Stage 5
     .venv/Scripts/python ../eval/run.py --concurrency 4 --extraction-timeout 150   # fill caches
     .venv/Scripts/python ../eval/run.py --url http://localhost:8000
 """
@@ -86,19 +87,19 @@ async def search_client(args):
             yield c
 
 
-def query_cost_usd(model_input: str, extraction: dict | None, settings) -> float:
-    """Paid-tier price of one uncached query: its embedding plus the LLM extraction."""
+def llm_cost_usd(call: dict | None, settings) -> float:
+    """Paid-tier price of one LLM call (extraction or rerank; both use the same model)."""
+    if not call or call.get("error"):
+        return 0.0
+    cost = call["input_tokens"] / 1e6 * float(settings.extraction_input_price_per_mtok_usd)
+    out_tokens = call["output_tokens"] + call["thought_tokens"]
+    return cost + out_tokens / 1e6 * float(settings.extraction_output_price_per_mtok_usd)
+
+
+def query_cost_usd(model_input: str, extraction: dict | None, rerank: dict | None, settings):
+    """Paid-tier price of one uncached query: embedding + LLM extraction + LLM rerank."""
     cost = estimate_tokens(model_input) / 1e6 * float(settings.embedding_price_per_mtok_usd)
-    if extraction and not extraction.get("error"):
-        cost += (
-            extraction["input_tokens"] / 1e6 * float(settings.extraction_input_price_per_mtok_usd)
-        )
-        cost += (
-            (extraction["output_tokens"] + extraction["thought_tokens"])
-            / 1e6
-            * float(settings.extraction_output_price_per_mtok_usd)
-        )
-    return cost
+    return cost + llm_cost_usd(extraction, settings) + llm_cost_usd(rerank, settings)
 
 
 async def run(args) -> dict:
@@ -120,6 +121,7 @@ async def run(args) -> dict:
                     "debug": True,
                     "extract": not args.no_extract,
                     "retrieval": args.retrieval,
+                    "rerank": False if args.no_rerank else None,
                 },
             )
             wall_ms = (time.perf_counter() - t0) * 1000
@@ -144,11 +146,12 @@ async def run(args) -> dict:
             "violations": wrong,
             "filters": body["extracted_filters"],
             "extraction": extraction,
+            "rerank": debug.get("rerank"),
             "wall_ms": round(wall_ms, 1),
             "server_ms": debug["timings_ms"],
             "embedding_cached": debug["embedding_cached"],
             "est_cost_usd_uncached": query_cost_usd(
-                provider.query_input(q["query"]), extraction, settings
+                provider.query_input(q["query"]), extraction, debug.get("rerank"), settings
             ),
         }
 
@@ -181,6 +184,8 @@ def summarize(per_query: list[dict], args) -> dict:
 
     extractions = [r["extraction"] for r in per_query if r["extraction"]]
     uncached_llm = [e["latency_ms"] for e in extractions if not e["cached"] and not e["error"]]
+    reranks = [r["rerank"] for r in per_query if r.get("rerank")]
+    uncached_rr = [x["latency_ms"] for x in reranks if not x["cached"] and not x["error"]]
     server_total = [r["server_ms"]["total"] for r in per_query]
     return {
         "label": args.label,
@@ -196,6 +201,15 @@ def summarize(per_query: list[dict], args) -> dict:
             "failed": sum(1 for e in extractions if e["error"]),
             "cached": sum(1 for e in extractions if e["cached"]),
             "uncached_latency_mean_ms": statistics.fmean(uncached_llm) if uncached_llm else None,
+        },
+        "rerank": {
+            "used": len(reranks),
+            "failed": sum(1 for x in reranks if x["error"]),
+            "cached": sum(1 for x in reranks if x["cached"]),
+            "uncached_latency_mean_ms": statistics.fmean(uncached_rr) if uncached_rr else None,
+            "input_tokens_mean": statistics.fmean(x["input_tokens"] for x in reranks)
+            if reranks
+            else None,
         },
         "latency_ms": {
             "server_mean": statistics.fmean(server_total),
@@ -242,6 +256,15 @@ def compact(filters: dict | None) -> str:
     return "; ".join(parts)
 
 
+def rerank_line(rr: dict | None) -> str:
+    if not rr or not rr["used"]:
+        return " Rerank: off."
+    line = f" Rerank: used on {rr['used']}, cached {rr['cached']}, failed {rr['failed']}"
+    if rr["uncached_latency_mean_ms"]:
+        line += f"; uncached rerank mean {rr['uncached_latency_mean_ms']:.0f} ms"
+    return line + f"; mean {rr['input_tokens_mean']:.0f} input tokens."
+
+
 def markdown(s: dict) -> str:
     lat, ex = s["latency_ms"], s["extraction"]
     lines = [
@@ -263,7 +286,8 @@ def markdown(s: dict) -> str:
             f"; uncached extraction mean {ex['uncached_latency_mean_ms']:.0f} ms."
             if ex["uncached_latency_mean_ms"]
             else "."
-        ),
+        )
+        + rerank_line(s.get("rerank")),
         "",
         "## By language and tag",
         "",
@@ -327,6 +351,7 @@ def main() -> int:
     parser.add_argument("--label", default="dev run")
     parser.add_argument("--record", action="store_true", help="append a row to docs/results.md")
     parser.add_argument("--no-extract", action="store_true", help="skip query understanding")
+    parser.add_argument("--no-rerank", action="store_true", help="skip reranking (Stage 5)")
     parser.add_argument(
         "--retrieval",
         choices=["hybrid", "vector"],
@@ -362,7 +387,7 @@ def main() -> int:
         f"{summary['queries']}  short pages {summary['short_pages']} "
         f"({summary['empty_pages']} empty)  latency {lat['server_mean']:.0f}/"
         f"{lat['server_p95']:.0f} ms  extraction used {ex['used']} cached {ex['cached']} "
-        f"failed {ex['failed']}  -> {report}"
+        f"failed {ex['failed']} {rerank_line(summary.get('rerank')).strip()}  -> {report}"
     )
     for reason, v in summary["failures"]["by_reason"].items():
         print(f"  {reason:22} {v['results']:4} wrong results in {v['queries']} queries")

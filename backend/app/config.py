@@ -77,6 +77,16 @@ class Settings(BaseSettings):
     # 512GB or M4 Max), or the raw query. With no keywords the full-text side is skipped.
     hybrid_keywords: Literal["llm", "query"] = "llm"
 
+    # Reranking (Stage 6): an LLM reorders the top candidates (listwise). Same model and
+    # free quota as extraction by default; the two share one rate limiter.
+    rerank_enabled: bool = True
+    rerank_model: str = "gemini-3.5-flash-lite"
+    rerank_candidates: int = Field(default=50, ge=10, le=100)
+    rerank_top_n: int = Field(default=10, ge=1, le=50)
+    rerank_timeout_s: float = Field(default=30, gt=0)
+    rerank_max_attempts: int = Field(default=2, ge=1, le=8)
+    rerank_thinking_level: str = "minimal"
+
     # Currency: QAR is the base; every listing also stores price_qar for cross-currency filters.
     base_currency: str = "QAR"
     fx_rates_to_qar: dict[str, Decimal] = Field(

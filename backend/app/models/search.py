@@ -20,6 +20,8 @@ class SearchRequest(BaseModel):
     extract: bool = True
     # None: the server default (RETRIEVAL_MODE). "vector" reproduces Stage 4.
     retrieval: Literal["hybrid", "vector"] | None = None
+    # None: the server default (RERANK_ENABLED). false reproduces Stage 5.
+    rerank: bool | None = None
     limit: int = Field(default=10, ge=1, le=50)
     debug: bool = False
 
@@ -50,7 +52,8 @@ class ListingResult(BaseModel):
     language: Language
     image_url: str | None
     score: float  # hybrid: RRF score; vector: cosine similarity (higher is better)
-    ranks: dict[str, int] = {}  # hybrid: 1-based rank on each side ("vector", "keyword")
+    # 1-based rank per stage: "vector" and "keyword" (hybrid), "rerank" (Stage 6).
+    ranks: dict[str, int] = {}
 
 
 class ExtractionDebug(BaseModel):
@@ -65,6 +68,19 @@ class ExtractionDebug(BaseModel):
     guard_notes: list[str] = []  # fields the guards dropped (scope, grounding) or filled
 
 
+class RerankDebug(BaseModel):
+    model: str
+    cached: bool
+    latency_ms: float
+    candidates: int  # how many listings the reranker saw
+    ranked: int  # how many it placed (the rest keep retrieval order)
+    invalid: int  # numbers it returned that were out of range or repeated
+    input_tokens: int
+    output_tokens: int
+    thought_tokens: int
+    error: str | None  # set when reranking failed and the retrieval order was kept
+
+
 class SearchDebug(BaseModel):
     retrieval: str  # vector | vector+filters | hybrid | hybrid+filters
     embedding_model: str
@@ -72,6 +88,7 @@ class SearchDebug(BaseModel):
     filters_source: str  # request | llm | none
     extraction: ExtractionDebug | None = None
     candidates: dict[str, int] = {}  # hybrid: rows found per side before fusion
+    rerank: RerankDebug | None = None
     timings_ms: dict[str, float]
 
 
