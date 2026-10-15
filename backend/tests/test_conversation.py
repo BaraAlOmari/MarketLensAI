@@ -6,9 +6,16 @@ from decimal import Decimal
 
 import pytest
 
-from app.answers.chat import ChatService
+from app.answers.chat import NEARBY_LIMIT, ChatService
 from app.config import DEFAULT_FX_RATES_TO_QAR as RATES
-from app.conversation.merge import median_price, merge, split_reset, wants_cheaper
+from app.conversation.merge import (
+    describe,
+    drop_removed_keywords,
+    median_price,
+    merge,
+    split_reset,
+    wants_cheaper,
+)
 from app.conversation.store import Session, combine_query
 from app.models.filters import SearchFilters
 from app.models.search import SearchResponse
@@ -225,10 +232,11 @@ class Understander:
 class Search:
     def __init__(self):
         self.pool, self.embedder, self.understanding = Pool(), Embedder(), Understander()
-        self.calls = []
+        self.calls, self.nearby = [], []  # main searches; "closest matches" searches
 
     async def search(self, request):
-        self.calls.append((request.query, dump(request.filters)))
+        calls = self.nearby if request.limit == NEARBY_LIMIT else self.calls
+        calls.append((request.query, dump(request.filters)))
         return SearchResponse(query=request.query, results=[])
 
 
@@ -266,3 +274,57 @@ async def test_sessions_are_independent():
     await run_turns(service, "a", ["used iPhone 15 Pro Max"])
     await run_turns(service, "b", ["under 2000 riyals"])
     assert search.calls[1] == ("under 2000 riyals", {"max_price": "2000"})  # no phone context
+
+
+async def test_edited_filter_tokens_replace_the_state_without_extraction():
+    search, store = Search(), MemoryStore()
+    service = ChatService(search, None, RATES, store)
+    await run_turns(service, "e", ["used iPhone 15 Pro Max", "under 2000 riyals"])
+    edited = SearchFilters(category="phones", models=["iPhone 15 Pro Max"])  # removed 2 tokens
+    async for _ in service.events("Removed: Used, Under 2,000 QAR", "e", edited):
+        pass
+    query, filters = search.calls[-1]
+    assert filters == {"category": "phones", "models": ["iPhone 15 Pro Max"]}
+    # Retrieval text is rebuilt from what is left, so removed values stop steering ranking.
+    assert query == "iPhone 15 Pro Max phones"
+    assert store.rows["e"].filters == edited and store.rows["e"].turns == 3
+
+
+def test_removing_the_model_drops_it_from_retrieval_text_and_keywords():
+    before = SearchFilters(
+        category="phones",
+        brands=["Apple"],
+        models=["iPhone 17"],
+        conditions=["like_new", "good"],
+        keywords=["iPhone 17", "great"],
+    )
+    edited = before.model_copy(update={"models": []})
+    cleaned = drop_removed_keywords(before, edited)
+    assert cleaned.keywords == ["great"]
+    assert describe(cleaned) == "like new or good Apple phones"
+    assert "17" not in describe(cleaned)
+
+
+def test_describe_covers_rentals_and_attributes():
+    f = SearchFilters(
+        category="apartments",
+        listing_type="rent",
+        location="Lusail",
+        attributes={
+            "bedrooms": {"eq": 2},
+            "furnished": {"eq": "furnished"},
+            "private_pool": {"eq": True},
+        },
+    )
+    assert describe(f) == "apartments for rent in Lusail 2 bedrooms furnished private pool"
+
+
+async def test_no_match_sends_relaxations_first_then_the_closest_listings():
+    search, store = Search(), MemoryStore()
+    service = ChatService(search, None, RATES, store)
+    names = [e.name async for e in service.events("used iPhone 15 Pro Max", "n")]
+    assert names[:3] == ["filters", "listings", "no_match"]
+    assert names.index("nearby") > names.index("token") and names[-1] == "done"
+    # The nearby search keeps the person's words and only the kind of item.
+    query, filters = search.nearby[-1]
+    assert query == search.calls[-1][0] and filters == {"category": "phones"}

@@ -1,7 +1,7 @@
 import "server-only";
 
 // Server-side only: the browser talks to Next.js, and Next.js talks to FastAPI.
-const BACKEND_URL = process.env.BACKEND_URL ?? "http://localhost:8000";
+export const BACKEND_URL = process.env.BACKEND_URL ?? "http://localhost:8000";
 
 export type HealthResponse = {
   status: "ok";

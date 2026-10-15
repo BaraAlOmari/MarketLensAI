@@ -151,3 +151,43 @@ def merge(
         )
         notes.append(f"cheaper: below median {cheaper_than:.0f} QAR")
     return merged, notes
+
+
+def describe(filters: SearchFilters) -> str:
+    """Retrieval text for filters the person edited by hand: only what is still asked for.
+
+    The old message would keep ranking by what was removed ("iPhone 17" pulls 17 Pro/Max to
+    the top after the model token is gone), so an edit searches with the remaining filters.
+    Prices are left out: they are SQL bounds and carry no meaning for embeddings.
+    """
+    parts: list[str] = []
+    if filters.conditions:
+        parts.append(" or ".join(c.value.replace("_", " ") for c in filters.conditions))
+    parts += [" or ".join(filters.brands), " or ".join(filters.models)]
+    if filters.category:
+        parts.append(filters.category)
+    if filters.listing_type:
+        parts.append(f"for {filters.listing_type.value}")
+    if filters.location:
+        parts.append(f"in {filters.location}")
+    for key, rule in filters.attributes.items():
+        name = key.replace("_", " ")
+        if rule.eq is not None:
+            value = str(rule.eq)
+            parts.append(name if rule.eq is True else value if name in value else f"{value} {name}")
+        elif rule.any_of or rule.contains:
+            parts.append(f"{name} {' '.join(rule.any_of or rule.contains or [])}")
+        elif rule.min is not None or rule.max is not None:
+            parts.append(f"{name} {rule.min or ''}-{rule.max or ''}".strip())
+    return " ".join(p for p in parts if p)
+
+
+def drop_removed_keywords(previous: SearchFilters | None, edited: SearchFilters) -> SearchFilters:
+    """Keyword search terms that belonged to a removed brand or model go with it."""
+    if previous is None or not edited.keywords:
+        return edited
+    kept = {t.lower() for t in edited.brands + edited.models}
+    removed = [t.lower() for t in previous.brands + previous.models if t.lower() not in kept]
+    keywords = [k for k in edited.keywords
+                if not any(k.lower() in r or r in k.lower() for r in removed)]  # fmt: skip
+    return edited.model_copy(update={"keywords": keywords})

@@ -1,26 +1,235 @@
 @import "tailwindcss";
 
+/*
+ * MarketLens design tokens, modelled on iOS system colors and named by role (color.md).
+ * Apple's own secondary/tertiary label grays fall below 4.5:1, so those two are darkened
+ * (light) or lightened (dark) until they pass. Contrast, light / dark:
+ *   content   15.1 / 19.3 on surface     secondary 5.8 / 9.5 on surface, 6.5 / 7.7 on raised
+ *   tertiary   4.5 / 7.3 on surface      danger    5.4 / 6.0 on raised
+ *   accent (text)  6.6 / 8.3 on surface, 7.4 / 6.7 on raised, 6.2 / 6.1 on accent-surface
+ *   on-accent on accent-fill  7.4 / 7.5
+ * The tint is maroon: #903461 (light) and #942E5E (dark). In dark mode #942E5E is used
+ * only as a fill (white text on it 7.5:1); as text or a focus ring on the dark surfaces it
+ * would be 2.3-2.8:1, so text uses the same hue lightened, #DB8AB0. Used for sends, the
+ * user's own messages, the "understood as" tokens and recommendations (branding.md).
+ *
+ * Appearance follows the system unless the person picks Light or Dark in the header, which
+ * sets <html data-theme> (see ThemeSwitch). Each dark block is written twice: once for the
+ * system setting, once for the explicit choice.
+ */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  color-scheme: light;
+  --surface: #f2f2f7; /* systemGroupedBackground */
+  --raised: #ffffff; /* secondarySystemGroupedBackground */
+  --fill: #e9e9ee; /* thumbnails, quiet chips, segmented-control track */
+  --thumb: #ffffff; /* selected segment */
+  --content: #1d1d1f;
+  --secondary: #5e5e63;
+  --tertiary: #6e6e73;
+  --separator: #c6c6c8; /* opaqueSeparator */
+  --accent: #903461; /* text, icons, outlines */
+  --accent-fill: #903461; /* send button, the person's bubbles, "Recommended" */
+  --accent-surface: #f6e8ef;
+  --on-accent: #ffffff;
+  --danger: #d70015;
+  --placeholder-a: #e5e5ea;
+  --placeholder-b: #efeff4;
 }
 
 @media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --surface: #000000;
+    --raised: #1c1c1e;
+    --fill: #2c2c2e;
+    --thumb: #636366;
+    --content: #f5f5f7;
+    --secondary: #aeaeb2;
+    --tertiary: #98989d;
+    --separator: #38383a;
+    --accent: #db8ab0; /* #942e5e lightened: as text it would be 2.3:1 */
+    --accent-fill: #942e5e;
+    --accent-surface: #3a1a29;
+    --on-accent: #ffffff;
+    --danger: #ff6961;
+    --placeholder-a: #1c1c1e;
+    --placeholder-b: #2c2c2e;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --surface: #000000;
+  --raised: #1c1c1e;
+  --fill: #2c2c2e;
+  --thumb: #636366;
+  --content: #f5f5f7;
+  --secondary: #aeaeb2;
+  --tertiary: #98989d;
+  --separator: #38383a;
+  --accent: #db8ab0; /* #942e5e lightened: as text it would be 2.3:1 */
+  --accent-fill: #942e5e;
+  --accent-surface: #3a1a29;
+  --on-accent: #ffffff;
+  --danger: #ff6961;
+  --placeholder-a: #1c1c1e;
+  --placeholder-b: #2c2c2e;
+}
+
+/* Increase Contrast: stronger secondary text and separators. */
+@media (prefers-contrast: more) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --secondary: #3a3a3e;
+    --tertiary: #48484c;
+    --separator: #8e8e93;
+  }
+}
+@media (prefers-contrast: more) and (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --secondary: #d1d1d6;
+    --tertiary: #c7c7cc;
+    --separator: #636366;
+  }
+}
+@media (prefers-contrast: more) {
+  :root[data-theme="dark"] {
+    --secondary: #d1d1d6;
+    --tertiary: #c7c7cc;
+    --separator: #636366;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@theme inline {
+  --color-surface: var(--surface);
+  --color-raised: var(--raised);
+  --color-fill: var(--fill);
+  --color-thumb: var(--thumb);
+  --color-content: var(--content);
+  --color-secondary: var(--secondary);
+  --color-tertiary: var(--tertiary);
+  --color-separator: var(--separator);
+  --color-accent: var(--accent);
+  --color-accent-fill: var(--accent-fill);
+  --color-accent-surface: var(--accent-surface);
+  --color-on-accent: var(--on-accent);
+  --color-danger: var(--danger);
+  /* SF (with SF Arabic) on Apple devices; Inter + Noto Sans Arabic elsewhere. The real
+   * families come first: next/font's metric fallbacks are Arial, which has Arabic glyphs
+   * and would otherwise catch Arabic text before Noto Sans Arabic. */
+  --font-sans:
+    -apple-system, BlinkMacSystemFont, "Inter", "Noto Sans Arabic", var(--font-inter),
+    var(--font-arabic), system-ui, "Segoe UI", Roboto, sans-serif;
+}
+
+/*
+ * The iOS text styles at their default (Large) size, in rem so they follow the browser's
+ * text-size setting (typography.md: Dynamic Type). Tracking follows SF's: slightly tight,
+ * tighter as the size grows.
+ */
+@theme {
+  --text-large-title: 2.125rem; /* 34 */
+  --text-large-title--line-height: 2.5625rem;
+  --text-large-title--letter-spacing: -0.022em;
+  --text-large-title--font-weight: 700;
+  --text-title2: 1.375rem; /* 22 */
+  --text-title2--line-height: 1.75rem;
+  --text-title2--letter-spacing: -0.019em;
+  --text-title3: 1.25rem; /* 20 */
+  --text-title3--line-height: 1.5625rem;
+  --text-title3--letter-spacing: -0.017em;
+  --text-headline: 1.0625rem; /* 17 semibold */
+  --text-headline--line-height: 1.375rem;
+  --text-headline--letter-spacing: -0.013em;
+  --text-headline--font-weight: 600;
+  --text-body: 1.0625rem; /* 17 */
+  --text-body--line-height: 1.5rem;
+  --text-body--letter-spacing: -0.013em;
+  --text-callout: 1rem; /* 16 */
+  --text-callout--line-height: 1.3125rem;
+  --text-callout--letter-spacing: -0.011em;
+  --text-subhead: 0.9375rem; /* 15 */
+  --text-subhead--line-height: 1.25rem;
+  --text-subhead--letter-spacing: -0.009em;
+  --text-footnote: 0.8125rem; /* 13 */
+  --text-footnote--line-height: 1.125rem;
+  --text-footnote--letter-spacing: -0.004em;
+  --text-caption: 0.75rem; /* 12 */
+  --text-caption--line-height: 1rem;
+  --text-caption--letter-spacing: 0;
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background: var(--surface);
+    color: var(--content);
+    font-family: var(--font-sans);
+    font-optical-sizing: auto; /* Inter's opsz: text cut at body sizes, display cut for titles */
+    font-feature-settings: "cv11"; /* Inter's single-storey a, closer to SF */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+}
+
+/* The one orchestrated moment: result cards ease in as they arrive. Off for Reduce Motion. */
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.rise-in {
+  animation: rise-in 320ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+/* Loading placeholders: a slow shimmer, replaced by a still tint for Reduce Motion. */
+@keyframes shimmer {
+  from {
+    background-position: 100% 0;
+  }
+  to {
+    background-position: -100% 0;
+  }
+}
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--placeholder-a) 25%,
+    var(--placeholder-b) 50%,
+    var(--placeholder-a) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.6s linear infinite;
+}
+
+/* iOS-style activity indicator: eight spokes stepping round. */
+@keyframes spokes {
+  to {
+    transform: rotate(360deg);
+  }
+}
+.activity {
+  animation: spokes 0.8s steps(8) infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rise-in,
+  .skeleton,
+  .activity {
+    animation: none;
+  }
+  .skeleton {
+    background: var(--placeholder-a);
+  }
 }

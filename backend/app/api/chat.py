@@ -5,6 +5,7 @@ from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from app.answers.chat import ChatService, sse
+from app.models.filters import SearchFilters
 
 router = APIRouter(prefix="/api")
 
@@ -15,6 +16,8 @@ class ChatRequest(BaseModel):
     # Anonymous conversation id made up by the client (e.g. a UUID); no authentication.
     session_id: str = Field(min_length=1, max_length=64, pattern=r"^[A-Za-z0-9_-]+$")
     message: str = Field(min_length=1, max_length=500)
+    # Edited filter tokens from the UI: replace the conversation's filters for this turn.
+    filters: SearchFilters | None = None
 
     @field_validator("message")
     @classmethod
@@ -36,7 +39,7 @@ async def chat(
     is unavailable). Listing cards come from database rows; the text never carries prices."""
 
     async def stream():
-        async for event in service.events(body.message, body.session_id):
+        async for event in service.events(body.message, body.session_id, body.filters):
             yield sse(event)
 
     return StreamingResponse(

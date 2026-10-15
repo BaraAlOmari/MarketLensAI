@@ -3,7 +3,9 @@
 Events, in order:
     filters   the constraints applied (sent as soon as query understanding is done)
     listings  cards built from database rows (never from LLM output)
+    no_match  only when nothing matches: real counts for dropping each one filter
     token     the reply text, in small chunks
+    nearby    only after no_match: the closest listings, each with the filters it misses
     done      cited listing ids, grounding report, timings
     error     only if search itself is unavailable (then `done` follows)
 
@@ -24,9 +26,24 @@ from decimal import Decimal
 import asyncpg
 
 from app.answers.grounding import Grounded, ground, template_answer
-from app.answers.relax import ARABIC, Relaxation, no_match_message, relax_counts
-from app.conversation.merge import median_price, merge, split_reset, wants_cheaper
+from app.answers.relax import (
+    ARABIC,
+    Relaxation,
+    misses,
+    nearby_filters,
+    no_match_message,
+    relax_counts,
+)
+from app.conversation.merge import (
+    describe,
+    drop_removed_keywords,
+    median_price,
+    merge,
+    split_reset,
+    wants_cheaper,
+)
 from app.conversation.store import Session, SessionStore, combine_query
+from app.models.filters import SearchFilters
 from app.models.search import ListingResult, SearchRequest
 from app.providers.llm import (
     Answer,
@@ -44,6 +61,7 @@ logger = logging.getLogger(__name__)
 
 HYDRATE = f"select {LISTING_COLUMNS} from listings where id = any($1::bigint[])"
 WORDS_PER_TOKEN_EVENT = 4
+NEARBY_LIMIT = 6  # "closest matches" shown under a no-match reply
 START_OVER_EN = "Okay, starting over. What are you looking for?"
 START_OVER_AR = "تمام، نبدأ من جديد. عن ماذا تبحث؟"
 
@@ -164,7 +182,35 @@ class ChatService:
             async with self.search.pool.acquire() as conn:
                 await self.sessions.save(conn, session)
 
-    async def events(self, message: str, session_id: str | None = None) -> AsyncIterator[Event]:
+    async def _nearby(self, query: str, filters: SearchFilters) -> dict:
+        """Closest listings when nothing matches exactly (Stage 9): same words, only the
+        category and sale-or-rent kept, each card with the constraints it misses."""
+        try:
+            response = await self.search.search(
+                SearchRequest(
+                    query=query, filters=nearby_filters(filters), extract=False, limit=NEARBY_LIMIT
+                )
+            )
+            async with self.search.pool.acquire() as conn:
+                cards = await hydrate(conn, response.results)
+                missed = await misses(conn, [c.id for c in cards], filters, self.rates)
+        except Exception:  # noqa: BLE001 - the no-match reply stands on its own
+            logger.exception("nearby search failed")
+            return {"listings": [], "misses": {}}
+        return {
+            "listings": [c.model_dump(mode="json") for c in cards],
+            "misses": {str(c.id): missed.get(c.id, []) for c in cards},
+        }
+
+    async def events(
+        self,
+        message: str,
+        session_id: str | None = None,
+        filters_override: SearchFilters | None = None,
+    ) -> AsyncIterator[Event]:
+        """`filters_override`: the person edited the filter tokens in the UI (Stage 9). Those
+        filters replace the conversation's, with no extraction; `message` only labels the
+        turn in the history."""
         t0 = time.perf_counter()
         timings: dict[str, float] = {}
 
@@ -178,52 +224,64 @@ class ChatService:
             yield Event("done", {"cited_ids": [], "timings_ms": {}})
             return
 
-        # 0. Conversation state, and "start over".
+        # 0. Conversation state.
         session = await self._load(session_id)
-        reset, text = split_reset(message)
-        if reset:
-            session.filters, session.search_query, session.last_result_ids = None, "", []
-            if not text:
-                reply = START_OVER_AR if ARABIC.search(message) else START_OVER_EN
-                session.remember("user", message)
-                session.remember("assistant", reply)
-                session.turns += 1
-                await self._save(session)
-                yield Event("filters", {"filters": None, "previous": None, "reset": True,
-                                        "notes": ["start over"], "error": None})  # fmt: skip
-                yield Event("listings", {"listings": []})
-                for piece in chunks(reply):
-                    yield Event("token", {"text": piece})
-                lap("total", t0)
-                yield Event("done", {"cited_ids": [], "reset": True, "no_match": False,
-                                     "timings_ms": timings})  # fmt: skip
-                return
-        prev = session.filters if session.filters and not session.filters.is_empty() else None
-
-        # 1. Understand the new message (context-free, cached by its text) while its
-        #    embedding is computed in parallel; then merge it into the conversation.
-        warm_text = combine_query(session.search_query, text) if prev else text
-        warm = asyncio.create_task(self.search.embedder.embed_query(warm_text))
-        try:
-            understood = await self._understand(text)
-        except Exception:  # noqa: BLE001 - search still runs, with the previous filters
-            logger.exception("query understanding failed")
+        if filters_override is not None:
+            prev = session.filters
             understood = None
-        understanding = self.search.understanding
-        if understood is not None and understanding is not None and prev is not None:
-            understood = understanding.with_context(understood, text, prev.category)
-        delta = understood.filters if understood else None
-        median = None
-        if prev is not None and wants_cheaper(text):
-            async with self.search.pool.acquire() as conn:
-                median = await median_price(conn, prev, self.rates)
-        catalog = understanding.catalog if understanding is not None else None
-        filters, notes = merge(prev, delta, catalog, median)
-        new_topic = prev is None or any(n.startswith("new category") for n in notes)
-        # Reply in the language of the latest message, not of the accumulated query text.
-        language = reply_language(text)
-        search_query = text if new_topic else combine_query(session.search_query, text)
-        t = lap("understand", t0)
+            text = message
+            filters = drop_removed_keywords(prev, filters_override)
+            notes = ["filters edited"]
+            # Search with what is still asked for, not the old wording (see describe).
+            search_query = describe(filters) or session.search_query or message
+            language = reply_language(session.search_query or message)
+            warm = asyncio.create_task(self.search.embedder.embed_query(search_query))
+            t = lap("understand", t0)
+        else:
+            reset, text = split_reset(message)
+            if reset:
+                session.filters, session.search_query, session.last_result_ids = None, "", []
+                if not text:
+                    reply = START_OVER_AR if ARABIC.search(message) else START_OVER_EN
+                    session.remember("user", message)
+                    session.remember("assistant", reply)
+                    session.turns += 1
+                    await self._save(session)
+                    yield Event("filters", {"filters": None, "previous": None, "reset": True,
+                                            "notes": ["start over"], "error": None})  # fmt: skip
+                    yield Event("listings", {"listings": []})
+                    for piece in chunks(reply):
+                        yield Event("token", {"text": piece})
+                    lap("total", t0)
+                    yield Event("done", {"cited_ids": [], "reset": True, "no_match": False,
+                                         "timings_ms": timings})  # fmt: skip
+                    return
+            prev = session.filters if session.filters and not session.filters.is_empty() else None
+
+            # 1. Understand the new message (context-free, cached by its text) while its
+            #    embedding is computed in parallel; then merge it into the conversation.
+            warm_text = combine_query(session.search_query, text) if prev else text
+            warm = asyncio.create_task(self.search.embedder.embed_query(warm_text))
+            try:
+                understood = await self._understand(text)
+            except Exception:  # noqa: BLE001 - search still runs, with the previous filters
+                logger.exception("query understanding failed")
+                understood = None
+            understanding = self.search.understanding
+            if understood is not None and understanding is not None and prev is not None:
+                understood = understanding.with_context(understood, text, prev.category)
+            delta = understood.filters if understood else None
+            median = None
+            if prev is not None and wants_cheaper(text):
+                async with self.search.pool.acquire() as conn:
+                    median = await median_price(conn, prev, self.rates)
+            catalog = understanding.catalog if understanding is not None else None
+            filters, notes = merge(prev, delta, catalog, median)
+            new_topic = prev is None or any(n.startswith("new category") for n in notes)
+            # Reply in the language of the latest message, not of the accumulated query text.
+            language = reply_language(text)
+            search_query = text if new_topic else combine_query(session.search_query, text)
+            t = lap("understand", t0)
         yield Event(
             "filters",
             {
@@ -264,6 +322,9 @@ class ChatService:
                 cached_answer = await self.answers.lookup(conn, search_query, cards, language)
         t = lap("hydrate", t)
         yield Event("listings", {"listings": [c.model_dump(mode="json") for c in cards]})
+        no_match = not cards and filters is not None and not filters.is_empty()
+        if no_match:
+            yield Event("no_match", {"relaxations": [r.__dict__ for r in relaxations]})
 
         # 4. The reply: generated in full, grounded, then streamed.
         answer_info: dict = {"cached": cached_answer is not None, "error": None}
@@ -303,6 +364,10 @@ class ChatService:
 
         for piece in chunks(grounded.summary):
             yield Event("token", {"text": piece})
+        if no_match and filters is not None:
+            t = time.perf_counter()
+            yield Event("nearby", await self._nearby(search_query, filters))
+            lap("nearby", t)
         timings["total"] = round((time.perf_counter() - t0) * 1000, 1)
         yield Event(
             "done",

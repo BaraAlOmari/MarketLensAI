@@ -17,7 +17,14 @@ from app.answers.grounding import (
     template_answer,
     validate_citations,
 )
-from app.answers.relax import Relaxation, no_match_message, relax_counts, relaxed_variants
+from app.answers.relax import (
+    Relaxation,
+    nearby_filters,
+    no_match_message,
+    relax_counts,
+    relaxed_variants,
+    single_constraints,
+)
 from app.api.chat import get_chat_service
 from app.config import DEFAULT_FX_RATES_TO_QAR as RATES
 from app.config import Settings
@@ -332,3 +339,23 @@ def test_reply_language_follows_the_latest_message():
     chat_events(service, "Galaxy S24 Ultra")
     chat_events(service, "أرخص")
     assert answers.languages == ["English", "Arabic"]
+
+
+def test_single_constraints_isolate_each_filter_and_nearby_keeps_the_kind_of_item():
+    f = SearchFilters(
+        category="phones",
+        brands=["Apple"],
+        models=["iPhone 17"],
+        conditions=["like_new", "good"],
+        min_price=765,
+        max_price=1035,
+        currency="USD",
+        attributes={"storage_gb": {"eq": 256}},
+    )
+    singles = dict(single_constraints(f))
+    assert list(singles) == ["price", "conditions", "models", "brands", "attr:storage_gb"]
+    assert singles["price"].max_price == 1035 and singles["price"].currency == "USD"
+    assert singles["price"].models == [] and singles["models"].min_price is None
+    assert singles["attr:storage_gb"].attributes == {"storage_gb": f.attributes["storage_gb"]}
+    near = nearby_filters(f)
+    assert near.category == "phones" and not near.models and near.min_price is None
