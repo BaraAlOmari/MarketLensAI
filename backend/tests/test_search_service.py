@@ -9,6 +9,7 @@ from app.config import DEFAULT_FX_RATES_TO_QAR as RATES
 from app.models.filters import QueryParse, SearchFilters, parse_to_filters
 from app.models.search import SearchRequest
 from app.providers.query_cache import QueryVector
+from app.retrieval.hybrid import HybridResult
 from app.retrieval.service import SearchService
 from app.retrieval.understanding import Understanding
 
@@ -58,14 +59,20 @@ class FakeUnderstanding:
 
 @pytest.fixture
 def searches(monkeypatch):
-    """Capture what vector_search was asked to do instead of touching a database."""
+    """Capture what retrieval was asked to do instead of touching a database."""
     seen = []
 
     async def fake_vector_search(conn, literal, model, limit, clauses=(), params=()):
-        seen.append({"clauses": list(clauses), "params": list(params), "limit": limit})
+        seen.append({"mode": "vector", "clauses": list(clauses), "params": list(params)})
         return []
 
+    async def fake_hybrid_search(conn, literal, model, query, depth, clauses=(), params=(), k=60):
+        seen.append({"mode": "hybrid", "clauses": list(clauses), "params": list(params),
+                     "query": query, "depth": depth, "k": k})  # fmt: skip
+        return HybridResult({}, [], [], [])
+
     monkeypatch.setattr(service_module, "vector_search", fake_vector_search)
+    monkeypatch.setattr(service_module.hybrid, "hybrid_search", fake_hybrid_search)
     return seen
 
 
@@ -77,7 +84,7 @@ async def test_extracted_filters_are_applied(searches):
     resp = await svc.search(SearchRequest(query="phone under 1000", debug=True))
     assert resp.extracted_filters == {"category": "phones", "max_price": "1000"}
     assert any("price_qar <=" in c for c in searches[0]["clauses"])
-    assert resp.debug.retrieval == "vector+filters" and resp.debug.filters_source == "llm"
+    assert resp.debug.retrieval == "hybrid+filters" and resp.debug.filters_source == "llm"
 
 
 async def test_failed_extraction_falls_back_to_unfiltered_search(searches):
@@ -86,7 +93,7 @@ async def test_failed_extraction_falls_back_to_unfiltered_search(searches):
     resp = await svc.search(SearchRequest(query="phone under 1000", debug=True))
     assert searches[0]["clauses"] == []  # searched without filters
     assert resp.extracted_filters is None
-    assert resp.debug.retrieval == "vector"
+    assert resp.debug.retrieval == "hybrid"
     assert resp.debug.extraction.error.startswith("extraction call failed")
 
 
@@ -112,3 +119,32 @@ async def test_extract_false_reproduces_the_baseline(searches):
     resp = await svc.search(SearchRequest(query="phone under 1000", extract=False, debug=True))
     assert understanding.calls == 0 and searches[0]["clauses"] == []
     assert resp.debug.filters_source == "none"
+
+
+async def test_hybrid_is_the_default_and_gets_the_same_filters(searches):
+    svc = SearchService(FakePool(), FakeEmbedder(cached=True), FakeUnderstanding(PARSE), RATES)
+    resp = await svc.search(SearchRequest(query="phone under 1000", debug=True))
+    hybrid_call = searches[0]
+    # Default keyword source is the LLM's keywords: none here, so no full-text side.
+    assert hybrid_call["mode"] == "hybrid" and hybrid_call["query"] == ""
+    assert hybrid_call["depth"] == 50 and hybrid_call["k"] == 60
+    # Filter parameters are numbered after the hybrid query's own four ($1..$4).
+    assert any("price_qar <= $" in c for c in hybrid_call["clauses"])
+    assert all("$4" not in c for c in hybrid_call["clauses"])
+    assert resp.debug.retrieval == "hybrid+filters"
+
+    resp = await svc.search(SearchRequest(query="phone under 1000", retrieval="vector", debug=True))
+    vector_call = searches[1]
+    assert vector_call["mode"] == "vector"
+    assert len(vector_call["clauses"]) == len(hybrid_call["clauses"])  # same filters, both modes
+    assert resp.debug.retrieval == "vector+filters"
+
+
+async def test_keyword_side_uses_llm_keywords_or_the_raw_query(searches):
+    parse = QueryParse(category="phones", keywords=["512GB", "S24"])
+    svc = SearchService(FakePool(), FakeEmbedder(cached=True), FakeUnderstanding(parse), RATES)
+    await svc.search(SearchRequest(query="used galaxy s24 512GB"))
+    assert searches[-1]["query"] == "512GB S24"
+    svc.hybrid_keywords = "query"
+    await svc.search(SearchRequest(query="used galaxy s24 512GB"))
+    assert searches[-1]["query"] == "used galaxy s24 512GB"

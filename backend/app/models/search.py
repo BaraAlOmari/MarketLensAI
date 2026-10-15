@@ -1,7 +1,7 @@
 """Request/response schemas for POST /api/search (spec section 7)."""
 
 from decimal import Decimal
-from typing import Any
+from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
@@ -18,6 +18,8 @@ class SearchRequest(BaseModel):
     filters: SearchFilters | None = None
     # false: skip query understanding and search unfiltered (the Stage 3 baseline).
     extract: bool = True
+    # None: the server default (RETRIEVAL_MODE). "vector" reproduces Stage 4.
+    retrieval: Literal["hybrid", "vector"] | None = None
     limit: int = Field(default=10, ge=1, le=50)
     debug: bool = False
 
@@ -47,7 +49,8 @@ class ListingResult(BaseModel):
     location: str
     language: Language
     image_url: str | None
-    score: float  # cosine similarity for the vector baseline (higher is closer)
+    score: float  # hybrid: RRF score; vector: cosine similarity (higher is better)
+    ranks: dict[str, int] = {}  # hybrid: 1-based rank on each side ("vector", "keyword")
 
 
 class ExtractionDebug(BaseModel):
@@ -63,11 +66,12 @@ class ExtractionDebug(BaseModel):
 
 
 class SearchDebug(BaseModel):
-    retrieval: str
+    retrieval: str  # vector | vector+filters | hybrid | hybrid+filters
     embedding_model: str
     embedding_cached: bool
     filters_source: str  # request | llm | none
     extraction: ExtractionDebug | None = None
+    candidates: dict[str, int] = {}  # hybrid: rows found per side before fusion
     timings_ms: dict[str, float]
 
 

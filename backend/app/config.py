@@ -3,6 +3,7 @@
 from decimal import Decimal
 from functools import lru_cache
 from pathlib import Path
+from typing import Literal
 
 from pydantic import Field, SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -67,6 +68,14 @@ class Settings(BaseSettings):
     # Paid-tier list prices per 1M tokens (pricing page, 2026-10-13), for cost reporting.
     extraction_input_price_per_mtok_usd: Decimal = Decimal("0.30")
     extraction_output_price_per_mtok_usd: Decimal = Decimal("2.50")
+
+    # Retrieval (Stage 5): "hybrid" = vector + full-text fused with RRF; "vector" = Stage 4.
+    retrieval_mode: Literal["hybrid", "vector"] = "hybrid"
+    hybrid_candidates: int = Field(default=50, ge=10, le=200)  # per side, before fusion
+    rrf_k: int = Field(default=60, ge=1)
+    # What the full-text side searches: the LLM's extracted keywords (exact tokens such as
+    # 512GB or M4 Max), or the raw query. With no keywords the full-text side is skipped.
+    hybrid_keywords: Literal["llm", "query"] = "llm"
 
     # Currency: QAR is the base; every listing also stores price_qar for cross-currency filters.
     base_currency: str = "QAR"

@@ -62,7 +62,14 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         else:
             logger.warning("search disabled: needs DATABASE_URL and GEMINI_API_KEY")
         app.state.search_service = SearchService(
-            app.state.db_pool, embedder, understanding, settings.fx_rates_to_qar
+            app.state.db_pool,
+            embedder,
+            understanding,
+            settings.fx_rates_to_qar,
+            retrieval_mode=settings.retrieval_mode,
+            hybrid_candidates=settings.hybrid_candidates,
+            rrf_k=settings.rrf_k,
+            hybrid_keywords=settings.hybrid_keywords,
         )
         try:
             yield

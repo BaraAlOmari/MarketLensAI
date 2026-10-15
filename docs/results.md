@@ -12,6 +12,7 @@ Recall@10 counts the share of relevant listings found in the top 10 (denominator
 |---|---|---|---|---|---|---|---|---|
 | 2026-10-13 | Stage 3 baseline (vector only) | 0.853 | 0.919 | 31% | 0/45 | 891 / 921 | $0.0000046 | [report](../eval/results/2026-10-13-stage-3-baseline-vector-only.md) |
 | 2026-10-14 | Stage 4 query understanding | 0.996 | 1.000 | 1% | 0/45 | 1168 / 1146 | $0.000402 | [report](../eval/results/2026-10-14-stage-4-query-understanding.md) |
+| 2026-10-14 | Stage 5 hybrid (vector + full-text, RRF) | 0.996 | 1.000 | 1% | 0/45 | 1177 / 1159 | $0.000402 | [report](../eval/results/2026-10-14-stage-5-hybrid-vector-full-text-rrf.md) |
 <!-- runs:end -->
 
 ## Stage 3 baseline: vector search only
@@ -95,3 +96,42 @@ I wrote both the eval queries and the extraction rules, and the backstops were a
 - **Cached query:** about 1.2 s mean (the recorded row), almost all of it database round trips from the dev machine.
 - **Cost per uncached query at paid prices:** about **$0.0004**, from ≈ 883 input + 53 output tokens for the extraction plus ≈ 23 tokens for the embedding. On the free tier it is $0, with 500 extractions per day.
 - 503 retries count against the daily limit: on 2026-10-13 the 500/day quota was used up mostly by failed calls.
+
+## Stage 5: hybrid retrieval (vector + full-text, fused with RRF)
+
+Each search now takes the top 50 by vector distance and the top 50 by Postgres full-text rank (`ts_rank` on the English + Arabic `fts` column, query words OR-ed), both under the same Stage 4 filters. The two lists are merged with Reciprocal Rank Fusion (k = 60): `score = Σ 1 / (60 + rank)`. One SQL round trip; latency is unchanged. Report: [eval/results/2026-10-14-stage-5-hybrid-vector-full-text-rrf.md](../eval/results/2026-10-14-stage-5-hybrid-vector-full-text-rrf.md).
+
+| Variant | Recall@10 | MRR | Wrong in top 10 | Report |
+|---|---|---|---|---|
+| Vector + filters (Stage 4 behaviour) | 0.996 | 1.000 | 1% | [vector-only](../eval/results/2026-10-14-stage-5-variant-vector-only.md) |
+| **Hybrid, full-text on the LLM's keywords (shipped)** | **0.996** | **1.000** | **1%** | [shipped](../eval/results/2026-10-14-stage-5-hybrid-vector-full-text-rrf.md) |
+| Hybrid, full-text on the raw query | 0.987 | 1.000 | 2% | [raw-query](../eval/results/2026-10-14-stage-5-variant-raw-query.md) |
+| Hybrid on the raw query, **no LLM filters** | 0.689 | 0.907 | 43% | [no-filters](../eval/results/2026-10-14-stage-5-variant-raw-query-no-filters.md) |
+| Vector, no LLM filters (Stage 3 baseline) | 0.853 | 0.919 | 31% | [baseline](../eval/results/2026-10-13-stage-3-baseline-vector-only.md) |
+
+### Which queries improved or regressed
+
+**Shipped variant (LLM keywords): no query changed score.** The full-text side was active in only 9 of 45 queries, the ones where the LLM extracted exact tokens ("512GB", "1TB", "M4", "foldable", "مفروش"). It reordered the top 10 in 5 of them. Every reordered listing was already relevant, so Recall@10 and MRR cannot move: after Stage 4's filters the eval is close to saturated. What the reordering did, checked by hand:
+
+- `ph03` "Samsung Galaxy S24 Ultra 512GB": the two listings that say "512GB" in both title and description moved to #1 and #2, above one that mentions it only once in its description. ✓
+- `lp01` "MacBook Air M4 with 16GB RAM": a 32GB unit (relevant, since it has at least 16 GB) dropped out of the top 4 for listings that say "16GB". ✓
+- `ap07` "استوديو مفروش للإيجار": a studio whose text doesn't say "مفروش" dropped out of the top 4. ✓
+- `lp05` "MacBook Pro M4 Max 1TB": two exact matches swapped places (#3 ↔ #4); the one with "1TB" only in its description moved down. Neutral.
+- `vi03` "townhouse for sale": an Arabic-only listing ("تاون هاوس للبيع") dropped out of the top 4, because it doesn't contain the English word "townhouse". ✗ This is the cost of keyword matching: it is bound to one language.
+
+**Raw-query variant (not shipped): 2 regressions, 1 improvement.**
+
+- `ph06` "foldable phone in like new condition": Recall@10 1.00 → 0.60. "like new" is already a filter, but matching it again promoted non-foldable like-new phones (Pixel 10, OnePlus 13). "foldable" itself barely appears in listings.
+- `car08` "سيارة سيدان اقتصادية اقل من 30 الف": 1.00 → 0.90. "سيارة" ("car") matches every car listing, and an MG ZS SUV moved in.
+- `lp03` "lightweight laptop for a university student": 0.80 → 0.90, the only gain.
+
+### Why the raw query does worse, and what changed because of it
+
+- **`ts_rank` has no IDF.** It does not know that "used", "for", "في" and "سيارة" appear in hundreds of listings while "Lusail" or "foldable" are rare, so common words dominate. Without filters this is plain to see: hybrid on the raw query scores 0.689, below vector-only 0.853.
+- **It double-counts constraints the filters already enforce.** "Used", "under 1000" and "for sale" are hard filters from Stage 4; matching them again as keywords only adds noise.
+- **Shipped design:** the full-text side searches the LLM's `keywords` (exact tokens such as model numbers and specs, the field the Stage 4 form already extracts). If there are no keywords, there is no full-text side and the order is pure vector. Keyword-score ties are broken by vector similarity rather than by id.
+- **A hidden Stage 4 miss surfaced.** For "townhouse for sale" the LLM had not extracted "for sale". Vector ranking happened to put the sale listings first, so Stage 4 still scored 1.0; full-text on "townhouse" promoted the rentals. A third backstop now fills `listing_type` from an explicit "for sale" / "for rent" / "للبيع" / "للإيجار" when the LLM leaves it empty. It does not change the Stage 4 score, which is 0.996 with or without it.
+
+### Takeaway
+
+On this eval, hybrid retrieval adds no measurable recall: the hard constraints are already exact filters, and vector search ranks well inside them. It helps where an exact token matters but is not a filter (listings that state "512GB" or "16GB" outright now come first), at a small cost for listings written only in the other language. This dataset is synthetic with clean facts. On real listings, where specs are often missing from the structured fields and exist only in the text, the full-text side should matter more. Stage 6 (reranking) is the next place to look for gains in ordering.

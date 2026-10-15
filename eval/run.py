@@ -7,7 +7,8 @@ the first run the numbers reproduce exactly without spending quota.
 Usage (from backend/):
     .venv/Scripts/python ../eval/run.py                              # print scores
     .venv/Scripts/python ../eval/run.py --label "Stage 4 filters" --record   # + docs/results.md
-    .venv/Scripts/python ../eval/run.py --no-extract                 # Stage 3 baseline again
+    .venv/Scripts/python ../eval/run.py --no-extract --retrieval vector   # Stage 3 baseline
+    .venv/Scripts/python ../eval/run.py --retrieval vector           # Stage 4 (no keyword search)
     .venv/Scripts/python ../eval/run.py --concurrency 4 --extraction-timeout 150   # fill caches
     .venv/Scripts/python ../eval/run.py --url http://localhost:8000
 """
@@ -74,6 +75,8 @@ async def search_client(args):
     settings = get_settings()
     if args.extraction_timeout:
         settings = settings.model_copy(update={"extraction_timeout_s": args.extraction_timeout})
+    if args.hybrid_keywords:
+        settings = settings.model_copy(update={"hybrid_keywords": args.hybrid_keywords})
     if args.extraction_attempts:
         settings = settings.model_copy(update={"extraction_max_attempts": args.extraction_attempts})
     app = create_app(settings)
@@ -116,6 +119,7 @@ async def run(args) -> dict:
                     "limit": K,
                     "debug": True,
                     "extract": not args.no_extract,
+                    "retrieval": args.retrieval,
                 },
             )
             wall_ms = (time.perf_counter() - t0) * 1000
@@ -323,9 +327,17 @@ def main() -> int:
     parser.add_argument("--label", default="dev run")
     parser.add_argument("--record", action="store_true", help="append a row to docs/results.md")
     parser.add_argument("--no-extract", action="store_true", help="skip query understanding")
+    parser.add_argument(
+        "--retrieval",
+        choices=["hybrid", "vector"],
+        help="override RETRIEVAL_MODE (vector = Stage 4)",
+    )
     parser.add_argument("--concurrency", type=int, default=1, help="queries in flight")
     parser.add_argument(
         "--extraction-timeout", type=float, help="seconds per LLM call (in-process only)"
+    )
+    parser.add_argument(
+        "--hybrid-keywords", choices=["llm", "query"], help="full-text input (in-process)"
     )
     parser.add_argument(
         "--extraction-attempts", type=int, help="LLM attempts per query (in-process only)"

@@ -1,7 +1,9 @@
 """Search orchestration.
 
-Stage 4: understand the query (cached LLM extraction -> SearchFilters), then vector search
-under those filters. If extraction fails, search still runs, unfiltered.
+Stage 4: understand the query (cached LLM extraction -> SearchFilters). If extraction fails,
+search still runs, unfiltered.
+Stage 5: retrieve with hybrid search (vector + full-text, fused with RRF), both sides under
+the same filters. `retrieval="vector"` gives the Stage 4 behaviour.
 
 Round trips matter (~300 ms each from the dev machine to Supabase): when both the query
 embedding and the extraction are cached, lookups and search share one connection. On a miss,
@@ -24,7 +26,9 @@ from app.models.search import (
     SearchResponse,
 )
 from app.providers.query_cache import CachedQueryEmbedder, QueryVector
+from app.retrieval import hybrid
 from app.retrieval.filters_sql import build_where
+from app.retrieval.rrf import RRF_K
 from app.retrieval.understanding import QueryUnderstanding, Understanding
 from app.retrieval.vector import FIRST_FILTER_PARAM, vector_search
 
@@ -35,10 +39,16 @@ class SearchUnavailableError(RuntimeError):
     """The database or embedding provider is not configured or not reachable."""
 
 
-def to_result(record: asyncpg.Record) -> ListingResult:
+def to_result(
+    record: asyncpg.Record, score: float | None = None, ranks: dict[str, int] | None = None
+) -> ListingResult:
     row = dict(record)
     if isinstance(row["attributes"], str):  # asyncpg returns jsonb as text by default
         row["attributes"] = json.loads(row["attributes"])
+    if score is not None:
+        row["score"] = score
+    if ranks:
+        row["ranks"] = ranks
     return ListingResult(**row)
 
 
@@ -53,25 +63,65 @@ class SearchService:
         embedder: CachedQueryEmbedder | None,
         understanding: QueryUnderstanding | None = None,
         rates_to_qar: dict | None = None,
+        *,
+        retrieval_mode: str = "hybrid",
+        hybrid_candidates: int = 50,
+        hybrid_keywords: str = "llm",
+        rrf_k: int = RRF_K,
     ) -> None:
         self.pool = pool
         self.embedder = embedder
         self.understanding = understanding
         self.rates = rates_to_qar or {}
+        self.retrieval_mode = retrieval_mode
+        self.hybrid_candidates = hybrid_candidates
+        self.rrf_k = rrf_k
+        self.hybrid_keywords = hybrid_keywords
+
+    def _keyword_text(self, query: str, filters: SearchFilters | None) -> str:
+        """Text for the full-text side. "llm": the extracted exact tokens; words the filters
+        already enforce ("used", "for sale", "under 1000") are not matched a second time.
+        An empty string means no full-text side (the result is then pure vector order)."""
+        if self.hybrid_keywords == "query":
+            return query
+        return " ".join(filters.keywords) if filters is not None else ""
 
     async def _retrieve(
         self,
         conn: asyncpg.Connection,
+        mode: str,
+        query: str,
         vector: QueryVector,
         filters: SearchFilters | None,
         limit: int,
-    ) -> list[asyncpg.Record]:
+    ) -> tuple[list[ListingResult], dict[str, int]]:
+        """Results best first, and how many candidates each side found."""
+        model = self.embedder.model
+        if mode == "vector":
+            clauses, params = ([], [])
+            if filters is not None:
+                clauses, params = build_where(filters, self.rates, FIRST_FILTER_PARAM)
+            records = await vector_search(conn, vector.literal, model, limit, clauses, params)
+            return [to_result(r) for r in records], {"vector": len(records)}
+
         clauses, params = ([], [])
         if filters is not None:
-            clauses, params = build_where(filters, self.rates, FIRST_FILTER_PARAM)
-        return await vector_search(
-            conn, vector.literal, self.embedder.model, limit, clauses, params
+            clauses, params = build_where(filters, self.rates, hybrid.FIRST_FILTER_PARAM)
+        found = await hybrid.hybrid_search(
+            conn,
+            vector.literal,
+            model,
+            self._keyword_text(query, filters),
+            max(self.hybrid_candidates, limit),
+            clauses,
+            params,
+            k=self.rrf_k,
         )
+        results = [
+            to_result(found.records[f.id], score=round(f.score, 6), ranks=f.ranks)
+            for f in found.fused[:limit]
+        ]
+        return results, {"vector": len(found.vector_ids), "keyword": len(found.keyword_ids)}
 
     async def search(self, request: SearchRequest) -> SearchResponse:
         if self.pool is None or self.embedder is None:
@@ -79,13 +129,14 @@ class SearchService:
         if request.filters is not None:
             build_where(request.filters, self.rates, FIRST_FILTER_PARAM)  # 422 before any I/O
         use_llm = request.filters is None and request.extract and self.understanding is not None
+        mode = request.retrieval or self.retrieval_mode
         query, limit = request.query, request.limit
         timings: dict[str, float] = {}
         t0 = time.perf_counter()
 
         vector: QueryVector | None = None
         understood: Understanding | None = None
-        records = None
+        found = None
         async with self.pool.acquire() as conn:
             vector = await self.embedder.lookup(conn, query)
             if use_llm:
@@ -94,10 +145,10 @@ class SearchService:
             if vector is not None and (understood is not None or not use_llm):
                 filters = request.filters or (understood.filters if understood else None)
                 t1 = time.perf_counter()
-                records = await self._retrieve(conn, vector, filters, limit)
+                found = await self._retrieve(conn, mode, query, vector, filters, limit)
                 timings["retrieve"] = _ms(time.perf_counter() - t1)
 
-        if records is None:
+        if found is None:
             t1 = time.perf_counter()
             embed_task = self.embedder.embed_and_store(query) if vector is None else None
             llm_task = (
@@ -114,11 +165,11 @@ class SearchService:
             filters = request.filters or (understood.filters if understood else None)
             t2 = time.perf_counter()
             async with self.pool.acquire() as conn:
-                records = await self._retrieve(conn, vector, filters, limit)
+                found = await self._retrieve(conn, mode, query, vector, filters, limit)
             timings["retrieve"] = _ms(time.perf_counter() - t2)
 
         timings["total"] = _ms(time.perf_counter() - t0)
-        results = [to_result(r) for r in records]
+        results, candidates = found
         applied = filters is not None and not filters.is_empty()
         logger.info(
             "search done",
@@ -149,7 +200,7 @@ class SearchService:
                     else None,
                 )
             debug = SearchDebug(
-                retrieval="vector+filters" if applied else "vector",
+                retrieval=f"{mode}+filters" if applied else mode,
                 embedding_model=self.embedder.model,
                 embedding_cached=vector.cached,
                 filters_source="request"
@@ -158,6 +209,7 @@ class SearchService:
                 if use_llm
                 else "none",
                 extraction=extraction,
+                candidates=candidates,
                 timings_ms=timings,
             )
         return SearchResponse(

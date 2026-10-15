@@ -12,7 +12,13 @@ from app.providers.gemini import JsonResult
 from app.providers.llm import ExtractionError, GeminiLLMProvider, parse_schema
 from app.retrieval.catalog import Catalog
 from app.retrieval.filters_sql import MONTHLY_PRICE, build_where, escape_like
-from app.retrieval.guards import bedrooms_from_query, clean_parse, numbers_in, price_from_query
+from app.retrieval.guards import (
+    bedrooms_from_query,
+    clean_parse,
+    listing_type_from_query,
+    numbers_in,
+    price_from_query,
+)
 
 CATALOG = Catalog(
     categories=("apartments", "cars", "furniture", "laptops", "phones", "villas"),
@@ -236,8 +242,8 @@ def test_guards_drop_fields_from_other_categories_and_ungrounded_numbers():
     cleaned, dropped = guard(
         "studio for rent", category="apartments", property_type="studio", storage_gb=512
     )
-    assert cleaned == {"category": "apartments", "property_type": "studio"}
-    assert dropped == ["storage_gb:not for apartments"]
+    assert cleaned == {"category": "apartments", "property_type": "studio", "listing_type": "rent"}
+    assert dropped == ["storage_gb:not for apartments", "listing_type:filled from query"]
     # "office chair with delivery" came back with a location and a year it never mentioned.
     cleaned, dropped = guard(
         "office chair with delivery", category="furniture", item_types=["office chair"],
@@ -310,7 +316,9 @@ def test_arabic_place_names_are_checked_too():
     assert guard("office chair مع توصيل", category="furniture", location="Lusail")[1] == [
         "location:not named in query"
     ]
-    assert guard("فيلا للبيع في لوسيل", category="villas", location="Lusail")[1] == []
+    assert guard("فيلا للبيع في لوسيل", category="villas", location="Lusail")[1] == [
+        "listing_type:filled from query"
+    ]
 
 
 @pytest.mark.parametrize(
@@ -350,9 +358,28 @@ def test_backstops_fill_only_empty_fields():
     assert "price:filled from query" in notes
     assert float(cleaned["price"]["amount"]) == 15000 and cleaned["price"]["period"] == "month"
     cleaned, notes = guard("شقة غرفتين للإيجار في لوسيل", category="apartments")
-    assert cleaned["bedrooms"] == 2 and notes == ["bedrooms:filled from query"]
+    assert cleaned["bedrooms"] == 2 and cleaned["listing_type"] == "rent"
+    assert notes == ["bedrooms:filled from query", "listing_type:filled from query"]
     # An LLM price is kept as is; bedrooms are not filled for non-property categories.
     cleaned, notes = guard("phone under 900", category="phones",
                            price={"comparator": "under", "amount": 900})  # fmt: skip
     assert notes == []
     assert bedrooms_from_query("2 bedroom villa") == 2 and bedrooms_from_query("studio") is None
+
+
+@pytest.mark.parametrize(
+    ("query", "expected"),
+    [("townhouse for sale", "sale"), ("فيلا للبيع في لوسيل", "sale"), ("studio to rent", "rent"),
+     ("شقة للإيجار", "rent"), ("villa for rent or for sale", None), ("2 bedroom flat", None)],
+)  # fmt: skip
+def test_listing_type_backstop(query, expected):
+    kind = listing_type_from_query(query)
+    assert (kind.value if kind else None) == expected
+
+
+def test_listing_type_backstop_only_for_property():
+    # Found in Stage 5: "townhouse for sale" came back without listing_type.
+    cleaned, notes = guard("townhouse for sale", category="villas")
+    assert cleaned["listing_type"] == "sale" and notes == ["listing_type:filled from query"]
+    cleaned, notes = guard("iphone for sale", category="phones")
+    assert "listing_type" not in cleaned and notes == []

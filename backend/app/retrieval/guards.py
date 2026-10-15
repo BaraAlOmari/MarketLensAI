@@ -11,10 +11,11 @@ Two generic rules remove that without touching the prompt:
 2. Grounding: a number filter must appear in the query (as digits, "40k", "1TB", "30 الف", or a
    number word such as "غرفتين" = 2). Sizes, areas and mileages also need their unit
    (GB/TB, sqm/متر, km/كم). A location must be named (English, or a known Arabic spelling).
-3. Backstops for the two most important explicit constraints, used only when the LLM left the
-   field empty: a price limit ("under 15000 a month", "أقل من 1500 ريال") and a bedroom count
-   ("2BR", "غرفتين"). On 2026-10-14 the model put "under 15000 a month" into area, mileage,
-   storage and RAM but not price, and missed "غرفتين".
+3. Backstops for the most important explicit constraints, used only when the LLM left the
+   field empty: a price limit ("under 15000 a month", "أقل من 1500 ريال"), a bedroom count
+   ("2BR", "غرفتين") and sale or rent ("for sale", "للإيجار"). On 2026-10-14 the model put
+   "under 15000 a month" into area, mileage, storage and RAM but not price, missed "غرفتين",
+   and dropped "for sale" from "townhouse for sale" (hidden until hybrid search, Stage 5).
 
 Guards run on every parse, cached or fresh, so changing them never needs a new LLM call.
 """
@@ -23,7 +24,7 @@ import re
 from decimal import Decimal
 
 from app.models.filters import PriceComparator, PriceIntent, QueryParse
-from app.models.listing import PROPERTY_CATEGORIES, PricePeriod
+from app.models.listing import PROPERTY_CATEGORIES, ListingType, PricePeriod
 from app.retrieval.catalog import Catalog
 
 GENERAL = {"category", "brands", "models", "condition", "price", "location", "keywords"}
@@ -164,6 +165,20 @@ def price_from_query(query: str) -> PriceIntent | None:
     )
 
 
+FOR_RENT = re.compile(
+    r"\b(?:for rent|to rent|rental|for lease|to let)\b|للإيجار|للايجار|ايجار|إيجار", re.I
+)
+FOR_SALE = re.compile(r"\b(?:for sale|to buy|buy)\b|للبيع", re.I)
+
+
+def listing_type_from_query(query: str) -> ListingType | None:
+    """Sale or rent when the query says exactly one of them ("townhouse for sale")."""
+    rent, sale = bool(FOR_RENT.search(query)), bool(FOR_SALE.search(query))
+    if rent == sale:
+        return None  # neither, or both ("for rent or sale"): leave it open
+    return ListingType.rent if rent else ListingType.sale
+
+
 def bedrooms_from_query(query: str) -> int | None:
     text = query.translate(ARABIC_DIGITS)
     if match := BEDROOMS.search(text):
@@ -253,5 +268,12 @@ def clean_parse(parse: QueryParse, query: str, catalog: Catalog) -> tuple[QueryP
     ):
         update["bedrooms"] = beds
         dropped.append("bedrooms:filled from query")
+    if (
+        "listing_type" in allowed
+        and parse.listing_type is None
+        and (kind := listing_type_from_query(query)) is not None
+    ):
+        update["listing_type"] = kind
+        dropped.append("listing_type:filled from query")
 
     return parse.model_copy(update=update), dropped
