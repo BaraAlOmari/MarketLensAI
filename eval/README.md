@@ -65,6 +65,7 @@ The same mapping must be used by query understanding (Stage 4), so the eval and 
 .venv\Scripts\python ..\eval\run.py --retrieval vector --no-rerank   # Stage 4
 .venv\Scripts\python ..\eval\run.py --hybrid-keywords query          # full-text on the raw query
 .venv\Scripts\python ..\eval\run.py --no-rerank                         # Stage 5: no reranker
+.venv\Scripts\python ..\eval\grounding_check.py --concurrency 2 --llm-timeout 60   # Stage 7: chat grounding
 ```
 
 LLM extractions are cached too (`query_extraction_cache`), keyed by a hash of the prompt, schema and catalog. A prompt or catalog change therefore re-extracts all 45 queries once (45 of the 500 free daily Flash-Lite requests). Changes to the Python mapping or guards reuse the cache and cost nothing. Rerank orders are cached the same way (`rerank_cache`), keyed by the query and the exact candidate list.

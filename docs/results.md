@@ -168,3 +168,42 @@ After hybrid retrieval, the top candidates (up to 50, mean 18.6 after filters) g
 ### Takeaway
 
 The reranker earns its place on vague-intent queries, the one kind the filters and keyword search cannot handle: it fixed the last failing query. Everywhere else it reshuffles results that were already correct, and it does not apply soft preferences such as "cheap". It roughly triples the cost of a new query and adds about 7 s on today's free tier. Cached queries pay only about 0.35 s more (one extra lookup). Kept **on by default**, because the pipeline in the spec includes it and caching hides the cost for repeated queries. `RERANK_ENABLED=false` is the switch if interactive latency matters more than vague-query quality. Natural follow-ups (not done): a deterministic "sort by price" hint for "cheap" and "cheapest", and a diversity cap such as at most 3 listings per model in the top 10.
+
+## Stage 7: grounded answers and `POST /api/chat`
+
+`POST /api/chat` streams server-sent events: `filters` (as soon as query understanding is done), `listings` (cards from fresh database rows), `token` (the reply, in chunks) and `done` (cited ids, grounding report, timings). The reply is generated **in full and grounded before any token is sent**:
+
+1. **No prices to copy.** The answer model never sees price numbers, only a rank ("price rank 1 of 6 (1 = cheapest)"). It can say "the cheapest" but has no number to repeat.
+2. **Citations checked.** It cites listings by their number in the list; anything out of range or repeated is dropped. At most 3.
+3. **Text checked.** Any sentence with a price, currency amount, link, e-mail or phone number is removed; if nothing is left, a plain template is used.
+4. **Cards from the database.** Card data is re-read from Postgres by id. The LLM's text is never parsed for listing details.
+5. **No matches.** No LLM call. Each filter is dropped once and the matches are counted in one SQL query, and the reply states the real counts ("Nothing matches all of your filters. Without the property type there is 1.").
+
+### Acceptance: grounding check on all 45 eval queries
+
+`eval/grounding_check.py` runs every eval query through `/api/chat` and checks each reply: cited ids ⊆ cards sent; no price, link or phone number in the text; every card's title, price and currency equal the database row (re-read independently). Report: [eval/results/2026-10-15-stage-7-grounding.md](../eval/results/2026-10-15-stage-7-grounding.md).
+
+| Check | Result |
+|---|---|
+| Violations (any of the three checks) | **0 of 45 replies** ✅ |
+| Answers from the LLM / template / no-match | 45 / 0 / 0 |
+| Hallucinated or repeated ids dropped | 0 |
+| Sentences removed for a price or link | 0 (rule 1 removed the temptation at the source) |
+| Reply language matches the query (Arabic → Arabic) | 45 of 45 |
+| Reply length | 26–62 words, mean 42 |
+| Unit tests with a deliberately lying fake model (invented id, a price, a link, a phone number) | all removed before the stream: `tests/test_chat.py` |
+
+### Latency and cost
+
+| | |
+|---|---|
+| Answer call (uncached) | 4.9 s mean, about 1,300 input + 60 output tokens |
+| Whole chat message (with embedding and extraction cached, rerank + answer uncached) | 9.2 s mean server-side |
+| Answer cost per message, paid tier | **$0.0006** |
+| Full new message (embedding + extraction + rerank + answer) | ≈ $0.0019 at paid prices; 3 of the 500 free daily Flash-Lite requests |
+
+### Quality, checked by hand
+
+- Claims checked against the cited rows for three replies (`fu04`, `car07`, `vi05`): conditions, trims, GCC specs, locations, garden, maid room and "the cheapest" were all right. Two small slips: a townhouse called a villa, and "the brown one if you prefer leather" when both chairs are leather. **Grounding rules stop invented prices, links and listings; they do not prove every adjective.** Grading that would take a separate faithfulness check (an LLM judge or human review), which this project does not have yet.
+- Replies sometimes refer to cards by position ("the second listing", "الفيلا رقم 3") although the prompt says not to. It is harmless here, because cards are sent in the same order the model saw, but the UI must keep that order.
+- First smoke test: an Arabic query got an English reply. The model ignored "answer in the query's language", so the reply language is now chosen in code (more Arabic than Latin letters → Arabic) and stated in the prompt.

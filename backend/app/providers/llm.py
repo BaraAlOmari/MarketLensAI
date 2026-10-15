@@ -9,13 +9,16 @@ import hashlib
 import json
 import time
 from abc import ABC, abstractmethod
+from collections.abc import Sequence
 from dataclasses import dataclass
+from decimal import Decimal
 from typing import Any
 
 from pydantic import ValidationError
 
 from app.models.filters import ConditionIntent, PriceComparator, QueryParse, SearchFilters
 from app.models.listing import ListingType, PricePeriod
+from app.models.search import ListingResult
 from app.providers.gemini import GeminiJsonClient
 from app.providers.ratelimit import SlidingWindowLimiter
 from app.retrieval.catalog import Catalog
@@ -228,6 +231,89 @@ class Extraction:
     latency_ms: float = 0.0
 
 
+# --- grounded answers (Stage 7) -----------------------------------------------------------
+
+ANSWER_SYSTEM = """You write the short reply of a marketplace search assistant in Qatar.
+You get the shopper's query and the numbered listings the search found. They already match
+the shopper's filters.
+
+Write 2 to 4 short sentences (at most 70 words) in the reply language given with the query.
+Say how many listings were found and point out the best one
+to three and why (condition, specs, location, or "the cheapest" from the price rank).
+Mention a trade-off if it helps the shopper choose.
+
+Strict rules:
+- Use only facts from the listings below. Do not invent anything.
+- Never write a price, an amount of money, a currency, a link, a phone number or a listing
+  number. The app shows prices and details on cards next to your reply.
+- `recommended`: the numbers of the listings you point out, best first, at most 3."""
+
+ANSWER_SCHEMA: dict[str, Any] = {
+    "type": "object",
+    "properties": {
+        "summary": {"type": "string", "description": "The reply text. No prices, no links."},
+        "recommended": {
+            "type": "array",
+            "items": {"type": "integer"},
+            "description": "Numbers of the listings the reply points out, best first.",
+        },
+    },
+    "required": ["summary"],
+}
+
+
+class AnswerError(RuntimeError):
+    """The answer call failed or returned nothing usable; a template answer is used."""
+
+
+@dataclass(frozen=True)
+class Answer:
+    summary: str
+    recommended: list[int]  # 1-based numbers into the listings given (validated later)
+    input_tokens: int = 0
+    output_tokens: int = 0
+    thought_tokens: int = 0
+    latency_ms: float = 0.0
+
+
+def _comparable_price(listing: ListingResult) -> Decimal:
+    if listing.listing_type == ListingType.rent and listing.price_period == PricePeriod.year:
+        return listing.price_qar / 12
+    return listing.price_qar
+
+
+def reply_language(query: str) -> str:
+    """Decided in code: the model ignored "answer in the query's language" for Arabic
+    queries (2026-10-15). Mixed queries follow whichever script has more letters."""
+    arabic = sum(1 for ch in query if "؀" <= ch <= "ۿ")
+    latin = sum(1 for ch in query if ch.isascii() and ch.isalpha())
+    return "Arabic" if arabic > latin else "English"
+
+
+def answer_candidates(listings: Sequence[ListingResult]) -> list[str]:
+    """Numbered facts for the answer model. Prices are replaced by their rank among these
+    listings (1 = cheapest), so the model can say "the cheapest" but has no number to repeat."""
+    order = sorted(range(len(listings)), key=lambda i: _comparable_price(listings[i]))
+    rank = {i: r for r, i in enumerate(order, 1)}
+    lines = []
+    for i, listing in enumerate(listings):
+        facts = [listing.category, listing.brand or "", listing.model or "", listing.location]
+        if listing.condition:
+            facts.append(listing.condition.value.replace("_", " "))
+        if listing.listing_type == ListingType.rent:
+            facts.append(f"for rent per {listing.price_period.value}")
+        for key, value in listing.attributes.items():
+            if isinstance(value, list):
+                value = ", ".join(map(str, value))
+            facts.append(f"{key.replace('_', ' ')}: {value}")
+        facts.append(f"price rank {rank[i]} of {len(listings)} (1 = cheapest)")
+        description = " ".join(listing.description.split())[:160]
+        lines.append(
+            f"[{i + 1}] {listing.title} | {' | '.join(f for f in facts if f)} | {description}"
+        )
+    return lines
+
+
 class LLMProvider(ABC):
     model: str
 
@@ -236,9 +322,17 @@ class LLMProvider(ABC):
     def prompt_hash(self) -> str:
         """Changes whenever the prompt, schema or catalog changes (cache key)."""
 
+    @property
+    def answer_prompt_hash(self) -> str:
+        return ""
+
     @abstractmethod
     async def extract_filters(self, query: str, state: SearchFilters | None = None) -> Extraction:
         """Fill the filter form for `query`. Raises ExtractionError on any failure."""
+
+    async def generate_answer(self, query: str, listings: Sequence[ListingResult]) -> Answer:
+        """Short reply about `listings`. Raises AnswerError on any failure."""
+        raise AnswerError(f"{type(self).__name__} does not generate answers")
 
 
 class GeminiLLMProvider(LLMProvider):
@@ -266,6 +360,43 @@ class GeminiLLMProvider(LLMProvider):
     @property
     def prompt_hash(self) -> str:
         return self._prompt_hash
+
+    @property
+    def answer_prompt_hash(self) -> str:
+        blob = ANSWER_SYSTEM + json.dumps(ANSWER_SCHEMA, sort_keys=True) + self.client.api
+        return hashlib.sha256((blob + self.thinking_level).encode()).hexdigest()[:16]
+
+    async def generate_answer(self, query: str, listings: Sequence[ListingResult]) -> Answer:
+        prompt = "\n".join(
+            [f"Query: {query}", f"Reply language: {reply_language(query)}", "", "Listings:",
+             *answer_candidates(listings)]
+        )  # fmt: skip
+        await self._limiter.acquire(1)
+        started = time.perf_counter()
+        try:
+            result = await self.client.generate_json(
+                system=ANSWER_SYSTEM,
+                prompt=prompt,
+                schema=ANSWER_SCHEMA,
+                thinking_level=self.thinking_level,
+            )
+            data = json.loads(result.text or "{}")
+        except Exception as exc:
+            raise AnswerError(f"answer call failed: {type(exc).__name__}") from exc
+        summary = data.get("summary") if isinstance(data, dict) else None
+        if not isinstance(summary, str) or not summary.strip():
+            raise AnswerError("answer had no summary")
+        recommended = data.get("recommended") or []
+        return Answer(
+            summary=summary.strip(),
+            recommended=[r for r in recommended if isinstance(r, int)]
+            if isinstance(recommended, list)
+            else [],
+            input_tokens=result.input_tokens,
+            output_tokens=result.output_tokens,
+            thought_tokens=result.thought_tokens,
+            latency_ms=round((time.perf_counter() - started) * 1000, 1),
+        )
 
     async def extract_filters(self, query: str, state: SearchFilters | None = None) -> Extraction:
         prompt = query

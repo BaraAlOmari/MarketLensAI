@@ -4,7 +4,8 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api import health, search
+from app.answers.chat import AnswerCache, ChatService
+from app.api import chat, health, search
 from app.config import Settings, get_settings
 from app.db import create_pool
 from app.logging_setup import RequestIdMiddleware, configure_logging
@@ -108,6 +109,11 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             rerank_candidates=settings.rerank_candidates,
             rerank_top_n=settings.rerank_top_n,
         )
+        # Answers use the same LLM provider (and rate limiter) as query understanding.
+        answers = AnswerCache(app.state.db_pool, understanding.llm) if understanding else None
+        app.state.chat_service = ChatService(
+            app.state.search_service, answers, settings.fx_rates_to_qar
+        )
         try:
             yield
         finally:
@@ -125,6 +131,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.add_middleware(RequestIdMiddleware)
     app.include_router(health.router)
     app.include_router(search.router)
+    app.include_router(chat.router)
     return app
 
 

@@ -113,6 +113,20 @@ Every external fact the project relies on is recorded here with its source and t
 | 2026-10-15 | Extraction and reranking **share one rate limiter** per Gemini model (`llm_limiter` in `app/main.py`). | They draw from the same 15 RPM / 500 RPD free quota; separate limiters would together exceed it. |
 | 2026-10-15 | **On by default** (`RERANK_ENABLED=true`); `rerank: false` per request, or `--no-rerank` in the eval, reproduces Stage 5. | Eval: Recall@10 0.996 → 1.000 (fixed `lp03`, the only vague-intent failure), at about 3× the cost per new query and +7.3 s on a cache miss. Caching hides the cost for repeated queries. Hand checks found it ignores "cheap" and slightly reduces variety (`docs/results.md`), so a price-sort hint and a per-model diversity cap are noted as follow-ups. |
 
+### Stage 7: grounded answers and chat
+
+| Date | Decision | Reason |
+|---|---|---|
+| 2026-10-15 | `LLMProvider.generate_answer(query, listings)` on the same Flash-Lite provider, client and rate limiter as extraction (`generateContent`, JSON schema `{summary, recommended[]}`). | Spec section 5 interface. One model and one limiter for the shared 500/day quota. |
+| 2026-10-15 | **The answer model never sees price numbers**, only `price rank k of N (1 = cheapest)`. | Removes the temptation at the source: it can say "the cheapest" with nothing to copy. On the 45-query check, 0 sentences had to be removed. |
+| 2026-10-15 | **Grounding in code** (`app/answers/grounding.py`): citations are 1-based numbers mapped to ids, out-of-range or repeated ones dropped, at most 3; any sentence with a price (currency amounts, "priced at", grouped numbers without a unit, "40k"), link, e-mail or phone number is removed; template fallback if nothing is left. | Spec acceptance: no response contains a price or link that did not come from the database. Numbers with units (512GB, 45,000 km, 4K screen) are kept. |
+| 2026-10-15 | **Generate in full, ground, then stream** the checked text as `token` events. `filters` is sent as soon as extraction is done; `listings` before any text. | Streaming raw model tokens would let a price reach the client before the check. Costs the time to the first token (the answer call, ≈ 5 s), not total time. |
+| 2026-10-15 | Cards are **re-read from Postgres by id** (`hydrate`) right before the `listings` event, not taken from LLM output or from earlier pipeline objects. | "Hydrate listing data from the DB" (spec section 4). The grounding check also re-reads every card's title, price and currency independently. |
+| 2026-10-15 | **No matches:** no LLM call. Each applied filter (except category) is dropped once and matches are counted in **one SQL query** (`count(*) filter (where ...)` per variant). The reply names up to two relaxations with real counts, in English or Arabic. | "Handle no good matches honestly (suggest relaxing a constraint)." A count from the database cannot be wrong the way an LLM suggestion can. |
+| 2026-10-15 | The reply language is chosen in code (more Arabic than Latin letters → Arabic) and given in the prompt. | In the first smoke test the model answered an Arabic query in English despite "use the language of the query". 45 of 45 matched afterwards. |
+| 2026-10-15 | Answers are cached in `answer_cache` (migration 005) as raw model output, keyed by the query and every listing's id and text as the model saw them. | Re-runs are free, and changes to the grounding rules still apply to cached answers. |
+| 2026-10-15 | `ChatRequest` = `{session_id, message}` (`session_id` accepted, unused until Stage 8). An `error` event is added for an unavailable search; `done` always follows. | Spec section 7 contract. Clients can rely on `done` closing every stream. |
+
 
 ## Verified facts
 

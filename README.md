@@ -4,7 +4,7 @@ Natural-language marketplace search: ask "Find me a used iPhone 17 in great cond
 
 The spec is in [REQUIREMENTS.md](REQUIREMENTS.md). Verified facts and decisions are in [docs/decisions.md](docs/decisions.md).
 
-**Status:** Stage 6 (reranking) complete: LLM filters → hybrid retrieval (vector + full-text, RRF) → Gemini listwise reranker. Eval: Recall@10 0.853 (baseline) → 1.000, wrong results 31% → 0%. See [docs/results.md](docs/results.md).
+**Status:** Stage 7 (grounded chat) complete: `POST /api/chat` streams filters, listing cards from the database, and a short reply that never contains a price or link (0 violations on the 45-query grounding check). Search eval: Recall@10 0.853 (baseline) → 1.000. See [docs/results.md](docs/results.md).
 
 ## Layout
 
