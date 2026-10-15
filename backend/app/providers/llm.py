@@ -330,8 +330,11 @@ class LLMProvider(ABC):
     async def extract_filters(self, query: str, state: SearchFilters | None = None) -> Extraction:
         """Fill the filter form for `query`. Raises ExtractionError on any failure."""
 
-    async def generate_answer(self, query: str, listings: Sequence[ListingResult]) -> Answer:
-        """Short reply about `listings`. Raises AnswerError on any failure."""
+    async def generate_answer(
+        self, query: str, listings: Sequence[ListingResult], language: str | None = None
+    ) -> Answer:
+        """Short reply about `listings` (in `language`, default: the query's).
+        Raises AnswerError on any failure."""
         raise AnswerError(f"{type(self).__name__} does not generate answers")
 
 
@@ -366,9 +369,12 @@ class GeminiLLMProvider(LLMProvider):
         blob = ANSWER_SYSTEM + json.dumps(ANSWER_SCHEMA, sort_keys=True) + self.client.api
         return hashlib.sha256((blob + self.thinking_level).encode()).hexdigest()[:16]
 
-    async def generate_answer(self, query: str, listings: Sequence[ListingResult]) -> Answer:
+    async def generate_answer(
+        self, query: str, listings: Sequence[ListingResult], language: str | None = None
+    ) -> Answer:
+        reply_in = language or reply_language(query)
         prompt = "\n".join(
-            [f"Query: {query}", f"Reply language: {reply_language(query)}", "", "Listings:",
+            [f"Query: {query}", f"Reply language: {reply_in}", "", "Listings:",
              *answer_candidates(listings)]
         )  # fmt: skip
         await self._limiter.acquire(1)

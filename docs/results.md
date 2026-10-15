@@ -16,6 +16,15 @@ Recall@10 counts the share of relevant listings found in the top 10 (denominator
 | 2026-10-15 | Stage 6 rerank (Gemini listwise) | 1.000 | 1.000 | 0% | 0/45 | 1517 / 1490 | $0.001301 | [report](../eval/results/2026-10-15-stage-6-rerank-gemini-listwise.md) |
 <!-- runs:end -->
 
+## Multi-turn runs (Stage 8)
+
+12 conversations in `eval/conversations.json` (frozen 2026-10-15), 18 scored turns. A conversation passes when every scored turn has 0 wrong results in its top 10 and Recall@10 ≥ 0.8.
+
+| Date | Run | Conversations passed | Scored turns passed | Recall@10 (all scored) | Recall@10 (final turns) | Wrong in top 10 | Details |
+|---|---|---|---|---|---|---|---|
+| 2026-10-15 | Stage 8 conversation state | 12/12 | 18/18 | 1.000 | 1.000 | 0 | [report](../eval/results/2026-10-15-conversations-stage-8-conversation-state.md) |
+<!-- conversations:end -->
+
 ## Stage 3 baseline: vector search only
 
 `POST /api/search` embeds the query and returns the 10 nearest listings by cosine distance. There are no filters and no keyword search. Full per-query report: [eval/results/2026-10-13-stage-3-baseline-vector-only.md](../eval/results/2026-10-13-stage-3-baseline-vector-only.md).
@@ -207,3 +216,43 @@ The reranker earns its place on vague-intent queries, the one kind the filters a
 - Claims checked against the cited rows for three replies (`fu04`, `car07`, `vi05`): conditions, trims, GCC specs, locations, garden, maid room and "the cheapest" were all right. Two small slips: a townhouse called a villa, and "the brown one if you prefer leather" when both chairs are leather. **Grounding rules stop invented prices, links and listings; they do not prove every adjective.** Grading that would take a separate faithfulness check (an LLM judge or human review), which this project does not have yet.
 - Replies sometimes refer to cards by position ("the second listing", "الفيلا رقم 3") although the prompt says not to. It is harmless here, because cards are sent in the same order the model saw, but the UI must keep that order.
 - First smoke test: an Arabic query got an English reply. The model ignored "answer in the query's language", so the reply language is now chosen in code (more Arabic than Latin letters → Arabic) and stated in the prompt.
+
+## Stage 8: conversation state
+
+Each chat session keeps its filters in a Postgres `sessions` table (anonymous; the client makes up the id). A follow-up is understood **on its own** (a context-free delta, so its extraction cache entry is valid in any conversation), and **code** merges it into the saved filters:
+
+| Rule | Example |
+|---|---|
+| A field the delta sets replaces the old value; other fields are kept | "under 2000 riyals" keeps phone · iPhone 15 Pro Max · used; "actually under 25000" replaces 20000 |
+| Attributes merge by key; keywords combine | "with 16GB RAM", then "like new only" |
+| A new brand drops models of other brands | "what about Samsung?" drops iPhone 15 Pro Max, keeps "used" and the price |
+| A different category starts over | "actually I need a villa for rent in Lusail" after "Nissan Patrol" |
+| "Cheaper" / "أرخص" → ceiling just below the **median price of everything that matched the previous search** (SQL `percentile_cont`) | "cheaper ones" after Land Cruisers → below 205,000 QAR |
+| An explicit price beats "cheaper" | "cheaper, under 1500" uses 1,500 |
+| "start over" / "ابدأ من جديد" at the start of a message clears the session | "factory reset iPhone" is a search, not a reset |
+| A follow-up without a category inherits the conversation's before the guards run | "for rent", "غرفتين" keep listing type and bedrooms instead of being dropped as "not for unknown category" |
+
+Retrieval uses the accumulated message text (the item stays in the embedding: "used iPhone 15 Pro Max under 2000 riyals cheaper ones"), and the reply follows the language of the latest message.
+
+### Acceptance: multi-turn eval
+
+12 conversations (`eval/conversations.json`, written and frozen before the conversation code; one changed beforehand because no listing matched). Report: [eval/results/2026-10-15-conversations-stage-8-conversation-state.md](../eval/results/2026-10-15-conversations-stage-8-conversation-state.md).
+
+| Conversations passed | Scored turns passed | Recall@10 | Wrong in top 10 | Covers |
+|---|---|---|---|---|
+| **12 / 12** ✅ | 18 / 18 | 1.000 | 0 | add (6), replace (1), cheaper (2), brand switch (1), category switch (2), start over (2); 1 Arabic and 1 mixed conversation |
+
+Every pass was checked turn by turn in the report: each merge note matches the rule above (for example `models of other brands dropped, brand set`, `cheaper: below median 2474 QAR`, `new category: villas`).
+
+**Found and fixed during the first run:** the Arabic follow-up "أرخص" got an English reply, because the reply language came from the accumulated text ("Galaxy S24 Ultra 512GB أرخص"). The language now follows the latest message (regression test added). The Stage 7 grounding check was re-run with real sessions: still 0 violations in 45 replies.
+
+### Unseen conversations (unscored sanity check)
+
+Five new conversations with different wording, filters read by hand. All merges were correct: Fold7 → "like new"; West Bay rent → "3 bedrooms" → "furnished" → "something cheaper"; Lexus RX 350 → "2022 or newer" → "what about BMW?" (kept the year, dropped the Lexus model); "سرير كوين" → "مع توصيل" → "ابدأ من جديد" → "لابتوب ديل"; Tesla under 150k → "make it under 120k". Two honest limits:
+
+- **"with the box" changes nothing.** "Box included" exists in the data but is not a filterable field, so the follow-up is silently ignored (the conversation is otherwise unaffected). The same applies to the spec's "only unlocked" example: the data has SIM types but no "unlocked" field.
+- **"Cheaper" after a single match** finds nothing (the median of one listing is its own price). The reply is then the grounded no-match message ("Without the location there are 17"), which is honest but not ideal.
+
+### Cost
+
+A follow-up costs one extraction call (cached by its text), plus a rerank and an answer call when the results change. "Start over" on its own costs no LLM call. One session row per conversation, with history capped at 20 messages.

@@ -24,10 +24,17 @@ from decimal import Decimal
 import asyncpg
 
 from app.answers.grounding import Grounded, ground, template_answer
-from app.answers.relax import Relaxation, no_match_message, relax_counts
-from app.models.filters import SearchFilters
+from app.answers.relax import ARABIC, Relaxation, no_match_message, relax_counts
+from app.conversation.merge import median_price, merge, split_reset, wants_cheaper
+from app.conversation.store import Session, SessionStore, combine_query
 from app.models.search import ListingResult, SearchRequest
-from app.providers.llm import Answer, AnswerError, LLMProvider, answer_candidates
+from app.providers.llm import (
+    Answer,
+    AnswerError,
+    LLMProvider,
+    answer_candidates,
+    reply_language,
+)
 from app.providers.query_cache import normalize_query
 from app.providers.retry import QuotaExhaustedError
 from app.retrieval.service import SearchService, SearchUnavailableError, to_result
@@ -37,6 +44,8 @@ logger = logging.getLogger(__name__)
 
 HYDRATE = f"select {LISTING_COLUMNS} from listings where id = any($1::bigint[])"
 WORDS_PER_TOKEN_EVENT = 4
+START_OVER_EN = "Okay, starting over. What are you looking for?"
+START_OVER_AR = "تمام، نبدأ من جديد. عن ماذا تبحث؟"
 
 
 @dataclass(frozen=True)
@@ -70,29 +79,37 @@ class AnswerCache:
         self.pool = pool
         self.llm = llm
 
-    def _key(self, query: str, listings: Sequence[ListingResult]) -> str:
-        blob = json.dumps(
-            [normalize_query(query), [x.id for x in listings], answer_candidates(listings)],
-            ensure_ascii=False,
-        )
+    def _key(
+        self, query: str, listings: Sequence[ListingResult], language: str | None = None
+    ) -> str:
+        parts = [normalize_query(query), [x.id for x in listings], answer_candidates(listings)]
+        # The language is part of the key only when it differs from the query's own, so
+        # answers cached before Stage 8 stay valid.
+        if language and language != reply_language(query):
+            parts.append(language)
+        blob = json.dumps(parts, ensure_ascii=False)
         return hashlib.sha256(blob.encode()).hexdigest()
 
-    async def lookup(self, conn, query: str, listings: Sequence[ListingResult]) -> Answer | None:
+    async def lookup(
+        self, conn, query: str, listings: Sequence[ListingResult], language: str | None = None
+    ) -> Answer | None:
         row = await conn.fetchrow(
             """update answer_cache set hits = hits + 1, last_used_at = now()
                where model = $1 and prompt_hash = $2 and input_sha256 = $3
                returning summary, recommended, input_tokens, output_tokens, thought_tokens""",
             self.llm.model,
             self.llm.answer_prompt_hash,
-            self._key(query, listings),
+            self._key(query, listings, language),
         )
         if row is None:
             return None
         return Answer(row["summary"], list(row["recommended"]), row["input_tokens"],
                       row["output_tokens"], row["thought_tokens"], 0.0)  # fmt: skip
 
-    async def generate_and_store(self, query: str, listings: Sequence[ListingResult]) -> Answer:
-        answer = await self.llm.generate_answer(normalize_query(query), listings)
+    async def generate_and_store(
+        self, query: str, listings: Sequence[ListingResult], language: str | None = None
+    ) -> Answer:
+        answer = await self.llm.generate_answer(normalize_query(query), listings, language)
         async with self.pool.acquire() as conn:
             await conn.execute(
                 """insert into answer_cache
@@ -102,7 +119,7 @@ class AnswerCache:
                    on conflict (model, prompt_hash, input_sha256) do nothing""",
                 self.llm.model,
                 self.llm.answer_prompt_hash,
-                self._key(query, listings),
+                self._key(query, listings, language),
                 normalize_query(query),
                 [x.id for x in listings],
                 answer.summary,
@@ -120,10 +137,12 @@ class ChatService:
         search: SearchService,
         answers: AnswerCache | None,
         rates_to_qar: dict[str, Decimal],
+        sessions: SessionStore | None = None,
     ) -> None:
         self.search = search
         self.answers = answers
         self.rates = rates_to_qar
+        self.sessions = sessions
 
     async def _understand(self, query: str):
         """Cached or fresh extraction; None when query understanding is off."""
@@ -134,7 +153,18 @@ class ChatService:
             cached = await understanding.lookup(conn, query)
         return cached or await understanding.extract_and_store(query)
 
-    async def events(self, message: str) -> AsyncIterator[Event]:
+    async def _load(self, session_id: str | None) -> Session:
+        if session_id is None or self.sessions is None:
+            return Session("")  # stateless: every message is a new search (Stage 7)
+        async with self.search.pool.acquire() as conn:
+            return await self.sessions.load(conn, session_id)
+
+    async def _save(self, session: Session) -> None:
+        if session.session_id and self.sessions is not None:
+            async with self.search.pool.acquire() as conn:
+                await self.sessions.save(conn, session)
+
+    async def events(self, message: str, session_id: str | None = None) -> AsyncIterator[Event]:
         t0 = time.perf_counter()
         timings: dict[str, float] = {}
 
@@ -148,14 +178,51 @@ class ChatService:
             yield Event("done", {"cited_ids": [], "timings_ms": {}})
             return
 
-        # 1. Understand the query while the embedding is computed (and cached) in parallel.
-        warm = asyncio.create_task(self.search.embedder.embed_query(message))
+        # 0. Conversation state, and "start over".
+        session = await self._load(session_id)
+        reset, text = split_reset(message)
+        if reset:
+            session.filters, session.search_query, session.last_result_ids = None, "", []
+            if not text:
+                reply = START_OVER_AR if ARABIC.search(message) else START_OVER_EN
+                session.remember("user", message)
+                session.remember("assistant", reply)
+                session.turns += 1
+                await self._save(session)
+                yield Event("filters", {"filters": None, "previous": None, "reset": True,
+                                        "notes": ["start over"], "error": None})  # fmt: skip
+                yield Event("listings", {"listings": []})
+                for piece in chunks(reply):
+                    yield Event("token", {"text": piece})
+                lap("total", t0)
+                yield Event("done", {"cited_ids": [], "reset": True, "no_match": False,
+                                     "timings_ms": timings})  # fmt: skip
+                return
+        prev = session.filters if session.filters and not session.filters.is_empty() else None
+
+        # 1. Understand the new message (context-free, cached by its text) while its
+        #    embedding is computed in parallel; then merge it into the conversation.
+        warm_text = combine_query(session.search_query, text) if prev else text
+        warm = asyncio.create_task(self.search.embedder.embed_query(warm_text))
         try:
-            understood = await self._understand(message)
-        except Exception:  # noqa: BLE001 - search still runs unfiltered
+            understood = await self._understand(text)
+        except Exception:  # noqa: BLE001 - search still runs, with the previous filters
             logger.exception("query understanding failed")
             understood = None
-        filters: SearchFilters | None = understood.filters if understood else None
+        understanding = self.search.understanding
+        if understood is not None and understanding is not None and prev is not None:
+            understood = understanding.with_context(understood, text, prev.category)
+        delta = understood.filters if understood else None
+        median = None
+        if prev is not None and wants_cheaper(text):
+            async with self.search.pool.acquire() as conn:
+                median = await median_price(conn, prev, self.rates)
+        catalog = understanding.catalog if understanding is not None else None
+        filters, notes = merge(prev, delta, catalog, median)
+        new_topic = prev is None or any(n.startswith("new category") for n in notes)
+        # Reply in the language of the latest message, not of the accumulated query text.
+        language = reply_language(text)
+        search_query = text if new_topic else combine_query(session.search_query, text)
         t = lap("understand", t0)
         yield Event(
             "filters",
@@ -163,15 +230,17 @@ class ChatService:
                 "filters": filters.model_dump(mode="json", exclude_defaults=True)
                 if filters
                 else None,
+                "previous": prev.model_dump(mode="json", exclude_defaults=True) if prev else None,
+                "notes": notes,
                 "error": understood.error if understood else None,
             },
         )
 
-        # 2. Retrieve (hybrid + rerank) with those filters; the embedding is cached by now.
+        # 2. Retrieve (hybrid + rerank) with the merged filters.
         try:
             await warm
             response = await self.search.search(
-                SearchRequest(query=message, filters=filters, extract=False, debug=True)
+                SearchRequest(query=search_query, filters=filters, extract=False, debug=True)
             )
         except (SearchUnavailableError, QuotaExhaustedError) as exc:
             yield Event("error", {"message": str(exc) or "search unavailable"})
@@ -192,29 +261,27 @@ class ChatService:
             if not cards and filters is not None and not filters.is_empty():
                 relaxations = await relax_counts(conn, filters, self.rates)
             elif cards and self.answers is not None:
-                cached_answer = await self.answers.lookup(conn, message, cards)
+                cached_answer = await self.answers.lookup(conn, search_query, cards, language)
         t = lap("hydrate", t)
         yield Event("listings", {"listings": [c.model_dump(mode="json") for c in cards]})
 
         # 4. The reply: generated in full, grounded, then streamed.
         answer_info: dict = {"cached": cached_answer is not None, "error": None}
         if not cards:
-            grounded = Grounded(no_match_message(message, relaxations), [], [], 0, False)
+            grounded = Grounded(no_match_message(text, relaxations), [], [], 0, False)
             answer_info["source"] = "no-match template"
         else:
             answer = cached_answer
             if answer is None and self.answers is not None:
                 try:
-                    answer = await self.answers.generate_and_store(message, cards)
+                    answer = await self.answers.generate_and_store(search_query, cards, language)
                 except (AnswerError, QuotaExhaustedError) as exc:
                     answer_info["error"] = str(exc)
             if answer is None:
-                grounded = Grounded(template_answer(message, len(cards)), [], [], 0, True)
+                grounded = Grounded(template_answer(text, len(cards)), [], [], 0, True)
                 answer_info["source"] = "template"
             else:
-                grounded = ground(
-                    message, answer.summary, answer.recommended, [c.id for c in cards]
-                )
+                grounded = ground(text, answer.summary, answer.recommended, [c.id for c in cards])
                 answer_info.update(
                     source="llm",
                     model=self.answers.llm.model,
@@ -224,6 +291,15 @@ class ChatService:
                     latency_ms=answer.latency_ms,
                 )
         lap("answer", t)
+
+        # 5. Remember the turn.
+        session.filters = filters
+        session.search_query = search_query
+        session.last_result_ids = [c.id for c in cards]
+        session.remember("user", message)
+        session.remember("assistant", grounded.summary)
+        session.turns += 1
+        await self._save(session)
 
         for piece in chunks(grounded.summary):
             yield Event("token", {"text": piece})
@@ -240,6 +316,7 @@ class ChatService:
                 "answer": answer_info,
                 "no_match": not cards,
                 "relaxations": [r.__dict__ for r in relaxations],
+                "session": {"turn": session.turns, "search_query": search_query},
                 "search": response.debug.model_dump(mode="json") if response.debug else None,
                 "timings_ms": timings,
             },

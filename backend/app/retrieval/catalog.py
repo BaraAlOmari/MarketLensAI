@@ -7,7 +7,7 @@ Loaded once at startup; reload the app after loading a new dataset.
 
 import hashlib
 import json
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, field
 
 import asyncpg
 
@@ -22,6 +22,8 @@ class Catalog:
     locations: tuple[str, ...]
     furnished: tuple[str, ...]
     amenities: tuple[str, ...]
+    # model -> brand, so a brand switch ("what about Samsung?") can drop other brands' models.
+    brand_by_model: dict[str, str] = field(default_factory=dict)
 
     @property
     def models(self) -> tuple[str, ...]:
@@ -64,4 +66,11 @@ async def load_catalog(conn: asyncpg.Connection) -> Catalog:
             """select distinct jsonb_array_elements_text(attributes -> 'amenities')
                from listings where jsonb_typeof(attributes -> 'amenities') = 'array'"""
         ),
+        brand_by_model={
+            r["model"]: r["brand"]
+            for r in await conn.fetch(
+                "select distinct model, brand from listings where model is not null"
+            )
+            if r["brand"]
+        },
     )

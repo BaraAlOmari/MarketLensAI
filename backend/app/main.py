@@ -7,6 +7,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.answers.chat import AnswerCache, ChatService
 from app.api import chat, health, search
 from app.config import Settings, get_settings
+from app.conversation.store import SessionStore
 from app.db import create_pool
 from app.logging_setup import RequestIdMiddleware, configure_logging
 from app.providers.embeddings import get_embedding_provider
@@ -112,7 +113,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         # Answers use the same LLM provider (and rate limiter) as query understanding.
         answers = AnswerCache(app.state.db_pool, understanding.llm) if understanding else None
         app.state.chat_service = ChatService(
-            app.state.search_service, answers, settings.fx_rates_to_qar
+            app.state.search_service, answers, settings.fx_rates_to_qar, SessionStore()
         )
         try:
             yield

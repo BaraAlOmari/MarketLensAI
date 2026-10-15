@@ -4,7 +4,7 @@ Natural-language marketplace search: ask "Find me a used iPhone 17 in great cond
 
 The spec is in [REQUIREMENTS.md](REQUIREMENTS.md). Verified facts and decisions are in [docs/decisions.md](docs/decisions.md).
 
-**Status:** Stage 7 (grounded chat) complete: `POST /api/chat` streams filters, listing cards from the database, and a short reply that never contains a price or link (0 violations on the 45-query grounding check). Search eval: Recall@10 0.853 (baseline) → 1.000. See [docs/results.md](docs/results.md).
+**Status:** Stage 8 (conversation state) complete: chat sessions remember their filters, so follow-ups like "under 2000 riyals", "what about Samsung?", "cheaper ones" or "start over" refine the search (12/12 multi-turn cases pass). Search eval: Recall@10 0.853 (baseline) → 1.000. See [docs/results.md](docs/results.md).
 
 ## Layout
 

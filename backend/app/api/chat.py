@@ -12,8 +12,8 @@ router = APIRouter(prefix="/api")
 class ChatRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
-    # Anonymous conversation id. Accepted now; conversation state arrives in Stage 8.
-    session_id: str = Field(min_length=1, max_length=64)
+    # Anonymous conversation id made up by the client (e.g. a UUID); no authentication.
+    session_id: str = Field(min_length=1, max_length=64, pattern=r"^[A-Za-z0-9_-]+$")
     message: str = Field(min_length=1, max_length=500)
 
     @field_validator("message")
@@ -36,7 +36,7 @@ async def chat(
     is unavailable). Listing cards come from database rows; the text never carries prices."""
 
     async def stream():
-        async for event in service.events(body.message):
+        async for event in service.events(body.message, body.session_id):
             yield sse(event)
 
     return StreamingResponse(

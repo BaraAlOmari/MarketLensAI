@@ -1,0 +1,94 @@
+{
+  "version": 1,
+  "frozen": "2026-10-15",
+  "notes": "Multi-turn eval (Stage 8). Written before the conversation code and never tuned to pass. Each scored turn has a `relevant` spec over the generator's facts (same grammar as queries.json). `cheaper_than_turn: N` adds: comparable price (QAR; yearly rent / 12) strictly below the median of turn N's relevant set. c10 was changed from 150,000 to 250,000 QAR before any run because no listing matched. Pass rule (fixed before the first run): every scored turn has 0 wrong results in its top 10 and Recall@10 >= 0.8.",
+  "conversations": [
+    {"id": "c01", "lang": "en", "tags": ["add"],
+     "turns": [
+       {"message": "used iPhone 15 Pro Max",
+        "relevant": {"category": "phones", "models": ["iPhone 15 Pro Max"], "conditions": ["like_new", "good", "fair", "poor"]}},
+       {"message": "under 2000 riyals",
+        "relevant": {"category": "phones", "models": ["iPhone 15 Pro Max"], "conditions": ["like_new", "good", "fair", "poor"], "price": {"max": 2000, "currency": "QAR"}}}
+     ]},
+    {"id": "c02", "lang": "en", "tags": ["add", "add"],
+     "turns": [
+       {"message": "MacBook Air M4"},
+       {"message": "with 16GB RAM"},
+       {"message": "like new only",
+        "relevant": {"category": "laptops", "models": ["MacBook Air 13 M4", "MacBook Air 15 M4"], "attrs": {"ram_gb": {"min": 16}}, "conditions": ["new", "like_new"]}}
+     ]},
+    {"id": "c03", "lang": "en", "tags": ["cheaper"],
+     "turns": [
+       {"message": "Toyota Land Cruiser",
+        "relevant": {"category": "cars", "models": ["Land Cruiser"]}},
+       {"message": "cheaper ones",
+        "relevant": {"category": "cars", "models": ["Land Cruiser"]}, "cheaper_than_turn": 1}
+     ]},
+    {"id": "c04", "lang": "en", "tags": ["brand_switch"],
+     "turns": [
+       {"message": "used iPhone 15 Pro Max under 3000 QAR"},
+       {"message": "what about Samsung?",
+        "relevant": {"category": "phones", "brands": ["Samsung"], "conditions": ["like_new", "good", "fair", "poor"], "price": {"max": 3000, "currency": "QAR"}}}
+     ]},
+    {"id": "c05", "lang": "en", "tags": ["add", "add"],
+     "turns": [
+       {"message": "2 bedroom apartment in Lusail"},
+       {"message": "for rent",
+        "relevant": {"category": "apartments", "listing_type": "rent", "location": "Lusail", "attrs": {"bedrooms": 2}}},
+       {"message": "under 12000 a month",
+        "relevant": {"category": "apartments", "listing_type": "rent", "location": "Lusail", "attrs": {"bedrooms": 2}, "price": {"max": 12000, "currency": "QAR", "basis": "month"}}}
+     ]},
+    {"id": "c06", "lang": "en", "tags": ["reset"],
+     "turns": [
+       {"message": "MacBook Air"},
+       {"message": "start over"},
+       {"message": "office chair with delivery",
+        "relevant": {"category": "furniture", "attrs": {"item_type": "office chair", "delivery_available": true}}}
+     ]},
+    {"id": "c07", "lang": "en", "tags": ["category_switch"],
+     "turns": [
+       {"message": "Nissan Patrol"},
+       {"message": "actually I need a villa for rent in Lusail",
+        "relevant": {"category": "villas", "listing_type": "rent", "location": "Lusail"}}
+     ]},
+    {"id": "c08", "lang": "ar", "tags": ["add", "add"],
+     "turns": [
+       {"message": "شقة للإيجار في لوسيل"},
+       {"message": "غرفتين",
+        "relevant": {"category": "apartments", "listing_type": "rent", "location": "Lusail", "attrs": {"bedrooms": 2}}},
+       {"message": "أقل من 12000 ريال بالشهر",
+        "relevant": {"category": "apartments", "listing_type": "rent", "location": "Lusail", "attrs": {"bedrooms": 2}, "price": {"max": 12000, "currency": "QAR", "basis": "month"}}}
+     ]},
+    {"id": "c09", "lang": "en", "tags": ["replace"],
+     "turns": [
+       {"message": "villa for rent with a private pool"},
+       {"message": "under 20000 a month",
+        "relevant": {"category": "villas", "listing_type": "rent", "attrs": {"private_pool": true}, "price": {"max": 20000, "currency": "QAR", "basis": "month"}}},
+       {"message": "actually under 25000",
+        "relevant": {"category": "villas", "listing_type": "rent", "attrs": {"private_pool": true}, "price": {"max": 25000, "currency": "QAR", "basis": "month"}}}
+     ]},
+    {"id": "c10", "lang": "en", "tags": ["add", "add"],
+     "turns": [
+       {"message": "Nissan Patrol under 250,000 QAR"},
+       {"message": "less than 100,000 km"},
+       {"message": "GCC specs only",
+        "relevant": {"category": "cars", "models": ["Patrol"], "price": {"max": 250000, "currency": "QAR"}, "attrs": {"mileage_km": {"max": 100000}, "gcc_specs": true}}}
+     ]},
+    {"id": "c11", "lang": "mixed", "tags": ["add", "cheaper"],
+     "turns": [
+       {"message": "Galaxy S24 Ultra"},
+       {"message": "512GB",
+        "relevant": {"category": "phones", "models": ["Galaxy S24 Ultra"], "attrs": {"storage_gb": 512}}},
+       {"message": "أرخص",
+        "relevant": {"category": "phones", "models": ["Galaxy S24 Ultra"], "attrs": {"storage_gb": 512}}, "cheaper_than_turn": 2}
+     ]},
+    {"id": "c12", "lang": "en", "tags": ["reset", "category_switch"],
+     "turns": [
+       {"message": "furnished studio for rent"},
+       {"message": "in Al Qassar"},
+       {"message": "start over"},
+       {"message": "townhouse for sale",
+        "relevant": {"category": "villas", "listing_type": "sale", "attrs": {"property_type": "townhouse"}}}
+     ]}
+  ]
+}

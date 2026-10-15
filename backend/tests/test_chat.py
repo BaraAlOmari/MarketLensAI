@@ -248,11 +248,13 @@ class LyingAnswers:
 
     def __init__(self):
         self.llm = type("L", (), {"model": "fake-lite"})()
+        self.languages = []
 
-    async def lookup(self, conn, query, listings):
+    async def lookup(self, conn, query, listings, language=None):
         return None
 
-    async def generate_and_store(self, query, listings):
+    async def generate_and_store(self, query, listings, language=None):
+        self.languages.append(language)
         return Answer(
             "I found 2 iPhones. The first is only 999 QAR! Both have the box. "
             "Message 5512 3456 or visit https://scam.example.com.",
@@ -318,3 +320,15 @@ def test_sse_format_and_chunks():
         'event: token\ndata: {"text": "hi"}\n\n'
     )
     assert "".join(chunks("one two three four five six")) == "one two three four five six"
+
+
+def test_reply_language_follows_the_latest_message():
+    # Found in the first multi-turn run: "أرخص" after an English conversation got English,
+    # because the language came from the accumulated query text.
+    answers = LyingAnswers()
+    service = ChatService(
+        FakeSearch(FakePool({1: row(1, "2100.00")}), [listing(1)]), answers, RATES
+    )
+    chat_events(service, "Galaxy S24 Ultra")
+    chat_events(service, "أرخص")
+    assert answers.languages == ["English", "Arabic"]

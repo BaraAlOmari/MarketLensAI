@@ -18,6 +18,7 @@ import json
 import statistics
 import sys
 import time
+import uuid
 from datetime import UTC, datetime
 from decimal import Decimal
 from pathlib import Path
@@ -57,12 +58,16 @@ async def run(args) -> dict:
     queries = load_queries()
     gate = asyncio.Semaphore(args.concurrency)
     db = await asyncpg.connect(settings.database_url.get_secret_value(), statement_cache_size=0)
+    # Each query is its own one-turn conversation (sessions are real since Stage 8).
+    run = uuid.uuid4().hex[:8]
+    db_lock = asyncio.Lock()
 
     async def one(client, q) -> dict:
         async with gate:
             t0 = time.perf_counter()
+            session_id = f"grounding-{run}-{q['id']}"
             resp = await client.post(
-                "/api/chat", json={"session_id": "grounding", "message": q["query"]}
+                "/api/chat", json={"session_id": session_id, "message": q["query"]}
             )
             wall = (time.perf_counter() - t0) * 1000
         events = parse_sse(resp.text)
@@ -81,10 +86,12 @@ async def run(args) -> dict:
             problems.append("price in reply text")
         if has_link(text):
             problems.append("link or contact in reply text")
-        rows = {r["id"]: r for r in await db.fetch(
-            "select id, title, price, currency from listings where id = any($1::bigint[])",
-            card_ids,
-        )}  # fmt: skip
+        async with db_lock:  # one connection, shared by concurrent queries
+            fetched = await db.fetch(
+                "select id, title, price, currency from listings where id = any($1::bigint[])",
+                card_ids,
+            )
+        rows = {r["id"]: r for r in fetched}
         for c in cards:
             r = rows.get(c["id"])
             if r is None:

@@ -1,10 +1,10 @@
 # Stage 7 grounding check
 
-2026-10-15 10:03 UTC · 45 eval queries through `POST /api/chat`
+2026-10-15 10:38 UTC · 45 eval queries through `POST /api/chat`
 
 | Violations | Answers (LLM / template / no-match) | Hallucinated ids dropped | Sentences removed (price/link) | Answer latency (uncached) | Answer cost (paid) |
 |---|---|---|---|---|---|
-| **0** | 45 / 0 / 0 | 0 | 0 | 4932 ms | $0.000603 |
+| **0** | 45 / 0 / 0 | 0 | 0 | cached | $0.000603 |
 
 Checks per reply: cited ids ⊆ cards sent; no price, link or phone number in the text; every card's title, price and currency equal the database row.
 

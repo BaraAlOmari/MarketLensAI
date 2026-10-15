@@ -11,6 +11,8 @@ A fixed set of 45 search queries with known right answers, used to measure every
 | `ground_truth.json` | Generated: the relevant `external_id`s per query (for review and diffs). |
 | `run.py` | Sends every query to `POST /api/search` and scores the top 10. |
 | `results/` | One `.json` (all details) and `.md` (readable report) per run. |
+| `conversations.json` | 12 multi-turn conversations (Stage 8), frozen 2026-10-15. Scored turns have a `relevant` spec; `cheaper_than_turn: N` means below the median price of turn N's relevant set. |
+| `conversations.py`, `run_conversations.py` | Ground truth for the conversations, and the runner (pass: 0 wrong and Recall@10 ≥ 0.8 on every scored turn). |
 
 ## How relevance is decided
 
@@ -66,6 +68,8 @@ The same mapping must be used by query understanding (Stage 4), so the eval and 
 .venv\Scripts\python ..\eval\run.py --hybrid-keywords query          # full-text on the raw query
 .venv\Scripts\python ..\eval\run.py --no-rerank                         # Stage 5: no reranker
 .venv\Scripts\python ..\eval\grounding_check.py --concurrency 2 --llm-timeout 60   # Stage 7: chat grounding
+.venv\Scripts\python ..\eval\conversations.py                          # multi-turn ground truth counts
+.venv\Scripts\python ..\eval\run_conversations.py --label "..." --record   # Stage 8: 12 conversations
 ```
 
 LLM extractions are cached too (`query_extraction_cache`), keyed by a hash of the prompt, schema and catalog. A prompt or catalog change therefore re-extracts all 45 queries once (45 of the 500 free daily Flash-Lite requests). Changes to the Python mapping or guards reuse the cache and cost nothing. Rerank orders are cached the same way (`rerank_cache`), keyed by the query and the exact candidate list.

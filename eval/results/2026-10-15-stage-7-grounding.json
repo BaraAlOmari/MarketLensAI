@@ -1,5 +1,5 @@
 {
- "date": "2026-10-15 10:03 UTC",
+ "date": "2026-10-15 10:38 UTC",
  "queries": 45,
  "violations": 0,
  "sources": {
@@ -11,8 +11,8 @@
  "dropped_ids": 0,
  "removed_sentences": 0,
  "templates_after_removal": 0,
- "answer_latency_mean_ms": 4932.3,
- "total_ms_mean": 9245.575555555555,
+ "answer_latency_mean_ms": null,
+ "total_ms_mean": 3881.9711111111114,
  "answer_cost_mean_usd": 0.0006026355555555556,
  "answer_input_tokens_mean": 1306.9333333333334,
  "rows": [
@@ -43,13 +43,13 @@
     "latency_ms": 0.0
    },
    "timings_ms": {
-    "understand": 474.3,
-    "search": 3674.1,
-    "hydrate": 1426.4,
-    "answer": 1.1,
-    "total": 5576.6
+    "understand": 1618.7,
+    "search": 3727.7,
+    "hydrate": 1459.8,
+    "answer": 0.4,
+    "total": 7289.9
    },
-   "wall_ms": 5595.2
+   "wall_ms": 7306.5
   },
   {
    "id": "ph02",
@@ -68,23 +68,23 @@
     "used_template": false
    },
    "answer": {
-    "cached": false,
+    "cached": true,
     "error": null,
     "source": "llm",
     "model": "gemini-3.5-flash-lite",
     "input_tokens": 1466,
     "output_tokens": 71,
     "thought_tokens": 0,
-    "latency_ms": 2120.2
+    "latency_ms": 0.0
    },
    "timings_ms": {
-    "understand": 1620.5,
-    "search": 2543.5,
-    "hydrate": 1415.8,
-    "answer": 2594.9,
-    "total": 8175.9
+    "understand": 2721.1,
+    "search": 1945.0,
+    "hydrate": 1465.3,
+    "answer": 0.8,
+    "total": 6617.1
    },
-   "wall_ms": 8184.9
+   "wall_ms": 6624.6
   },
   {
    "id": "ph03",
@@ -103,23 +103,23 @@
     "used_template": false
    },
    "answer": {
-    "cached": false,
+    "cached": true,
     "error": null,
     "source": "llm",
     "model": "gemini-3.5-flash-lite",
     "input_tokens": 974,
     "output_tokens": 85,
     "thought_tokens": 0,
-    "latency_ms": 1227.1
+    "latency_ms": 0.0
    },
    "timings_ms": {
-    "understand": 471.7,
-    "search": 2617.5,
-    "hydrate": 1451.6,
-    "answer": 1699.4,
-    "total": 6241.5
+    "understand": 963.8,
+    "search": 1915.3,
+    "hydrate": 1440.2,
+    "answer": 0.4,
+    "total": 4799.3
    },
-   "wall_ms": 6243.7
+   "wall_ms": 4801.7
   },
   {
    "id": "ph04",
@@ -138,23 +138,23 @@
     "used_template": false
    },
    "answer": {
-    "cached": false,
+    "cached": true,
     "error": null,
     "source": "llm",
     "model": "gemini-3.5-flash-lite",
     "input_tokens": 1479,
     "output_tokens": 64,
     "thought_tokens": 0,
-    "latency_ms": 1584.3
+    "latency_ms": 0.0
    },
    "timings_ms": {
-    "understand": 469.2,
-    "search": 1282.8,
-    "hydrate": 785.7,
-    "answer": 2057.9,
-    "total": 4596.7
+    "understand": 964.8,
+    "search": 1148.3,
+    "hydrate": 820.2,
+    "answer": 0.8,
+    "total": 3420.8
    },
-   "wall_ms": 4599.2
+   "wall_ms": 3422.7
   },
   {
    "id": "ph05",
@@ -173,23 +173,23 @@
     "used_template": false
    },
    "answer": {
-    "cached": false,
+    "cached": true,
     "error": null,
     "source": "llm",
     "model": "gemini-3.5-flash-lite",
     "input_tokens": 1047,
     "output_tokens": 81,
     "thought_tokens": 0,
-    "latency_ms": 1854.6
+    "latency_ms": 0.0
    },
    "timings_ms": {
-    "understand": 472.8,
-    "search": 1957.4,
-    "hydrate": 807.9,
-    "answer": 2325.1,
-    "total": 5563.6
+    "understand": 968.0,
+    "search": 1294.0,
+    "hydrate": 804.0,
+    "answer": 0.5,
+    "total": 3549.4
    },
-   "wall_ms": 5565.6
+   "wall_ms": 3551.4
   },
   {
    "id": "ph06",
@@ -208,23 +208,23 @@
     "used_template": false
    },
    "answer": {
-    "cached": false,
+    "cached": true,
     "error": null,
     "source": "llm",
     "model": "gemini-3.5-flash-lite",
     "input_tokens": 1465,
     "output_tokens": 56,
     "thought_tokens": 0,
-    "latency_ms": 835.6
+    "latency_ms": 0.0
    },
    "timings_ms": {
-    "understand": 472.2,
-    "search": 1408.4,
-    "hydrate": 792.2,
-    "answer": 1309.4,
-    "total": 3983.2
+    "understand": 961.5,
+    "search": 2098.2,
+    "hydrate": 804.8,
+    "answer": 0.4,
+    "total": 4349.2
    },
-   "wall_ms": 3985.9
+   "wall_ms": 4350.9
   },
   {
    "id": "ph07",
@@ -243,23 +243,23 @@
     "used_template": false
    },
    "answer": {
-    "cached": false,
+    "cached": true,
     "error": null,
     "source": "llm",
     "model": "gemini-3.5-flash-lite",
     "input_tokens": 1542,
     "output_tokens": 86,
     "thought_tokens": 0,
-    "latency_ms": 1437.0
+    "latency_ms": 0.0
    },
    "timings_ms": {
-    "understand": 472.7,
-    "search": 1304.0,
-    "hydrate": 803.3,
-    "answer": 1913.6,
-    "total": 4494.5
+    "understand": 961.8,
+    "search": 1282.8,
+    "hydrate": 810.5,
+    "answer": 0.5,
+    "total": 3534.5
    },
-   "wall_ms": 4496.8
+   "wall_ms": 3536.7
   },
   {
    "id": "ph08",
@@ -278,23 +278,23 @@
     "used_template": false
    },
    "answer": {
-    "cached": false,
+    "cached": true,
     "error": null,
     "source": "llm",
     "model": "gemini-3.5-flash-lite",
     "input_tokens": 1293,
     "output_tokens": 77,
     "thought_tokens": 0,
-    "latency_ms": 8552.7
+    "latency_ms": 0.0
    },
    "timings_ms": {
-    "understand": 474.3,
-    "search": 1257.6,
-    "hydrate": 784.5,
-    "answer": 9034.8,
-    "total": 11551.5
+    "understand": 965.8,
+    "search": 1297.5,
+    "hydrate": 805.6,
+    "answer": 0.4,
+    "total": 3551.9
    },
-   "wall_ms": 11553.9
+   "wall_ms": 3553.9
   },
   {
    "id": "ph09",
@@ -313,23 +313,23 @@
     "used_template": false
    },
    "answer": {
-    "cached": false,
+    "cached": true,
     "error": null,
     "source": "llm",
     "model": "gemini-3.5-flash-lite",
     "input_tokens": 491,
     "output_tokens": 112,
     "thought_tokens": 0,
-    "latency_ms": 9354.1
+    "latency_ms": 0.0
    },
    "timings_ms": {
-    "understand": 477.1,
-    "search": 1295.6,
-    "hydrate": 803.7,
-    "answer": 9838.1,
-    "total": 12416.1
+    "understand": 956.0,
+    "search": 1298.7,
+    "hydrate": 816.3,
+    "answer": 0.3,
+    "total": 3555.8
    },
-   "wall_ms": 12418.5
+   "wall_ms": 3558.6
   },
   {
    "id": "ph10",
@@ -348,23 +348,23 @@
     "used_template": false
    },
    "answer": {
-    "cached": false,
+    "cached": true,
     "error": null,
     "source": "llm",
     "model": "gemini-3.5-flash-lite",
     "input_tokens": 1526,
     "output_tokens": 92,
     "thought_tokens": 0,
-    "latency_ms": 1266.1
+    "latency_ms": 0.0
    },
    "timings_ms": {
-    "understand": 489.8,
-    "search": 1264.4,
-    "hydrate": 786.9,
-    "answer": 1741.7,
-    "total": 4284.0
+    "understand": 963.7,
+    "search": 1292.1,
+    "hydrate": 801.3,
+    "answer": 0.7,
+    "total": 3536.4
    },
-   "wall_ms": 4286.4
+   "wall_ms": 3538.9
   },
   {
    "id": "lp01",
@@ -383,23 +383,23 @@
     "used_template": false
    },
    "answer": {
-    "cached": false,
+    "cached": true,
     "error": null,
     "source": "llm",
     "model": "gemini-3.5-flash-lite",
     "input_tokens": 1731,
     "output_tokens": 90,
     "thought_tokens": 0,
-    "latency_ms": 1430.7
+    "latency_ms": 0.0
    },
    "timings_ms": {
-    "understand": 472.4,
-    "search": 1289.7,
-    "hydrate": 783.4,
-    "answer": 1901.8,
-    "total": 4447.7
+    "understand": 967.5,
+    "search": 1293.6,
+    "hydrate": 804.5,
+    "answer": 1.2,
+    "total": 3550.8
    },
-   "wall_ms": 4449.6
+   "wall_ms": 3553.7
   },
   {
    "id": "lp02",
@@ -418,23 +418,23 @@
     "used_template": false
    },
    "answer": {
-    "cached": false,
+    "cached": true,
     "error": null,
     "source": "llm",
     "model": "gemini-3.5-flash-lite",
     "input_tokens": 1933,
     "output_tokens": 98,
     "thought_tokens": 0,
-    "latency_ms": 8614.7
+    "latency_ms": 0.0
    },
    "timings_ms": {
-    "understand": 481.7,
-    "search": 2701.4,
-    "hydrate": 1424.4,
-    "answer": 9099.0,
-    "total": 13707.1
+    "understand": 956.1,
+    "search": 1490.9,
+    "hydrate": 809.6,
+    "answer": 0.7,
+    "total": 3742.0
    },
-   "wall_ms": 13708.8
+   "wall_ms": 3744.0
   },
   {
    "id": "lp03",
@@ -453,23 +453,23 @@
     "used_template": false
    },
    "answer": {
-    "cached": false,
+    "cached": true,
     "error": null,
     "source": "llm",
     "model": "gemini-3.5-flash-lite",
     "input_tokens": 1693,
     "output_tokens": 80,
     "thought_tokens": 0,
-    "latency_ms": 8621.5
+    "latency_ms": 0.0
    },
    "timings_ms": {
-    "understand": 472.2,
-    "search": 1339.3,
-    "hydrate": 807.8,
-    "answer": 9103.1,
-    "total": 11722.9
+    "understand": 961.4,
+    "search": 2004.5,
+    "hydrate": 798.8,
+    "answer": 0.7,
+    "total": 4245.0
    },
-   "wall_ms": 11724.7
+   "wall_ms": 4247.8
   },
   {
    "id": "lp04",
@@ -488,23 +488,23 @@
     "used_template": false
    },
    "answer": {
-    "cached": false,
+    "cached": true,
     "error": null,
     "source": "llm",
     "model": "gemini-3.5-flash-lite",
     "input_tokens": 1684,
     "output_tokens": 71,
     "thought_tokens": 0,
-    "latency_ms": 1184.2
+    "latency_ms": 0.0
    },
    "timings_ms": {
-    "understand": 481.7,
-    "search": 1884.5,
-    "hydrate": 784.6,
-    "answer": 1658.1,
-    "total": 4809.6
+    "understand": 966.1,
+    "search": 1287.6,
+    "hydrate": 805.6,
+    "answer": 0.6,
+    "total": 3542.2
    },
-   "wall_ms": 4811.2
+   "wall_ms": 3545.0
   },
   {
    "id": "lp05",
@@ -523,23 +523,23 @@
     "used_template": false
    },
    "answer": {
-    "cached": false,
+    "cached": true,
     "error": null,
     "source": "llm",
     "model": "gemini-3.5-flash-lite",
     "input_tokens": 1748,
     "output_tokens": 68,
     "thought_tokens": 0,
-    "latency_ms": 7749.3
+    "latency_ms": 0.0
    },
    "timings_ms": {
-    "understand": 480.7,
-    "search": 1256.6,
-    "hydrate": 784.7,
-    "answer": 21934.0,
-    "total": 24457.0
+    "understand": 962.8,
+    "search": 1295.0,
+    "hydrate": 804.2,
+    "answer": 0.6,
+    "total": 3549.3
    },
-   "wall_ms": 24459.1
+   "wall_ms": 3552.7
   },
   {
    "id": "lp06",
@@ -558,23 +558,23 @@
     "used_template": false
    },
    "answer": {
-    "cached": false,
+    "cached": true,
     "error": null,
     "source": "llm",
     "model": "gemini-3.5-flash-lite",
     "input_tokens": 1949,
     "output_tokens": 100,
     "thought_tokens": 0,
-    "latency_ms": 6958.8
+    "latency_ms": 0.0
    },
    "timings_ms": {
-    "understand": 471.4,
-    "search": 1750.5,
-    "hydrate": 787.8,
-    "answer": 22398.9,
-    "total": 25409.9
+    "understand": 962.7,
+    "search": 1137.7,
+    "hydrate": 807.4,
+    "answer": 0.7,
+    "total": 3397.3
    },
-   "wall_ms": 25412.4
+   "wall_ms": 3399.8
   },
   {
    "id": "lp07",
@@ -594,23 +594,23 @@
     "used_template": false
    },
    "answer": {
-    "cached": false,
+    "cached": true,
     "error": null,
     "source": "llm",
     "model": "gemini-3.5-flash-lite",
     "input_tokens": 1746,
     "output_tokens": 103,
     "thought_tokens": 0,
-    "latency_ms": 1300.7
+    "latency_ms": 0.0
    },
    "timings_ms": {
-    "understand": 470.5,
-    "search": 1265.8,
-    "hydrate": 789.3,
-    "answer": 1784.6,
-    "total": 4311.0
+    "understand": 966.8,
+    "search": 1280.6,
+    "hydrate": 796.2,
+    "answer": 0.5,
+    "total": 3525.3
    },
-   "wall_ms": 4313.5
+   "wall_ms": 3527.8
   },
   {
    "id": "car01",
@@ -630,23 +630,23 @@
     "used_template": false
    },
    "answer": {
-    "cached": false,
+    "cached": true,
     "error": null,
     "source": "llm",
     "model": "gemini-3.5-flash-lite",
     "input_tokens": 1464,
     "output_tokens": 77,
     "thought_tokens": 0,
-    "latency_ms": 1292.4
+    "latency_ms": 0.0
    },
    "timings_ms": {
-    "understand": 475.4,
-    "search": 1254.1,
-    "hydrate": 785.6,
-    "answer": 1765.3,
-    "total": 4281.1
+    "understand": 970.5,
+    "search": 1134.8,
+    "hydrate": 810.8,
+    "answer": 0.7,
+    "total": 3402.1
    },
-   "wall_ms": 4283.2
+   "wall_ms": 3404.2
   },
   {
    "id": "car02",
@@ -666,23 +666,23 @@
     "used_template": false
    },
    "answer": {
-    "cached": false,
+    "cached": true,
     "error": null,
     "source": "llm",
     "model": "gemini-3.5-flash-lite",
     "input_tokens": 649,
     "output_tokens": 99,
     "thought_tokens": 0,
-    "latency_ms": 1177.6
+    "latency_ms": 0.0
    },
    "timings_ms": {
-    "understand": 480.9,
-    "search": 1255.4,
-    "hydrate": 785.3,
-    "answer": 1649.2,
-    "total": 4171.3
+    "understand": 958.1,
+    "search": 1294.7,
+    "hydrate": 806.6,
+    "answer": 0.6,
+    "total": 3547.3
    },
-   "wall_ms": 4173.2
+   "wall_ms": 3549.2
   },
   {
    "id": "car03",
@@ -701,23 +701,23 @@
     "used_template": false
    },
    "answer": {
-    "cached": false,
+    "cached": true,
     "error": null,
     "source": "llm",
     "model": "gemini-3.5-flash-lite",
     "input_tokens": 1556,
     "output_tokens": 88,
     "thought_tokens": 0,
-    "latency_ms": 6729.5
+    "latency_ms": 0.0
    },
    "timings_ms": {
-    "understand": 470.1,
-    "search": 1378.2,
-    "hydrate": 801.0,
-    "answer": 7213.0,
-    "total": 9862.6
+    "understand": 971.6,
+    "search": 1207.5,
+    "hydrate": 798.2,
+    "answer": 0.5,
+    "total": 3455.8
    },
-   "wall_ms": 9864.4
+   "wall_ms": 3459.0
   },
   {
    "id": "car04",
@@ -737,23 +737,23 @@
     "used_template": false
    },
    "answer": {
-    "cached": false,
+    "cached": true,
     "error": null,
     "source": "llm",
     "model": "gemini-3.5-flash-lite",
     "input_tokens": 1615,
     "output_tokens": 84,
     "thought_tokens": 0,
-    "latency_ms": 1674.3
+    "latency_ms": 0.0
    },
    "timings_ms": {
-    "understand": 473.8,
-    "search": 1308.8,
-    "hydrate": 786.8,
-    "answer": 2148.5,
-    "total": 4718.9
+    "understand": 964.7,
+    "search": 1345.5,
+    "hydrate": 810.2,
+    "answer": 0.5,
+    "total": 3607.0
    },
-   "wall_ms": 4721.1
+   "wall_ms": 3609.0
   },
   {
    "id": "car05",
@@ -772,23 +772,23 @@
     "used_template": false
    },
    "answer": {
-    "cached": false,
+    "cached": true,
     "error": null,
     "source": "llm",
     "model": "gemini-3.5-flash-lite",
     "input_tokens": 1615,
     "output_tokens": 91,
     "thought_tokens": 0,
-    "latency_ms": 5527.3
+    "latency_ms": 0.0
    },
    "timings_ms": {
-    "understand": 471.6,
-    "search": 1303.1,
-    "hydrate": 801.9,
-    "answer": 6003.4,
-    "total": 8581.0
+    "understand": 954.4,
+    "search": 1148.2,
+    "hydrate": 804.8,
+    "answer": 0.9,
+    "total": 3392.8
    },
-   "wall_ms": 8582.8
+   "wall_ms": 3394.6
   },
   {
    "id": "car06",
@@ -807,23 +807,23 @@
     "used_template": false
    },
    "answer": {
-    "cached": false,
+    "cached": true,
     "error": null,
     "source": "llm",
     "model": "gemini-3.5-flash-lite",
     "input_tokens": 1598,
     "output_tokens": 80,
     "thought_tokens": 0,
-    "latency_ms": 1342.7
+    "latency_ms": 0.0
    },
    "timings_ms": {
-    "understand": 481.3,
-    "search": 1271.1,
-    "hydrate": 793.5,
-    "answer": 1816.5,
-    "total": 4362.7
+    "understand": 965.3,
+    "search": 1275.7,
+    "hydrate": 797.7,
+    "answer": 0.9,
+    "total": 3519.9
    },
-   "wall_ms": 4364.4
+   "wall_ms": 3522.4
   },
   {
    "id": "car07",
@@ -842,23 +842,23 @@
     "used_template": false
    },
    "answer": {
-    "cached": false,
+    "cached": true,
     "error": null,
     "source": "llm",
     "model": "gemini-3.5-flash-lite",
     "input_tokens": 1601,
     "output_tokens": 102,
     "thought_tokens": 0,
-    "latency_ms": 7363.8
+    "latency_ms": 0.0
    },
    "timings_ms": {
-    "understand": 479.7,
-    "search": 1253.5,
-    "hydrate": 784.2,
-    "answer": 7837.0,
-    "total": 10354.7
+    "understand": 965.8,
+    "search": 3825.2,
+    "hydrate": 1451.3,
+    "answer": 0.8,
+    "total": 6724.5
    },
-   "wall_ms": 10356.4
+   "wall_ms": 6727.4
   },
   {
    "id": "car08",
@@ -877,23 +877,23 @@
     "used_template": false
    },
    "answer": {
-    "cached": false,
+    "cached": true,
     "error": null,
     "source": "llm",
     "model": "gemini-3.5-flash-lite",
     "input_tokens": 1742,
     "output_tokens": 115,
     "thought_tokens": 0,
-    "latency_ms": 8104.0
+    "latency_ms": 0.0
    },
    "timings_ms": {
-    "understand": 470.4,
-    "search": 1265.5,
-    "hydrate": 784.5,
-    "answer": 8578.8,
-    "total": 11099.9
+    "understand": 957.7,
+    "search": 1300.6,
+    "hydrate": 812.3,
+    "answer": 0.4,
+    "total": 3554.8
    },
-   "wall_ms": 11102.3
+   "wall_ms": 3557.3
   },
   {
    "id": "car09",
@@ -912,23 +912,23 @@
     "used_template": false
    },
    "answer": {
-    "cached": false,
+    "cached": true,
     "error": null,
     "source": "llm",
     "model": "gemini-3.5-flash-lite",
     "input_tokens": 1073,
     "output_tokens": 86,
     "thought_tokens": 0,
-    "latency_ms": 1227.6
+    "latency_ms": 0.0
    },
    "timings_ms": {
-    "understand": 471.2,
-    "search": 1259.3,
-    "hydrate": 786.0,
-    "answer": 1700.3,
-    "total": 4217.2
+    "understand": 970.2,
+    "search": 1274.8,
+    "hydrate": 798.4,
+    "answer": 1.0,
+    "total": 3522.9
    },
-   "wall_ms": 4218.9
+   "wall_ms": 3525.5
   },
   {
    "id": "fu01",
@@ -948,23 +948,23 @@
     "used_template": false
    },
    "answer": {
-    "cached": false,
+    "cached": true,
     "error": null,
     "source": "llm",
     "model": "gemini-3.5-flash-lite",
     "input_tokens": 985,
     "output_tokens": 82,
     "thought_tokens": 0,
-    "latency_ms": 7675.1
+    "latency_ms": 0.0
    },
    "timings_ms": {
-    "understand": 469.2,
-    "search": 1264.8,
-    "hydrate": 790.8,
-    "answer": 9004.2,
-    "total": 11529.4
+    "understand": 960.3,
+    "search": 1304.9,
+    "hydrate": 809.1,
+    "answer": 0.6,
+    "total": 3558.8
    },
-   "wall_ms": 11531.6
+   "wall_ms": 3561.0
   },
   {
    "id": "fu02",
@@ -983,23 +983,23 @@
     "used_template": false
    },
    "answer": {
-    "cached": false,
+    "cached": true,
     "error": null,
     "source": "llm",
     "model": "gemini-3.5-flash-lite",
     "input_tokens": 967,
     "output_tokens": 76,
     "thought_tokens": 0,
-    "latency_ms": 7215.0
+    "latency_ms": 0.0
    },
    "timings_ms": {
-    "understand": 473.4,
-    "search": 1263.6,
-    "hydrate": 786.6,
-    "answer": 20624.7,
-    "total": 23149.0
+    "understand": 955.6,
+    "search": 1929.8,
+    "hydrate": 804.9,
+    "answer": 0.6,
+    "total": 4172.1
    },
-   "wall_ms": 23150.9
+   "wall_ms": 4174.2
   },
   {
    "id": "fu03",
@@ -1018,23 +1018,23 @@
     "used_template": false
    },
    "answer": {
-    "cached": false,
+    "cached": true,
     "error": null,
     "source": "llm",
     "model": "gemini-3.5-flash-lite",
     "input_tokens": 1094,
     "output_tokens": 78,
     "thought_tokens": 0,
-    "latency_ms": 6815.6
+    "latency_ms": 0.0
    },
    "timings_ms": {
-    "understand": 472.6,
-    "search": 1270.6,
-    "hydrate": 785.2,
-    "answer": 16228.6,
-    "total": 18757.4
+    "understand": 967.7,
+    "search": 1298.2,
+    "hydrate": 805.4,
+    "answer": 0.6,
+    "total": 3556.4
    },
-   "wall_ms": 18759.3
+   "wall_ms": 3558.5
   },
   {
    "id": "fu04",
@@ -1053,23 +1053,23 @@
     "used_template": false
    },
    "answer": {
-    "cached": false,
+    "cached": true,
     "error": null,
     "source": "llm",
     "model": "gemini-3.5-flash-lite",
     "input_tokens": 634,
     "output_tokens": 69,
     "thought_tokens": 0,
-    "latency_ms": 7050.5
+    "latency_ms": 0.0
    },
    "timings_ms": {
-    "understand": 472.1,
-    "search": 1260.7,
-    "hydrate": 785.4,
-    "answer": 8073.2,
-    "total": 10592.3
+    "understand": 967.7,
+    "search": 1291.8,
+    "hydrate": 810.2,
+    "answer": 0.3,
+    "total": 3557.7
    },
-   "wall_ms": 10594.3
+   "wall_ms": 3560.2
   },
   {
    "id": "fu05",
@@ -1088,23 +1088,23 @@
     "used_template": false
    },
    "answer": {
-    "cached": false,
+    "cached": true,
     "error": null,
     "source": "llm",
     "model": "gemini-3.5-flash-lite",
     "input_tokens": 1074,
     "output_tokens": 74,
     "thought_tokens": 0,
-    "latency_ms": 7093.6
+    "latency_ms": 0.0
    },
    "timings_ms": {
-    "understand": 474.6,
-    "search": 1267.2,
-    "hydrate": 783.5,
-    "answer": 7719.6,
-    "total": 10245.2
+    "understand": 958.1,
+    "search": 1141.3,
+    "hydrate": 803.6,
+    "answer": 0.4,
+    "total": 3386.5
    },
-   "wall_ms": 10246.9
+   "wall_ms": 3388.6
   },
   {
    "id": "fu06",
@@ -1124,23 +1124,23 @@
     "used_template": false
    },
    "answer": {
-    "cached": false,
+    "cached": true,
     "error": null,
     "source": "llm",
     "model": "gemini-3.5-flash-lite",
     "input_tokens": 1294,
     "output_tokens": 87,
     "thought_tokens": 0,
-    "latency_ms": 1661.2
+    "latency_ms": 0.0
    },
    "timings_ms": {
-    "understand": 474.4,
-    "search": 1264.4,
-    "hydrate": 787.4,
-    "answer": 2135.0,
-    "total": 4662.1
+    "understand": 969.6,
+    "search": 1289.6,
+    "hydrate": 800.4,
+    "answer": 0.4,
+    "total": 3540.3
    },
-   "wall_ms": 4664.3
+   "wall_ms": 3542.5
   },
   {
    "id": "ap01",
@@ -1159,23 +1159,23 @@
     "used_template": false
    },
    "answer": {
-    "cached": false,
+    "cached": true,
     "error": null,
     "source": "llm",
     "model": "gemini-3.5-flash-lite",
     "input_tokens": 478,
     "output_tokens": 68,
     "thought_tokens": 0,
-    "latency_ms": 6709.6
+    "latency_ms": 0.0
    },
    "timings_ms": {
-    "understand": 471.3,
-    "search": 1889.6,
-    "hydrate": 784.0,
-    "answer": 7182.1,
-    "total": 10327.5
+    "understand": 964.8,
+    "search": 1925.0,
+    "hydrate": 797.3,
+    "answer": 0.3,
+    "total": 4163.8
    },
-   "wall_ms": 10330.2
+   "wall_ms": 4165.8
   },
   {
    "id": "ap02",
@@ -1194,23 +1194,23 @@
     "used_template": false
    },
    "answer": {
-    "cached": false,
+    "cached": true,
     "error": null,
     "source": "llm",
     "model": "gemini-3.5-flash-lite",
     "input_tokens": 1557,
     "output_tokens": 74,
     "thought_tokens": 0,
-    "latency_ms": 1374.9
+    "latency_ms": 0.0
    },
    "timings_ms": {
-    "understand": 472.1,
-    "search": 1910.7,
-    "hydrate": 785.1,
-    "answer": 1847.6,
-    "total": 5017.1
+    "understand": 960.4,
+    "search": 1951.3,
+    "hydrate": 804.7,
+    "answer": 0.4,
+    "total": 4208.6
    },
-   "wall_ms": 5019.7
+   "wall_ms": 4211.1
   },
   {
    "id": "ap03",
@@ -1229,23 +1229,23 @@
     "used_template": false
    },
    "answer": {
-    "cached": false,
+    "cached": true,
     "error": null,
     "source": "llm",
     "model": "gemini-3.5-flash-lite",
     "input_tokens": 937,
     "output_tokens": 61,
     "thought_tokens": 0,
-    "latency_ms": 7812.8
+    "latency_ms": 0.0
    },
    "timings_ms": {
-    "understand": 472.1,
-    "search": 1259.8,
-    "hydrate": 783.1,
-    "answer": 8283.4,
-    "total": 10798.9
+    "understand": 953.4,
+    "search": 1133.0,
+    "hydrate": 804.4,
+    "answer": 0.3,
+    "total": 3374.8
    },
-   "wall_ms": 10800.7
+   "wall_ms": 3377.1
   },
   {
    "id": "ap04",
@@ -1264,23 +1264,23 @@
     "used_template": false
    },
    "answer": {
-    "cached": false,
+    "cached": true,
     "error": null,
     "source": "llm",
     "model": "gemini-3.5-flash-lite",
     "input_tokens": 595,
     "output_tokens": 78,
     "thought_tokens": 0,
-    "latency_ms": 6841.6
+    "latency_ms": 0.0
    },
    "timings_ms": {
-    "understand": 473.1,
-    "search": 1263.4,
-    "hydrate": 788.2,
-    "answer": 7312.9,
-    "total": 9837.9
+    "understand": 968.7,
+    "search": 1267.9,
+    "hydrate": 799.7,
+    "answer": 0.5,
+    "total": 3515.1
    },
-   "wall_ms": 9840.4
+   "wall_ms": 3516.9
   },
   {
    "id": "ap05",
@@ -1300,23 +1300,23 @@
     "used_template": false
    },
    "answer": {
-    "cached": false,
+    "cached": true,
     "error": null,
     "source": "llm",
     "model": "gemini-3.5-flash-lite",
     "input_tokens": 720,
     "output_tokens": 94,
     "thought_tokens": 0,
-    "latency_ms": 916.5
+    "latency_ms": 0.0
    },
    "timings_ms": {
-    "understand": 476.7,
-    "search": 1265.5,
-    "hydrate": 785.7,
-    "answer": 1388.9,
-    "total": 3917.7
+    "understand": 959.4,
+    "search": 1295.9,
+    "hydrate": 803.5,
+    "answer": 0.3,
+    "total": 3541.8
    },
-   "wall_ms": 3919.9
+   "wall_ms": 3544.6
   },
   {
    "id": "ap06",
@@ -1345,13 +1345,13 @@
     "latency_ms": 0.0
    },
    "timings_ms": {
-    "understand": 472.0,
-    "search": 1898.5,
-    "hydrate": 787.4,
+    "understand": 953.9,
+    "search": 1934.2,
+    "hydrate": 800.1,
     "answer": 0.3,
-    "total": 3158.5
+    "total": 4168.3
    },
-   "wall_ms": 3160.1
+   "wall_ms": 4170.4
   },
   {
    "id": "ap07",
@@ -1371,23 +1371,23 @@
     "used_template": false
    },
    "answer": {
-    "cached": false,
+    "cached": true,
     "error": null,
     "source": "llm",
     "model": "gemini-3.5-flash-lite",
     "input_tokens": 1585,
     "output_tokens": 103,
     "thought_tokens": 0,
-    "latency_ms": 7658.0
+    "latency_ms": 0.0
    },
    "timings_ms": {
-    "understand": 472.6,
-    "search": 1956.1,
-    "hydrate": 808.0,
-    "answer": 8260.9,
-    "total": 11497.9
+    "understand": 966.8,
+    "search": 1289.4,
+    "hydrate": 809.6,
+    "answer": 0.7,
+    "total": 3549.6
    },
-   "wall_ms": 11499.7
+   "wall_ms": 3551.7
   },
   {
    "id": "ap08",
@@ -1406,23 +1406,23 @@
     "used_template": false
    },
    "answer": {
-    "cached": false,
+    "cached": true,
     "error": null,
     "source": "llm",
     "model": "gemini-3.5-flash-lite",
     "input_tokens": 794,
     "output_tokens": 81,
     "thought_tokens": 0,
-    "latency_ms": 8128.7
+    "latency_ms": 0.0
    },
    "timings_ms": {
-    "understand": 477.7,
-    "search": 1284.0,
-    "hydrate": 795.8,
-    "answer": 8611.9,
-    "total": 11170.1
+    "understand": 964.0,
+    "search": 1950.5,
+    "hydrate": 815.0,
+    "answer": 0.7,
+    "total": 4215.0
    },
-   "wall_ms": 11171.9
+   "wall_ms": 4217.3
   },
   {
    "id": "vi01",
@@ -1442,23 +1442,23 @@
     "used_template": false
    },
    "answer": {
-    "cached": false,
+    "cached": true,
     "error": null,
     "source": "llm",
     "model": "gemini-3.5-flash-lite",
     "input_tokens": 1528,
     "output_tokens": 97,
     "thought_tokens": 0,
-    "latency_ms": 7383.7
+    "latency_ms": 0.0
    },
    "timings_ms": {
-    "understand": 491.5,
-    "search": 1739.9,
-    "hydrate": 805.9,
-    "answer": 7859.1,
-    "total": 10897.2
+    "understand": 958.7,
+    "search": 1278.2,
+    "hydrate": 798.5,
+    "answer": 0.8,
+    "total": 3517.2
    },
-   "wall_ms": 10899.3
+   "wall_ms": 3519.7
   },
   {
    "id": "vi02",
@@ -1477,23 +1477,23 @@
     "used_template": false
    },
    "answer": {
-    "cached": false,
+    "cached": true,
     "error": null,
     "source": "llm",
     "model": "gemini-3.5-flash-lite",
     "input_tokens": 1443,
     "output_tokens": 78,
     "thought_tokens": 0,
-    "latency_ms": 7010.4
+    "latency_ms": 0.0
    },
    "timings_ms": {
-    "understand": 475.0,
-    "search": 1513.4,
-    "hydrate": 785.0,
-    "answer": 8205.1,
-    "total": 10979.3
+    "understand": 962.4,
+    "search": 1294.8,
+    "hydrate": 800.9,
+    "answer": 0.5,
+    "total": 3540.1
    },
-   "wall_ms": 10981.1
+   "wall_ms": 3543.6
   },
   {
    "id": "vi03",
@@ -1512,23 +1512,23 @@
     "used_template": false
    },
    "answer": {
-    "cached": false,
+    "cached": true,
     "error": null,
     "source": "llm",
     "model": "gemini-3.5-flash-lite",
     "input_tokens": 1432,
     "output_tokens": 83,
     "thought_tokens": 0,
-    "latency_ms": 7133.5
+    "latency_ms": 0.0
    },
    "timings_ms": {
-    "understand": 475.0,
-    "search": 1394.7,
-    "hydrate": 804.9,
-    "answer": 7610.5,
-    "total": 10285.5
+    "understand": 967.5,
+    "search": 1291.7,
+    "hydrate": 805.0,
+    "answer": 0.4,
+    "total": 3549.5
    },
-   "wall_ms": 10287.0
+   "wall_ms": 3551.8
   },
   {
    "id": "vi04",
@@ -1547,23 +1547,23 @@
     "used_template": false
    },
    "answer": {
-    "cached": false,
+    "cached": true,
     "error": null,
     "source": "llm",
     "model": "gemini-3.5-flash-lite",
     "input_tokens": 1437,
     "output_tokens": 88,
     "thought_tokens": 0,
-    "latency_ms": 8216.0
+    "latency_ms": 0.0
    },
    "timings_ms": {
-    "understand": 471.9,
-    "search": 1346.6,
-    "hydrate": 784.6,
-    "answer": 9338.6,
-    "total": 11942.2
+    "understand": 963.0,
+    "search": 1309.4,
+    "hydrate": 805.5,
+    "answer": 0.4,
+    "total": 3564.5
    },
-   "wall_ms": 11944.0
+   "wall_ms": 3567.1
   },
   {
    "id": "vi05",
@@ -1582,23 +1582,23 @@
     "used_template": false
    },
    "answer": {
-    "cached": false,
+    "cached": true,
     "error": null,
     "source": "llm",
     "model": "gemini-3.5-flash-lite",
     "input_tokens": 1540,
     "output_tokens": 98,
     "thought_tokens": 0,
-    "latency_ms": 6861.4
+    "latency_ms": 0.0
    },
    "timings_ms": {
-    "understand": 472.7,
-    "search": 1293.1,
-    "hydrate": 786.6,
-    "answer": 7334.4,
-    "total": 9887.5
+    "understand": 963.9,
+    "search": 1285.4,
+    "hydrate": 797.1,
+    "answer": 0.4,
+    "total": 3525.3
    },
-   "wall_ms": 9889.4
+   "wall_ms": 3527.6
   }
  ]
 }

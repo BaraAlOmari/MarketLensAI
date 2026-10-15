@@ -1,0 +1,1228 @@
+{
+ "label": "Stage 8 conversation state",
+ "date": "2026-10-15 10:36 UTC",
+ "conversations": 12,
+ "passed": 12,
+ "scored_turns": 18,
+ "turns_passed": 18,
+ "recall_at_10": 1.0,
+ "mrr": 1.0,
+ "final_recall_at_10": 1.0,
+ "wrong_results": 0,
+ "results": [
+  {
+   "id": "c01",
+   "lang": "en",
+   "tags": [
+    "add"
+   ],
+   "turns": [
+    {
+     "turn": 1,
+     "message": "used iPhone 15 Pro Max",
+     "filters": {
+      "category": "phones",
+      "brands": [
+       "Apple"
+      ],
+      "models": [
+       "iPhone 15 Pro Max"
+      ],
+      "conditions": [
+       "like_new",
+       "good",
+       "fair",
+       "poor"
+      ]
+     },
+     "notes": [
+      "new search"
+     ],
+     "returned": [
+      "syn-qa-01983",
+      "syn-qa-00069",
+      "syn-qa-00162",
+      "syn-qa-00433",
+      "syn-qa-01659",
+      "syn-qa-01310",
+      "syn-qa-00369",
+      "syn-qa-02057",
+      "syn-qa-01560",
+      "syn-qa-00763"
+     ],
+     "reply": "We found ten used iPhone 15 Pro Max listings. For the best condition and warranty, check listing 2 which is like new and comes with a box and warranty. If you prefer a larger storage capacity, listing 9 offers a massive storage option.",
+     "total_ms": 7212.1,
+     "scored": true,
+     "relevant_count": 16,
+     "hits": 10,
+     "recall_at_10": 1.0,
+     "rr": 1.0,
+     "wrong": {},
+     "passed": true
+    },
+    {
+     "turn": 2,
+     "message": "under 2000 riyals",
+     "filters": {
+      "category": "phones",
+      "brands": [
+       "Apple"
+      ],
+      "models": [
+       "iPhone 15 Pro Max"
+      ],
+      "conditions": [
+       "like_new",
+       "good",
+       "fair",
+       "poor"
+      ],
+      "max_price": "2000"
+     },
+     "notes": [
+      "price replaced"
+     ],
+     "returned": [
+      "syn-qa-01983",
+      "syn-qa-01659",
+      "syn-qa-01310",
+      "syn-qa-00574",
+      "syn-qa-02057",
+      "syn-qa-01560",
+      "syn-qa-00433",
+      "syn-qa-00387"
+     ],
+     "reply": "We found 8 listings matching your request. Listing 1 is a great choice with 91 percent battery health and a box included in The Pearl. Listing 5 offers good battery health at 90 percent in Najma, though it has visible scratches. Choose based on your preference for condition versus location.",
+     "total_ms": 6513.0,
+     "scored": true,
+     "relevant_count": 8,
+     "hits": 8,
+     "recall_at_10": 1.0,
+     "rr": 1.0,
+     "wrong": {},
+     "passed": true
+    }
+   ],
+   "passed": true
+  },
+  {
+   "id": "c02",
+   "lang": "en",
+   "tags": [
+    "add",
+    "add"
+   ],
+   "turns": [
+    {
+     "turn": 1,
+     "message": "MacBook Air M4",
+     "filters": {
+      "category": "laptops",
+      "brands": [
+       "Apple"
+      ],
+      "models": [
+       "MacBook Air 13 M4",
+       "MacBook Air 15 M4"
+      ]
+     },
+     "notes": [
+      "new search"
+     ],
+     "returned": [
+      "syn-qa-00852",
+      "syn-qa-01692",
+      "syn-qa-01729",
+      "syn-qa-01961",
+      "syn-qa-00362",
+      "syn-qa-01459",
+      "syn-qa-01455",
+      "syn-qa-00710",
+      "syn-qa-00174",
+      "syn-qa-00665"
+     ],
+     "reply": "We found 10 listings for the MacBook Air M4. For the highest performance, check out listing 1 featuring massive 32GB RAM and 1TB storage in brand new condition. If you prefer a balanced option, listing 3 offers 24GB RAM and like new condition with only 7 battery cycles.",
+     "total_ms": 6719.2
+    },
+    {
+     "turn": 2,
+     "message": "with 16GB RAM",
+     "filters": {
+      "category": "laptops",
+      "brands": [
+       "Apple"
+      ],
+      "models": [
+       "MacBook Air 13 M4",
+       "MacBook Air 15 M4"
+      ],
+      "attributes": {
+       "ram_gb": {
+        "min": "16"
+       }
+      }
+     },
+     "notes": [
+      "attributes: ram_gb"
+     ],
+     "returned": [
+      "syn-qa-01692",
+      "syn-qa-00362",
+      "syn-qa-01455",
+      "syn-qa-00174",
+      "syn-qa-00665",
+      "syn-qa-01459",
+      "syn-qa-00710",
+      "syn-qa-00852",
+      "syn-qa-01340",
+      "syn-qa-00017"
+     ],
+     "reply": "We found 10 listings matching your search. For the best value, check out listing 3 which is the cheapest option in good condition with 16GB RAM and a 512GB SSD. If you prefer a brand new sealed device, listing 1 in Madinat Khalifa is a great choice.",
+     "total_ms": 4856.2
+    },
+    {
+     "turn": 3,
+     "message": "like new only",
+     "filters": {
+      "category": "laptops",
+      "brands": [
+       "Apple"
+      ],
+      "models": [
+       "MacBook Air 13 M4",
+       "MacBook Air 15 M4"
+      ],
+      "conditions": [
+       "new",
+       "like_new"
+      ],
+      "attributes": {
+       "ram_gb": {
+        "min": "16"
+       }
+      }
+     },
+     "notes": [
+      "condition set"
+     ],
+     "returned": [
+      "syn-qa-01459",
+      "syn-qa-00362",
+      "syn-qa-01692",
+      "syn-qa-01729",
+      "syn-qa-01961",
+      "syn-qa-00526",
+      "syn-qa-01963",
+      "syn-qa-00268",
+      "syn-qa-00852",
+      "syn-qa-01417"
+     ],
+     "reply": "We found 10 listings matching your search. For a like new option with 16GB RAM, the cheapest choice is listing 1 located in Lusail with the original charger included. Alternatively, listing 2 in Abu Hamour is also like new with the original charger.",
+     "total_ms": 3478.8,
+     "scored": true,
+     "relevant_count": 13,
+     "hits": 10,
+     "recall_at_10": 1.0,
+     "rr": 1.0,
+     "wrong": {},
+     "passed": true
+    }
+   ],
+   "passed": true
+  },
+  {
+   "id": "c03",
+   "lang": "en",
+   "tags": [
+    "cheaper"
+   ],
+   "turns": [
+    {
+     "turn": 1,
+     "message": "Toyota Land Cruiser",
+     "filters": {
+      "category": "cars",
+      "brands": [
+       "Toyota"
+      ],
+      "models": [
+       "Land Cruiser"
+      ]
+     },
+     "notes": [
+      "new search"
+     ],
+     "returned": [
+      "syn-qa-00728",
+      "syn-qa-01624",
+      "syn-qa-00391",
+      "syn-qa-00524",
+      "syn-qa-02059",
+      "syn-qa-00900",
+      "syn-qa-01027",
+      "syn-qa-00276",
+      "syn-qa-01651",
+      "syn-qa-02043"
+     ],
+     "reply": "We found 10 Toyota Land Cruiser listings. For a nearly new vehicle with complete peace of mind, listing 4 is an accident-free VXR in like new condition with agency service history located in Lusail. If you prefer a brand new option, listing 5 in Al Sadd has minimal mileage and agency maintenance.",
+     "total_ms": 3547.5,
+     "scored": true,
+     "relevant_count": 14,
+     "hits": 10,
+     "recall_at_10": 1.0,
+     "rr": 1.0,
+     "wrong": {},
+     "passed": true
+    },
+    {
+     "turn": 2,
+     "message": "cheaper ones",
+     "filters": {
+      "category": "cars",
+      "brands": [
+       "Toyota"
+      ],
+      "models": [
+       "Land Cruiser"
+      ],
+      "max_price": "204999.999"
+     },
+     "notes": [
+      "nothing new to merge",
+      "cheaper: below median 205000 QAR"
+     ],
+     "returned": [
+      "syn-qa-01054",
+      "syn-qa-00308",
+      "syn-qa-00187",
+      "syn-qa-02043",
+      "syn-qa-01284",
+      "syn-qa-01027",
+      "syn-qa-00276"
+     ],
+     "reply": "We found 7 Toyota Land Cruiser listings matching your request. Listing 1 is the cheapest option available, featuring a white VXR trim with agency service history and located in Msheireb. Listing 2 is also a great choice with similar specs and condition, while listing 3 offers a slightly newer model year with a red GXR trim in West Bay.",
+     "total_ms": 3872.2,
+     "scored": true,
+     "relevant_count": 7,
+     "hits": 7,
+     "recall_at_10": 1.0,
+     "rr": 1.0,
+     "wrong": {},
+     "passed": true
+    }
+   ],
+   "passed": true
+  },
+  {
+   "id": "c04",
+   "lang": "en",
+   "tags": [
+    "brand_switch"
+   ],
+   "turns": [
+    {
+     "turn": 1,
+     "message": "used iPhone 15 Pro Max under 3000 QAR",
+     "filters": {
+      "category": "phones",
+      "brands": [
+       "Apple"
+      ],
+      "models": [
+       "iPhone 15 Pro Max"
+      ],
+      "conditions": [
+       "like_new",
+       "good",
+       "fair",
+       "poor"
+      ],
+      "max_price": "3000"
+     },
+     "notes": [
+      "new search"
+     ],
+     "returned": [
+      "syn-qa-00069",
+      "syn-qa-00162",
+      "syn-qa-00433",
+      "syn-qa-01983",
+      "syn-qa-01659",
+      "syn-qa-01310",
+      "syn-qa-00369",
+      "syn-qa-00507",
+      "syn-qa-01209",
+      "syn-qa-01560"
+     ],
+     "reply": "We found 10 listings matching your search. The best option is listing 1 because it is like new, includes a box, dual sim, and has active warranty in Al Rayyan. If you want a more budget-friendly choice, listing 4 offers good condition with a box in The Pearl.",
+     "total_ms": 3464.7
+    },
+    {
+     "turn": 2,
+     "message": "what about Samsung?",
+     "filters": {
+      "category": "phones",
+      "brands": [
+       "Samsung"
+      ],
+      "conditions": [
+       "like_new",
+       "good",
+       "fair",
+       "poor"
+      ],
+      "max_price": "3000"
+     },
+     "notes": [
+      "models of other brands dropped",
+      "brand set"
+     ],
+     "returned": [
+      "syn-qa-01826",
+      "syn-qa-01429",
+      "syn-qa-00847",
+      "syn-qa-02003",
+      "syn-qa-00560",
+      "syn-qa-01450",
+      "syn-qa-00855",
+      "syn-qa-02169",
+      "syn-qa-00732",
+      "syn-qa-02122"
+     ],
+     "reply": "We found 10 Samsung listings for you. For the best condition and warranty, check out the like-new Galaxy S24 Ultra in West Bay or Al Sadd. If you want the cheapest option with a full box, the Galaxy S24 Ultra in Lusail is a great pick.",
+     "total_ms": 3495.7,
+     "scored": true,
+     "relevant_count": 63,
+     "hits": 10,
+     "recall_at_10": 1.0,
+     "rr": 1.0,
+     "wrong": {},
+     "passed": true
+    }
+   ],
+   "passed": true
+  },
+  {
+   "id": "c05",
+   "lang": "en",
+   "tags": [
+    "add",
+    "add"
+   ],
+   "turns": [
+    {
+     "turn": 1,
+     "message": "2 bedroom apartment in Lusail",
+     "filters": {
+      "category": "apartments",
+      "location": "Lusail",
+      "attributes": {
+       "bedrooms": {
+        "eq": 2
+       }
+      }
+     },
+     "notes": [
+      "new search"
+     ],
+     "returned": [
+      "syn-qa-01162",
+      "syn-qa-02058",
+      "syn-qa-01614",
+      "syn-qa-00426",
+      "syn-qa-01226",
+      "syn-qa-01942",
+      "syn-qa-00791"
+     ],
+     "reply": "We found seven 2-bedroom apartments in Lusail. For a furnished option on a very high floor with a gym, listing 1 is a great choice. If you want more space and a sea view, listing 4 offers a semi-furnished layout with parking and a balcony.",
+     "total_ms": 3482.4
+    },
+    {
+     "turn": 2,
+     "message": "for rent",
+     "filters": {
+      "category": "apartments",
+      "listing_type": "rent",
+      "location": "Lusail",
+      "attributes": {
+       "bedrooms": {
+        "eq": 2
+       }
+      }
+     },
+     "notes": [
+      "listing_type set"
+     ],
+     "returned": [
+      "syn-qa-01614",
+      "syn-qa-00791"
+     ],
+     "reply": "We found two listings for a two-bedroom apartment in Lusail. Listing one is the cheapest and semi-furnished, offering a lovely sea view, a maid room, and a balcony. Listing two is a larger penthouse with a pool access trade-off.",
+     "total_ms": 4091.4,
+     "scored": true,
+     "relevant_count": 2,
+     "hits": 2,
+     "recall_at_10": 1.0,
+     "rr": 1.0,
+     "wrong": {},
+     "passed": true
+    },
+    {
+     "turn": 3,
+     "message": "under 12000 a month",
+     "filters": {
+      "category": "apartments",
+      "max_price": "12000",
+      "price_period": "month",
+      "listing_type": "rent",
+      "location": "Lusail",
+      "attributes": {
+       "bedrooms": {
+        "eq": 2
+       }
+      }
+     },
+     "notes": [
+      "price replaced",
+      "listing_type set"
+     ],
+     "returned": [
+      "syn-qa-01614"
+     ],
+     "reply": "We found 1 apartment matching your criteria in Lusail. Listing 1 is a semi-furnished two-bedroom apartment featuring a lovely sea view, a maid room, and a balcony on the 37th floor. Keep in mind that bills are not included.",
+     "total_ms": 3882.4,
+     "scored": true,
+     "relevant_count": 1,
+     "hits": 1,
+     "recall_at_10": 1.0,
+     "rr": 1.0,
+     "wrong": {},
+     "passed": true
+    }
+   ],
+   "passed": true
+  },
+  {
+   "id": "c06",
+   "lang": "en",
+   "tags": [
+    "reset"
+   ],
+   "turns": [
+    {
+     "turn": 1,
+     "message": "MacBook Air",
+     "filters": {
+      "category": "laptops",
+      "models": [
+       "MacBook Air 13 M2",
+       "MacBook Air 13 M4",
+       "MacBook Air 15 M4"
+      ]
+     },
+     "notes": [
+      "new search"
+     ],
+     "returned": [
+      "syn-qa-01729",
+      "syn-qa-01459",
+      "syn-qa-01692",
+      "syn-qa-01065",
+      "syn-qa-01961",
+      "syn-qa-00526",
+      "syn-qa-00710",
+      "syn-qa-01455",
+      "syn-qa-00268",
+      "syn-qa-00362"
+     ],
+     "reply": "We found 10 MacBook Air listings. For high performance, listing 1 offers like new condition, 24GB RAM, and 512GB storage with a charger included. If you want maximum specs, listing 9 has 32GB RAM and 1TB storage, while listing 8 is the cheapest option with 16GB RAM and a charger.",
+     "total_ms": 3393.8
+    },
+    {
+     "turn": 2,
+     "message": "start over",
+     "filters": null,
+     "notes": [
+      "start over"
+     ],
+     "returned": [],
+     "reply": "Okay, starting over. What are you looking for?",
+     "total_ms": 968.1
+    },
+    {
+     "turn": 3,
+     "message": "office chair with delivery",
+     "filters": {
+      "category": "furniture",
+      "attributes": {
+       "item_type": {
+        "any_of": [
+         "office chair"
+        ]
+       },
+       "delivery_available": {
+        "eq": true
+       }
+      }
+     },
+     "notes": [
+      "new search"
+     ],
+     "returned": [
+      "syn-qa-00446",
+      "syn-qa-01779",
+      "syn-qa-00024",
+      "syn-qa-00536",
+      "syn-qa-00097"
+     ],
+     "reply": "We found five office chairs with delivery available. The cheapest option is brand new and located in Al Sadd. If you prefer like-new condition, the black mesh chair in Old Airport or the brown Herman Miller in Al Rayyan are great choices.",
+     "total_ms": 3480.8,
+     "scored": true,
+     "relevant_count": 5,
+     "hits": 5,
+     "recall_at_10": 1.0,
+     "rr": 1.0,
+     "wrong": {},
+     "passed": true
+    }
+   ],
+   "passed": true
+  },
+  {
+   "id": "c07",
+   "lang": "en",
+   "tags": [
+    "category_switch"
+   ],
+   "turns": [
+    {
+     "turn": 1,
+     "message": "Nissan Patrol",
+     "filters": {
+      "category": "cars",
+      "brands": [
+       "Nissan"
+      ],
+      "models": [
+       "Patrol"
+      ]
+     },
+     "notes": [
+      "new search"
+     ],
+     "returned": [
+      "syn-qa-01360",
+      "syn-qa-01528",
+      "syn-qa-01013",
+      "syn-qa-01123",
+      "syn-qa-00196",
+      "syn-qa-01066",
+      "syn-qa-01572",
+      "syn-qa-01180",
+      "syn-qa-01018",
+      "syn-qa-00481"
+     ],
+     "reply": "We found 10 Nissan Patrol listings. For a like-new vehicle with low mileage, check out the blue 2014 SE in Abu Hamour. If you want something newer, the 2017 SE in Najma offers a V6 engine but has past accident history.",
+     "total_ms": 3480.7
+    },
+    {
+     "turn": 2,
+     "message": "actually I need a villa for rent in Lusail",
+     "filters": {
+      "category": "villas",
+      "listing_type": "rent",
+      "location": "Lusail"
+     },
+     "notes": [
+      "new category: villas"
+     ],
+     "returned": [
+      "syn-qa-01839",
+      "syn-qa-00171",
+      "syn-qa-00169",
+      "syn-qa-02179"
+     ],
+     "reply": "We found 4 villas for rent in Lusail. Listing 1 is the cheapest option and features 5 bedrooms, an unfurnished layout, a private pool, and a garden, with a negotiable price. If you prefer a semi-furnished compound villa with a maid room instead, listing 2 offers a larger area.",
+     "total_ms": 3391.4,
+     "scored": true,
+     "relevant_count": 4,
+     "hits": 4,
+     "recall_at_10": 1.0,
+     "rr": 1.0,
+     "wrong": {},
+     "passed": true
+    }
+   ],
+   "passed": true
+  },
+  {
+   "id": "c08",
+   "lang": "ar",
+   "tags": [
+    "add",
+    "add"
+   ],
+   "turns": [
+    {
+     "turn": 1,
+     "message": "شقة للإيجار في لوسيل",
+     "filters": {
+      "category": "apartments",
+      "listing_type": "rent",
+      "location": "Lusail"
+     },
+     "notes": [
+      "new search"
+     ],
+     "returned": [
+      "syn-qa-01520",
+      "syn-qa-01609",
+      "syn-qa-00085",
+      "syn-qa-00802",
+      "syn-qa-01614",
+      "syn-qa-00463",
+      "syn-qa-00716",
+      "syn-qa-00347",
+      "syn-qa-01059",
+      "syn-qa-00754"
+     ],
+     "reply": "وجدت عشرة إعلانات لشقق للإيجار في لوسيل. نوصي بالشقة رقم اثنان لأنها شبه مفروشة وتشمل الفواتير وتعتبر خياراً اقتصادياً، أو بالشقة رقم ثلاثة التي تتميز بإطلالة على البحر والفواتير المشمولة. إذا كنت تبحث عن مساحة أكبر، فالشقة رقم خمسة توفر غرفتي نوم وإطلالة بحرية.",
+     "total_ms": 4131.6
+    },
+    {
+     "turn": 2,
+     "message": "غرفتين",
+     "filters": {
+      "category": "apartments",
+      "listing_type": "rent",
+      "location": "Lusail",
+      "attributes": {
+       "bedrooms": {
+        "eq": 2
+       }
+      }
+     },
+     "notes": [
+      "attributes: bedrooms"
+     ],
+     "returned": [
+      "syn-qa-01614",
+      "syn-qa-00791"
+     ],
+     "reply": "وجدنا إعلارين لشقق غرفتين للإيجار في لوسيل. الإعلان الأول يوفر شقة نصف مفروشة مع إطلالة على البحر وغرفة خادمة وبلكونة وتقع في الطابق السابع والثلاثين وهي الخيار الأرخص. بينما يقدم الإعلان الثاني بنتهاوس غير مفروش بمساحة أكبر ومسبح.",
+     "total_ms": 4205.6,
+     "scored": true,
+     "relevant_count": 2,
+     "hits": 2,
+     "recall_at_10": 1.0,
+     "rr": 1.0,
+     "wrong": {},
+     "passed": true
+    },
+    {
+     "turn": 3,
+     "message": "أقل من 12000 ريال بالشهر",
+     "filters": {
+      "category": "apartments",
+      "max_price": "12000",
+      "price_period": "month",
+      "listing_type": "rent",
+      "location": "Lusail",
+      "attributes": {
+       "bedrooms": {
+        "eq": 2
+       }
+      }
+     },
+     "notes": [
+      "price replaced",
+      "listing_type set"
+     ],
+     "returned": [
+      "syn-qa-01614"
+     ],
+     "reply": "تم العثور على خيار واحد مناسب في لوسيل. إنها شقة شبه مفروشة بغرفتين نوم وتضم إطلالة على البحر، غرفة خادمة، وشرفة في الطابق السابع والثلاثين.",
+     "total_ms": 3069.3,
+     "scored": true,
+     "relevant_count": 1,
+     "hits": 1,
+     "recall_at_10": 1.0,
+     "rr": 1.0,
+     "wrong": {},
+     "passed": true
+    }
+   ],
+   "passed": true
+  },
+  {
+   "id": "c09",
+   "lang": "en",
+   "tags": [
+    "replace"
+   ],
+   "turns": [
+    {
+     "turn": 1,
+     "message": "villa for rent with a private pool",
+     "filters": {
+      "category": "villas",
+      "listing_type": "rent",
+      "attributes": {
+       "private_pool": {
+        "eq": true
+       }
+      }
+     },
+     "notes": [
+      "new search"
+     ],
+     "returned": [
+      "syn-qa-00822",
+      "syn-qa-01019",
+      "syn-qa-01428",
+      "syn-qa-00395",
+      "syn-qa-01047",
+      "syn-qa-01440",
+      "syn-qa-00700",
+      "syn-qa-00208",
+      "syn-qa-01884",
+      "syn-qa-01040"
+     ],
+     "reply": "We found 10 villas with private pools for rent. For a great value option with a garden, consider the unfurnished 3-bedroom villa in Najma. If you need more space, the 4-bedroom villa in Al Khor offers a large area and a private pool.",
+     "total_ms": 3490.5
+    },
+    {
+     "turn": 2,
+     "message": "under 20000 a month",
+     "filters": {
+      "category": "villas",
+      "max_price": "20000",
+      "price_period": "month",
+      "listing_type": "rent",
+      "attributes": {
+       "private_pool": {
+        "eq": true
+       }
+      }
+     },
+     "notes": [
+      "price replaced",
+      "listing_type set"
+     ],
+     "returned": [
+      "syn-qa-00822",
+      "syn-qa-01019",
+      "syn-qa-00395",
+      "syn-qa-00052",
+      "syn-qa-01884",
+      "syn-qa-01428",
+      "syn-qa-01809",
+      "syn-qa-00151",
+      "syn-qa-00857",
+      "syn-qa-00806"
+     ],
+     "reply": "We found 10 villas with private pools matching your criteria. For the best value, the Al Khor villa is the cheapest option and very spacious, while the Al Wakrah villa offers a massive 5-bedroom layout at a low price rank. If you prefer a furnished option in Doha, check out Bin Mahmoud.",
+     "total_ms": 3541.6,
+     "scored": true,
+     "relevant_count": 40,
+     "hits": 10,
+     "recall_at_10": 1.0,
+     "rr": 1.0,
+     "wrong": {},
+     "passed": true
+    },
+    {
+     "turn": 3,
+     "message": "actually under 25000",
+     "filters": {
+      "category": "villas",
+      "max_price": "25000",
+      "price_period": "month",
+      "listing_type": "rent",
+      "attributes": {
+       "private_pool": {
+        "eq": true
+       }
+      }
+     },
+     "notes": [
+      "price replaced",
+      "listing_type set"
+     ],
+     "returned": [
+      "syn-qa-00874",
+      "syn-qa-01412",
+      "syn-qa-00835",
+      "syn-qa-00432",
+      "syn-qa-01839",
+      "syn-qa-01809",
+      "syn-qa-01023",
+      "syn-qa-01474",
+      "syn-qa-01884",
+      "syn-qa-00822"
+     ],
+     "reply": "We found 10 villas with private pools matching your criteria. For the best value, check out the fully furnished 4-bedroom villa in Bin Mahmoud which is the cheapest option. If you need more space, the 6-bedroom villa in Old Airport offers a very large area.",
+     "total_ms": 3491.8,
+     "scored": true,
+     "relevant_count": 50,
+     "hits": 10,
+     "recall_at_10": 1.0,
+     "rr": 1.0,
+     "wrong": {},
+     "passed": true
+    }
+   ],
+   "passed": true
+  },
+  {
+   "id": "c10",
+   "lang": "en",
+   "tags": [
+    "add",
+    "add"
+   ],
+   "turns": [
+    {
+     "turn": 1,
+     "message": "Nissan Patrol under 250,000 QAR",
+     "filters": {
+      "category": "cars",
+      "brands": [
+       "Nissan"
+      ],
+      "models": [
+       "Patrol"
+      ],
+      "max_price": "250000"
+     },
+     "notes": [
+      "new search"
+     ],
+     "returned": [
+      "syn-qa-01180",
+      "syn-qa-01123",
+      "syn-qa-01066",
+      "syn-qa-01360",
+      "syn-qa-01013",
+      "syn-qa-01528",
+      "syn-qa-00481"
+     ],
+     "reply": "We found 7 Nissan Patrol listings that match your criteria. Listing 2 stands out with agency service history and zero accidents, though it is in fair condition. Alternatively, listing 6 is accident-free and running like new, offering a great trade-off if you prefer an older model.",
+     "total_ms": 3482.5
+    },
+    {
+     "turn": 2,
+     "message": "less than 100,000 km",
+     "filters": {
+      "category": "cars",
+      "brands": [
+       "Nissan"
+      ],
+      "models": [
+       "Patrol"
+      ],
+      "max_price": "250000",
+      "attributes": {
+       "mileage_km": {
+        "max": "100000"
+       }
+      }
+     },
+     "notes": [
+      "attributes: mileage_km"
+     ],
+     "returned": [
+      "syn-qa-01123",
+      "syn-qa-01066",
+      "syn-qa-01180",
+      "syn-qa-00481"
+     ],
+     "reply": "We found 4 Nissan Patrol listings matching your criteria. Listing 1 is the best option with accident-free status, very low mileage, and agency service history in Abu Hamour, though it is in fair condition. Alternatively, listing 2 offers a like-new condition in Al Rayyan but has a prior accident history.",
+     "total_ms": 3538.7
+    },
+    {
+     "turn": 3,
+     "message": "GCC specs only",
+     "filters": {
+      "category": "cars",
+      "brands": [
+       "Nissan"
+      ],
+      "models": [
+       "Patrol"
+      ],
+      "max_price": "250000",
+      "attributes": {
+       "mileage_km": {
+        "max": "100000"
+       },
+       "gcc_specs": {
+        "eq": true
+       }
+      }
+     },
+     "notes": [
+      "attributes: gcc_specs"
+     ],
+     "returned": [
+      "syn-qa-01066",
+      "syn-qa-01123",
+      "syn-qa-01180"
+     ],
+     "reply": "We found 3 Nissan Patrol listings matching your criteria. Listing 2 is accident-free with very low mileage and agency service history, located in Abu Hamour, though it is in fair condition. Listing 1 is the cheapest option and looks like new inside out, but has a prior repaired accident.",
+     "total_ms": 3491.6,
+     "scored": true,
+     "relevant_count": 3,
+     "hits": 3,
+     "recall_at_10": 1.0,
+     "rr": 1.0,
+     "wrong": {},
+     "passed": true
+    }
+   ],
+   "passed": true
+  },
+  {
+   "id": "c11",
+   "lang": "mixed",
+   "tags": [
+    "add",
+    "cheaper"
+   ],
+   "turns": [
+    {
+     "turn": 1,
+     "message": "Galaxy S24 Ultra",
+     "filters": {
+      "category": "phones",
+      "brands": [
+       "Samsung"
+      ],
+      "models": [
+       "Galaxy S24 Ultra"
+      ]
+     },
+     "notes": [
+      "new search"
+     ],
+     "returned": [
+      "syn-qa-00809",
+      "syn-qa-00560",
+      "syn-qa-02003",
+      "syn-qa-02122",
+      "syn-qa-00732",
+      "syn-qa-00101",
+      "syn-qa-00855",
+      "syn-qa-01450",
+      "syn-qa-01881",
+      "syn-qa-02169"
+     ],
+     "reply": "We found 10 Galaxy S24 Ultra listings. If you want a brand new device, listing 1 is sealed and comes with a box and warranty. For a lower price with a box and more storage, listing 9 offers good condition and a mint color.",
+     "total_ms": 3562.3
+    },
+    {
+     "turn": 2,
+     "message": "512GB",
+     "filters": {
+      "category": "phones",
+      "brands": [
+       "Samsung"
+      ],
+      "models": [
+       "Galaxy S24 Ultra"
+      ],
+      "attributes": {
+       "storage_gb": {
+        "eq": 512
+       }
+      },
+      "keywords": [
+       "512GB"
+      ]
+     },
+     "notes": [
+      "attributes: storage_gb"
+     ],
+     "returned": [
+      "syn-qa-01450",
+      "syn-qa-00855",
+      "syn-qa-01881",
+      "syn-qa-00101",
+      "syn-qa-01224",
+      "syn-qa-01817"
+     ],
+     "reply": "We found six Galaxy S24 Ultra 512GB options. For the best condition, check out the titanium gray model in Al Duhail which is like new. If you prefer having the original box included, the mint option in West Bay and the navy one in Al Sadd are both in good condition.",
+     "total_ms": 3485.2,
+     "scored": true,
+     "relevant_count": 6,
+     "hits": 6,
+     "recall_at_10": 1.0,
+     "rr": 1.0,
+     "wrong": {},
+     "passed": true
+    },
+    {
+     "turn": 3,
+     "message": "أرخص",
+     "filters": {
+      "category": "phones",
+      "brands": [
+       "Samsung"
+      ],
+      "models": [
+       "Galaxy S24 Ultra"
+      ],
+      "max_price": "2474.499",
+      "attributes": {
+       "storage_gb": {
+        "eq": 512
+       }
+      },
+      "keywords": [
+       "512GB"
+      ]
+     },
+     "notes": [
+      "nothing new to merge",
+      "cheaper: below median 2474 QAR"
+     ],
+     "returned": [
+      "syn-qa-01817",
+      "syn-qa-01224",
+      "syn-qa-01881"
+     ],
+     "reply": "وجدت ثلاثة عروض لهاتف جالكسي إس 24 ألترا بسعة 512 جيجابايت. الخيار الأول هو الأرخص ولكنه يحتاج إلى تصليح ويدعم الشريحة الإلكترونية فقط. أما الخياران الآخران فهما بحالة جيدة ويدعمان الشريحة العادية والإلكترونية، ويتميز أحدهما بلون مميز مع العلبة.",
+     "total_ms": 8974.0,
+     "scored": true,
+     "relevant_count": 3,
+     "hits": 3,
+     "recall_at_10": 1.0,
+     "rr": 1.0,
+     "wrong": {},
+     "passed": true
+    }
+   ],
+   "passed": true
+  },
+  {
+   "id": "c12",
+   "lang": "en",
+   "tags": [
+    "reset",
+    "category_switch"
+   ],
+   "turns": [
+    {
+     "turn": 1,
+     "message": "furnished studio for rent",
+     "filters": {
+      "category": "apartments",
+      "listing_type": "rent",
+      "attributes": {
+       "property_type": {
+        "eq": "studio"
+       },
+       "furnished": {
+        "eq": "furnished"
+       }
+      }
+     },
+     "notes": [
+      "new search"
+     ],
+     "returned": [
+      "syn-qa-01327",
+      "syn-qa-00799",
+      "syn-qa-00767",
+      "syn-qa-00295",
+      "syn-qa-01546",
+      "syn-qa-00901",
+      "syn-qa-01248",
+      "syn-qa-02189",
+      "syn-qa-02082",
+      "syn-qa-00721"
+     ],
+     "reply": "We found 10 furnished studios for rent. For the best value, the studio in Najma is the cheapest option and offers a sea view. If you prefer bills included in the rent, consider the units in Al Waab or Al Wakrah.",
+     "total_ms": 3550.5
+    },
+    {
+     "turn": 2,
+     "message": "in Al Qassar",
+     "filters": {
+      "category": "apartments",
+      "listing_type": "rent",
+      "location": "Al Qassar",
+      "attributes": {
+       "furnished": {
+        "eq": "furnished"
+       },
+       "property_type": {
+        "eq": "studio"
+       }
+      }
+     },
+     "notes": [
+      "location set"
+     ],
+     "returned": [
+      "syn-qa-02082"
+     ],
+     "reply": "We found one fully furnished studio in Al Qassar. It includes great amenities like a gym, swimming pool, and parking, making it a convenient choice.",
+     "total_ms": 3159.1
+    },
+    {
+     "turn": 3,
+     "message": "start over",
+     "filters": null,
+     "notes": [
+      "start over"
+     ],
+     "returned": [],
+     "reply": "Okay, starting over. What are you looking for?",
+     "total_ms": 946.8
+    },
+    {
+     "turn": 4,
+     "message": "townhouse for sale",
+     "filters": {
+      "category": "villas",
+      "listing_type": "sale",
+      "attributes": {
+       "property_type": {
+        "eq": "townhouse"
+       }
+      },
+      "keywords": [
+       "townhouse"
+      ]
+     },
+     "notes": [
+      "new search"
+     ],
+     "returned": [
+      "syn-qa-02174",
+      "syn-qa-01825",
+      "syn-qa-00400",
+      "syn-qa-00336",
+      "syn-qa-00435",
+      "syn-qa-01470",
+      "syn-qa-00642",
+      "syn-qa-00738",
+      "syn-qa-00793",
+      "syn-qa-00563"
+     ],
+     "reply": "We found 10 townhouses for sale. Listing 1 offers a fully furnished 5-bedroom option in Al Qassar featuring a private pool and garden. If you want a larger space, listing 8 provides a very big unfurnished 7-bedroom townhouse in Lusail with a private garden.",
+     "total_ms": 3477.7,
+     "scored": true,
+     "relevant_count": 14,
+     "hits": 10,
+     "recall_at_10": 1.0,
+     "rr": 1.0,
+     "wrong": {},
+     "passed": true
+    }
+   ],
+   "passed": true
+  }
+ ]
+}

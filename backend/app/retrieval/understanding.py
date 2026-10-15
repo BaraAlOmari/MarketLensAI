@@ -8,7 +8,7 @@ import hashlib
 import json
 import logging
 import time
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from decimal import Decimal
 
 import asyncpg
@@ -73,6 +73,24 @@ class QueryUnderstanding:
             latency_ms=round((time.perf_counter() - started) * 1000, 1),
             guard_notes=tuple(f"{f}:invalid value" for f in invalid) + tuple(notes),
             **tokens,
+        )
+
+    def with_context(
+        self, understood: Understanding, query: str, category: str | None
+    ) -> Understanding:
+        """Recompute filters for a follow-up (Stage 8). A message such as "for rent" or "غرفتين"
+        has no category of its own, so the guards would drop rent and bedrooms as "not for
+        unknown category". The conversation's category is filled in first. The cached parse
+        itself stays context-free, so one message's cache entry is valid in any conversation."""
+        if understood.parse is None or category is None or understood.parse.category is not None:
+            return understood
+        parse = understood.parse.model_copy(update={"category": category})
+        cleaned, notes = clean_parse(parse, normalize_query(query), self.catalog)
+        invalid = tuple(n for n in understood.guard_notes if n.endswith(":invalid value"))
+        return replace(
+            understood,
+            filters=parse_to_filters(cleaned, self.rates),
+            guard_notes=(*invalid, "category:from conversation", *notes),
         )
 
     async def lookup(self, conn: asyncpg.Connection, query: str) -> Understanding | None:
