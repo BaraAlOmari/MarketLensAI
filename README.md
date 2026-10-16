@@ -1,8 +1,15 @@
 # MarketLens
 
-**Search a marketplace the way you'd ask a friend.** Type *"Find me a used iPhone 17 in great condition for around $900"* (or the same in Gulf Arabic), and MarketLens works out what you mean, finds the listings that really match, and explains its picks. Every price and detail on screen comes straight from the database, never from the AI.
+**An AI search assistant for a marketplaces in Qatar.** Search a marketplace the way you'd ask a friend, and MarketLens turns it into an exact search, finds the listings that match, and explains the best picks.
 
-It is a full retrieval-augmented generation (RAG) system built from scratch: LLM query understanding, hybrid search (pgvector + Postgres full-text, fused with RRF), LLM reranking, grounded answers streamed over server-sent events, multi-turn conversation memory, and an evaluation harness that measured every step. The listings are 2,205 synthetic marketplace ads for Qatar, in English, Arabic and mixed text.
+<p align="center">
+  <img src="docs/images/start-desktop-light.png" alt="MarketLens start screen: 'What are you looking for?', example prompts, and an illustration of listing cards under a magnifying lens" width="100%">
+</p>
+
+Describe what you want in plain English or Arabic. Type *"Find me a used iPhone 17 in great condition for around 3000 QR"* (or the same in any Arabic dialect), and MarketLens works out what you mean, finds the listings that really match, and explains its picks. Every price and detail on screen comes straight from the database, never from the AI.
+
+
+Under the hood it is a full retrieval-augmented generation (RAG) system built from scratch: LLM query understanding, hybrid search (pgvector + Postgres full-text, fused with RRF), LLM reranking, grounded answers streamed over server-sent events, multi-turn conversation memory, and an evaluation harness that measured every step. The listings are 2,205 synthetic marketplace ads for Qatar, in English, Arabic and mixed text.
 
 <p align="center">
   <img src="docs/images/results-light.png" alt="Results for 'used iPhone 15 Pro Max': the extracted filters as removable tokens, a short summary, and numbered listing cards" width="100%">
@@ -42,6 +49,7 @@ Measured on a frozen set of 45 queries written before any improvement ([docs/res
 - **Explains, without making things up.** A short summary points out the best options. The model never sees exact prices and isn't allowed to write any. Every card is re-read from the database.
 - **Remembers the conversation.** "under 2000 riyals", "what about Samsung?", "cheaper ones" or "start over" refine the previous search.
 - **Never leaves you at a dead end.** When nothing matches, it says which single filter to drop and how many listings that would bring back ("Without 765–1,035 USD · 8 listings"). Below that it shows the **closest matches**, each labelled with what it misses ("Not 765–1,035 USD").
+- **Shows every detail on tap.** Each card opens a sheet with all of the listing's attributes and its full description.
 - **Works in English and Arabic,** including right-to-left layout and Arabic interface text for Arabic searches, with light and dark appearance.
 
 <p align="center">
@@ -49,9 +57,11 @@ Measured on a frozen set of 45 queries written before any improvement ([docs/res
 </p>
 
 <p align="center">
-  <img src="docs/images/start-phone-light.png" alt="Start screen on a phone" width="32%">
+  <img src="docs/images/start-phone-light.png" alt="Start screen on a phone" width="30%">
   &nbsp;
-  <img src="docs/images/arabic-phone-dark.png" alt="An Arabic search on a phone in dark mode: Arabic filter tokens and summary, right-to-left cards" width="32%">
+  <img src="docs/images/arabic-phone-dark.png" alt="An Arabic search on a phone in dark mode: Arabic filter tokens and summary, right-to-left cards" width="30%">
+  &nbsp;
+  <img src="docs/images/sheet-phone-light.png" alt="A listing's detail sheet on a phone: price, location and every attribute in a grouped list" width="30%">
 </p>
 
 ## Architecture
@@ -226,7 +236,7 @@ backend/
   tests/            pytest suite (234 tests, no network needed)
 frontend/
   src/app/          page, layout, design tokens (globals.css), API route handlers (proxy)
-  src/components/   Chat, ListingCard, FilterTokens, ThemeSwitch, icons
+  src/components/   Chat, ListingCard, ListingSheet, FilterTokens, ThemeSwitch, EmptyIllustration, icons
   src/lib/          event-stream client, filter and price formatting, English/Arabic copy, theme
 data/               synthetic data generator and listings.jsonl
 eval/               frozen queries and conversations, ground truth, runners, reports
@@ -258,5 +268,3 @@ The eval scripts need the backend's database and API key. Repeated runs mostly h
   - observability and hardening: per-step structured logs, rate limiting, CI;
   - deployment on Azure with a public demo;
   - a final documentation pass.
-
-  The full plan is in [REQUIREMENTS.md](REQUIREMENTS.md).
