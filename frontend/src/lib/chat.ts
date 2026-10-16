@@ -104,15 +104,19 @@ export class ChatRequestError extends Error {
   constructor(
     message: string,
     readonly status: number,
+    /** The request's ID in the backend logs (`scripts/explain.py <id>`). */
+    readonly requestId: string | null = null,
   ) {
     super(message);
   }
 }
 
+export type ChatStream = { events: AsyncGenerator<ChatEvent>; requestId: string | null };
+
 export async function streamChat(
   payload: { session_id: string; message: string; filters?: Filters },
   signal?: AbortSignal,
-): Promise<AsyncGenerator<ChatEvent>> {
+): Promise<ChatStream> {
   const response = await fetch("/api/chat", {
     method: "POST",
     headers: { "content-type": "application/json" },
@@ -127,7 +131,11 @@ export async function streamChat(
     } catch {
       // not JSON; fall through to the generic message
     }
-    throw new ChatRequestError(detail || `HTTP ${response.status}`, response.status);
+    throw new ChatRequestError(
+      detail || `HTTP ${response.status}`,
+      response.status,
+      response.headers.get("x-request-id"),
+    );
   }
-  return readEvents(response.body);
+  return { events: readEvents(response.body), requestId: response.headers.get("x-request-id") };
 }

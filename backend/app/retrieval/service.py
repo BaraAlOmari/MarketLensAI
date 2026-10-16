@@ -19,6 +19,7 @@ import time
 
 import asyncpg
 
+from app.logging_setup import log_event
 from app.models.filters import SearchFilters
 from app.models.search import (
     ExtractionDebug,
@@ -133,6 +134,77 @@ class SearchService:
         ]
         return results, {"vector": len(found.vector_ids), "keyword": len(found.keyword_ids)}
 
+    def _log_trace(
+        self,
+        request: SearchRequest,
+        mode: str,
+        use_llm: bool,
+        understood: Understanding | None,
+        filters: SearchFilters | None,
+        vector: QueryVector,
+        candidates: dict[str, int],
+        pool_results: list[ListingResult],
+        reranked: RerankOutcome | None,
+        results: list[ListingResult],
+        timings: dict[str, float],
+    ) -> None:
+        """One record per pipeline step, all under the request's ID (Stage 10). Together they
+        say why each result is on the page: it passed `search.understand`'s filters (SQL),
+        it ranked here on meaning and on exact words (`search.retrieve`, fused with RRF), and
+        the reranker put it in this position (`search.rerank`)."""
+        applied = filters.model_dump(mode="json", exclude_defaults=True) if filters else None
+        log_event(
+            logger,
+            "search.understand",
+            query=request.query[:200],
+            source="request" if request.filters is not None else "llm" if use_llm else "none",
+            filters=applied or None,
+            cached=understood.cached if understood else None,
+            error=understood.error if understood else None,
+            guard_notes=list(understood.guard_notes) if understood else [],
+            latency_ms=understood.latency_ms if understood else 0.0,
+        )
+        log_event(
+            logger,
+            "search.retrieve",
+            mode=mode,
+            embedding_cached=vector.cached,
+            keyword_text=self._keyword_text(request.query, filters)[:200] or None,
+            candidates=candidates,  # rows found per side, under the filters, before fusion
+            fused=len(pool_results),
+            rrf_k=self.rrf_k,
+            latency_ms=timings.get("retrieve"),
+        )
+        if reranked is not None:
+            log_event(
+                logger,
+                "search.rerank",
+                model=self.reranker.model,
+                cached=reranked.cached,
+                candidates=len(pool_results),
+                ranked=reranked.ranked,  # positions set by the model; the rest keep RRF order
+                invalid=reranked.invalid,
+                error=reranked.error,
+                latency_ms=reranked.latency_ms,
+            )
+        log_event(
+            logger,
+            "search.results",
+            count=len(results),
+            results=[
+                {
+                    "position": i,
+                    "id": r.id,
+                    "external_id": r.external_id,
+                    "title": r.title[:60],
+                    "ranks": r.ranks,  # vector, keyword (absent = not in that top list), rerank
+                    "rrf_score": r.score,
+                }
+                for i, r in enumerate(results, 1)
+            ],
+            timings_ms=timings,
+        )
+
     async def search(self, request: SearchRequest) -> SearchResponse:
         if self.pool is None or self.embedder is None:
             raise SearchUnavailableError("search needs DATABASE_URL and GEMINI_API_KEY")
@@ -195,17 +267,9 @@ class SearchService:
         results = (reranked.results if reranked else pool_results)[:limit]
         timings["total"] = _ms(time.perf_counter() - t0)
         applied = filters is not None and not filters.is_empty()
-        logger.info(
-            "search done",
-            extra={"fields": {
-                "results": len(results), "filters_applied": applied,
-                "embedding_cached": vector.cached,
-                "extraction_cached": understood.cached if understood else None,
-                "extraction_error": understood.error if understood else None,
-                "rerank_cached": reranked.cached if reranked else None,
-                "rerank_error": reranked.error if reranked else None,
-                "timings_ms": timings,
-            }},
+        self._log_trace(
+            request, mode, use_llm, understood, filters, vector, candidates, pool_results,
+            reranked, results, timings,
         )  # fmt: skip
 
         debug = None

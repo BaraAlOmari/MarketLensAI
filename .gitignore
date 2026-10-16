@@ -25,3 +25,7 @@ Thumbs.db
 
 # Generator temp output
 data/*.tmp
+
+# Runtime logs (contain what people searched for)
+backend/logs/
+*.log

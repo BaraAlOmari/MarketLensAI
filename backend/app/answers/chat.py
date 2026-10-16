@@ -43,6 +43,7 @@ from app.conversation.merge import (
     wants_cheaper,
 )
 from app.conversation.store import Session, SessionStore, combine_query
+from app.logging_setup import log_event
 from app.models.filters import SearchFilters
 from app.models.search import ListingResult, SearchRequest
 from app.providers.llm import (
@@ -70,6 +71,11 @@ START_OVER_AR = "تمام، نبدأ من جديد. عن ماذا تبحث؟"
 class Event:
     name: str
     data: dict
+
+
+def dump(filters: SearchFilters | None) -> dict | None:
+    """Filters as logged and sent: only what is set."""
+    return filters.model_dump(mode="json", exclude_defaults=True) if filters else None
 
 
 def sse(event: Event) -> str:
@@ -197,6 +203,12 @@ class ChatService:
         except Exception:  # noqa: BLE001 - the no-match reply stands on its own
             logger.exception("nearby search failed")
             return {"listings": [], "misses": {}}
+        log_event(
+            logger,
+            "chat.nearby",
+            filters=nearby_filters(filters).model_dump(mode="json", exclude_defaults=True),
+            listings=[{"id": c.id, "misses": missed.get(c.id, [])} for c in cards],
+        )
         return {
             "listings": [c.model_dump(mode="json") for c in cards],
             "misses": {str(c.id): missed.get(c.id, []) for c in cards},
@@ -282,6 +294,20 @@ class ChatService:
             language = reply_language(text)
             search_query = text if new_topic else combine_query(session.search_query, text)
             t = lap("understand", t0)
+            # How the model read this message and how it changed the conversation (Stage 10);
+            # the search below then reports source "request" because it gets these filters.
+            log_event(
+                logger,
+                "chat.understand",
+                message=text[:200],
+                cached=understood.cached if understood else None,
+                error=understood.error if understood else "understanding unavailable",
+                guard_notes=list(understood.guard_notes) if understood else [],
+                read_as=dump(delta),
+                previous=dump(prev),
+                merged=dump(filters),
+                merge_notes=notes,
+            )
         yield Event(
             "filters",
             {
@@ -369,6 +395,31 @@ class ChatService:
             yield Event("nearby", await self._nearby(search_query, filters))
             lap("nearby", t)
         timings["total"] = round((time.perf_counter() - t0) * 1000, 1)
+        # The turn in one record (Stage 10): how the message changed the search, what was
+        # shown, and how the reply was checked. The search's own steps are logged above it.
+        log_event(
+            logger,
+            "chat.turn",
+            session=session.session_id,
+            turn=session.turns,
+            edited=filters_override is not None,
+            merge_notes=notes,
+            search_query=search_query[:200],
+            language=language,
+            cards=[c.id for c in cards],
+            no_match=no_match,
+            relaxations={r.constraint: r.count for r in relaxations},
+            answer_source=answer_info.get("source"),
+            answer_cached=answer_info.get("cached"),
+            answer_error=answer_info.get("error"),
+            cited_ids=grounded.cited_ids,
+            grounding={
+                "dropped_ids": grounded.dropped_ids,
+                "removed_sentences": grounded.removed_sentences,
+                "used_template": grounded.used_template,
+            },
+            timings_ms=timings,
+        )
         yield Event(
             "done",
             {

@@ -8,9 +8,9 @@ here therefore changes behaviour for every query, consistently, without a new LL
 
 from decimal import Decimal
 from enum import StrEnum
-from typing import Any
+from typing import Annotated, Any
 
-from pydantic import BaseModel, ConfigDict, Field, model_validator
+from pydantic import BaseModel, ConfigDict, Field, StringConstraints, model_validator
 
 from app.models.listing import PROPERTY_CATEGORIES, Condition, ListingType, PricePeriod
 
@@ -87,19 +87,26 @@ class QueryParse(BaseModel):
     keywords: list[str] = []
 
 
+# A brand, model, place, keyword or attribute value: never longer than this in the catalog.
+Name = Annotated[str, StringConstraints(max_length=80)]
+
+
 class AttributeFilter(BaseModel):
     """One condition on `listings.attributes`. Exactly one operator is set."""
 
     model_config = ConfigDict(extra="forbid")
 
     eq: Any = None
-    any_of: list[str] | None = None
+    any_of: list[Name] | None = Field(default=None, max_length=20)
     min: Decimal | None = None
     max: Decimal | None = None
-    contains: list[str] | None = None  # the attribute is an array holding all of these
+    # the attribute is an array holding all of these
+    contains: list[Name] | None = Field(default=None, max_length=20)
 
     @model_validator(mode="after")
     def one_operator(self) -> "AttributeFilter":
+        if isinstance(self.eq, str) and len(self.eq) > 80:
+            raise ValueError("attribute value too long")
         set_ops = [
             k for k in ("eq", "any_of", "min", "max", "contains") if getattr(self, k) is not None
         ]
@@ -123,19 +130,23 @@ class SearchFilters(BaseModel):
 
     model_config = ConfigDict(extra="forbid")
 
-    category: str | None = None
-    brands: list[str] = []
-    models: list[str] = []
+    # Size caps (Stage 10): clients can send these filters directly (edited tokens), so
+    # lists and strings are bounded. The catalog has at most 32 models per category and
+    # 45 brands, so real searches never come near them.
+    category: Name | None = None
+    brands: list[Name] = Field(default=[], max_length=30)
+    models: list[Name] = Field(default=[], max_length=40)
     conditions: list[Condition] = []
     min_price: Decimal | None = Field(default=None, ge=0)
     max_price: Decimal | None = Field(default=None, ge=0)
-    currency: str = "QAR"
+    currency: str = Field(default="QAR", max_length=8)
     # For rentals: the period min/max_price refer to (yearly rents compare as yearly / 12).
     price_period: PricePeriod | None = None
     listing_type: ListingType | None = None
-    location: str | None = None
+    location: Name | None = None
     attributes: dict[str, AttributeFilter] = {}
-    keywords: list[str] = []  # extracted now; used by keyword search from Stage 5
+    # extracted now; used by keyword search from Stage 5
+    keywords: list[Name] = Field(default=[], max_length=16)
 
     @model_validator(mode="after")
     def known_attributes(self) -> "SearchFilters":

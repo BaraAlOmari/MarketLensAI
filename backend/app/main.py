@@ -1,11 +1,12 @@
 import logging
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI
+from fastapi import Depends, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.answers.chat import AnswerCache, ChatService
 from app.api import chat, health, search
+from app.api.guard import BodySizeLimitMiddleware, RateLimiter, rate_limited
 from app.config import Settings, get_settings
 from app.conversation.store import SessionStore
 from app.db import create_pool
@@ -83,7 +84,7 @@ async def build_understanding(
 
 def create_app(settings: Settings | None = None) -> FastAPI:
     settings = settings or get_settings()
-    configure_logging(settings.log_level)
+    configure_logging(settings.log_level, settings.log_file)
 
     @asynccontextmanager
     async def lifespan(app: FastAPI):
@@ -122,17 +123,26 @@ def create_app(settings: Settings | None = None) -> FastAPI:
                 await app.state.db_pool.close()
 
     app = FastAPI(title=settings.app_name, version="0.1.0", lifespan=lifespan)
+    app.state.settings = settings
+    app.state.rate_limiter = (
+        RateLimiter(settings.rate_limit_per_minute, settings.rate_limit_per_day)
+        if settings.rate_limit_enabled
+        else None
+    )
+    # Added last = runs first: request ID, then the body limit, then CORS.
     app.add_middleware(
         CORSMiddleware,
         allow_origins=settings.cors_origin_list,
         allow_methods=["GET", "POST"],
-        allow_headers=["*"],
-        expose_headers=["x-request-id"],
+        allow_headers=["content-type", "x-request-id"],
+        expose_headers=["x-request-id", "retry-after"],
     )
+    app.add_middleware(BodySizeLimitMiddleware, max_bytes=settings.max_body_bytes)
     app.add_middleware(RequestIdMiddleware)
+    limited = [Depends(rate_limited)]  # /health is never limited
     app.include_router(health.router)
-    app.include_router(search.router)
-    app.include_router(chat.router)
+    app.include_router(search.router, dependencies=limited)
+    app.include_router(chat.router, dependencies=limited)
     return app
 
 

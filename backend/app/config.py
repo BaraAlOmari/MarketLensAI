@@ -29,9 +29,24 @@ class Settings(BaseSettings):
     app_name: str = "MarketLens"
     environment: str = "local"
     log_level: str = "INFO"
+    # Also append the JSON log lines to this file (read by scripts/explain.py). Off if unset.
+    log_file: str | None = None
 
-    # Comma-separated list of allowed browser origins.
+    # Comma-separated list of allowed browser origins. The UI calls the backend through the
+    # Next.js proxy (server to server), so browsers only need this for direct API use.
     cors_origins: str = "http://localhost:3000"
+
+    # Abuse limits (Stage 10). Per client IP, in memory per instance: enough to stop one
+    # client from spending the free Gemini quota; the per-model limiters still cap the total.
+    rate_limit_enabled: bool = True
+    rate_limit_per_minute: int = 12
+    rate_limit_per_day: int = 300
+    # How many proxies in front of the backend APPEND to X-Forwarded-For (load balancers,
+    # ingress). 0 = use the socket address (local dev). The Next proxy forwards the header
+    # unchanged, so it does not count: e.g. browser -> ingress -> Next -> ingress -> backend
+    # is 2. Counted from the right, the client entry cannot be forged by the client.
+    forwarded_hops: int = 0
+    max_body_bytes: int = 16_384
 
     # Supabase Postgres. Use the Session pooler string (IPv4, port 5432) for local dev.
     database_url: SecretStr | None = None

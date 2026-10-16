@@ -57,6 +57,7 @@ type Turn = {
   nearby: Listing[] | null; // closest listings when nothing matches exactly
   misses: Record<string, string[]>; // listing id -> constraints it fails
   error: ErrorKind | null;
+  requestId: string | null; // names this turn in the backend logs; shown on errors
   stopped: boolean; // the person pressed Stop
 };
 
@@ -105,6 +106,7 @@ export function Chat() {
         id, message: text, lang, removed: removed ?? null, sentFilters: filters,
         status: "understanding", filters: null, reset: false, listings: null, reply: "",
         cited: [], noMatch: false, relaxations: [], nearby: null, misses: {}, error: null,
+        requestId: null,
         stopped: false,
       },
     ]); // prettier-ignore
@@ -112,18 +114,19 @@ export function Chat() {
     const controller = new AbortController();
     abortRef.current = controller;
     try {
-      const events = await streamChat(
+      const { events, requestId } = await streamChat(
         { session_id: (sessionRef.current ??= newSessionId()), message: text, filters },
         controller.signal,
       );
+      update(id, () => ({ requestId }));
       for await (const event of events) handle(id, event);
     } catch (err) {
       if (controller.signal.aborted) return;
+      const status = err instanceof ChatRequestError ? err.status : 0;
       const kind: ErrorKind =
-        err instanceof ChatRequestError && (err.status === 413 || err.status === 422)
-          ? "invalid"
-          : "connection";
-      update(id, () => ({ status: "error", error: kind }));
+        status === 429 ? "rate" : status === 413 || status === 422 ? "invalid" : "connection";
+      const requestId = err instanceof ChatRequestError ? err.requestId : null;
+      update(id, () => ({ status: "error", error: kind, requestId }));
     } finally {
       if (abortRef.current === controller) {
         abortRef.current = null;
@@ -495,7 +498,14 @@ function TurnView({
           className="pop-in flex flex-wrap items-center gap-3 rounded-[1.25rem] bg-raised p-4 text-subhead shadow-[var(--card-shadow)]"
         >
           <AlertIcon size={22} className="shrink-0 text-danger" />
-          <span className="min-w-0 flex-1">{copy.errors[turn.error]}</span>
+          <span className="min-w-0 flex-1">
+            {copy.errors[turn.error]}
+            {turn.requestId && (
+              <span className="mt-0.5 block text-footnote text-tertiary">
+                <bdi>{copy.reference(turn.requestId.slice(0, 12))}</bdi>
+              </span>
+            )}
+          </span>
           <button
             type="button"
             onClick={onRetry}

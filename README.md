@@ -1,5 +1,7 @@
 # MarketLens
 
+[![CI](https://github.com/BaraAlOmari/MarketLensAI/actions/workflows/ci.yml/badge.svg)](https://github.com/BaraAlOmari/MarketLensAI/actions/workflows/ci.yml)
+
 **An AI search assistant for a marketplaces in Qatar.** Search a marketplace the way you'd ask a friend, and MarketLens turns it into an exact search, finds the listings that match, and explains the best picks.
 
 <p align="center">
@@ -33,6 +35,7 @@ Measured on a frozen set of 45 queries written before any improvement ([docs/res
 - [Architecture](#architecture)
 - [How a search works](#how-a-search-works)
 - [How the chat works](#how-the-chat-works)
+- [Observability and limits](#observability-and-limits)
 - [The listings data](#the-listings-data)
 - [Evaluation](#evaluation)
 - [Getting started](#getting-started)
@@ -134,6 +137,30 @@ sequenceDiagram
 - **Editable filters.** Removing a token sends the remaining filters with the message. The backend skips the AI step, searches with exactly those filters, and builds its search text from them too, so a removed value can't keep steering the ranking.
 - **Proxy.** `frontend/src/app/api/chat/route.ts` forwards the request and passes the event stream through unchanged. The browser reads it with `fetch`, because `EventSource` can't send a POST body.
 
+## Observability and limits
+
+Every request gets one ID, made by the Next proxy and shared with the backend; the UI shows it as "Reference …" when something goes wrong. Each pipeline step writes one structured JSON record under that ID: how the message was read and merged into the conversation, the SQL filters, how many candidates each retriever found, what the reranker did, and every result's rank on meaning, on exact words and after reranking. `scripts/explain.py` turns those records into a plain answer to "why is this result here?":
+
+```text
+Message: "شقة غرفتين للإيجار في لوسيل"
+0. Read by the language model (cached) as: category=apartments, listing_type=rent, location=Lusail, bedrooms={"eq": 2}
+   Guards changed: bedrooms:filled from query
+1. Understood by the chat step above
+   Filters applied in SQL: category=apartments, listing_type=rent, location=Lusail, bedrooms={"eq": 2}
+2. Retrieved (hybrid): 2 matching listings by meaning, 0 by exact words for "شقة", fused with RRF (k=60); 2 candidates kept
+3. Reranked by gemini-3.5-flash-lite: placed 2 of 2 candidates, cached
+4. Results (2): each one passed every filter above, and is here because of these ranks:
+    1. syn-qa-01614  2br apt for rent lusail
+       #1 by meaning, not in the exact-word list, reranked to #1
+```
+
+The public API is also protected:
+- **Rate limit per client IP:** 12 requests a minute and 300 a day. Over the limit you get a 429 with `Retry-After`, shown in the UI as a plain sentence.
+- **Size limits:** request bodies are capped at 16 KB, messages at 500 characters, and filter lists are bounded.
+- **CORS:** narrowed to the methods and headers the API uses.
+
+**CI** (GitHub Actions) runs on every push and pull request: ruff and pytest for the backend; eslint, TypeScript, Prettier and a production build for the frontend.
+
 ## The listings data
 
 `data/listings.jsonl` holds **2,205 synthetic listings** across six categories: apartments 445, phones 435, cars 373, laptops 349, furniture 340, villas 263.
@@ -205,7 +232,7 @@ Open http://localhost:3000 and try one of the example prompts. `http://localhost
 
 ### Configuration
 
-All settings are environment variables, documented in [backend/.env.example](backend/.env.example). Each pipeline step can be switched off or tuned, for example `RETRIEVAL_MODE=vector`, `RERANK_ENABLED=false`, `HYBRID_CANDIDATES`, `RERANK_TOP_N`, or the per-model rate limits. Never commit `.env` or `.env.local`; both are git-ignored.
+All settings are environment variables, documented in [backend/.env.example](backend/.env.example). Each pipeline step can be switched off or tuned, for example `RETRIEVAL_MODE=vector`, `RERANK_ENABLED=false`, `HYBRID_CANDIDATES`, `RERANK_TOP_N`, or the per-model rate limits. `LOG_FILE` turns on the log file that `scripts/explain.py` reads, and `RATE_LIMIT_*`, `FORWARDED_HOPS` and `MAX_BODY_BYTES` set the abuse limits. Never commit `.env` or `.env.local`; both are git-ignored.
 
 ## API
 
@@ -255,16 +282,15 @@ docs/               results, design decisions, setup guide, screenshots
 | Search eval (45 queries) | `.venv\Scripts\python ..\eval\run.py` | |
 | Multi-turn eval (12 conversations) | `.venv\Scripts\python ..\eval\run_conversations.py` | |
 | Grounding check (chat replies) | `.venv\Scripts\python ..\eval\grounding_check.py` | |
+| Explain a search (needs `LOG_FILE`) | `.venv\Scripts\python scripts\explain.py --last` | |
 
 The eval scripts need the backend's database and API key. Repeated runs mostly hit the caches and use little quota.
 
 ## Limitations and next steps
 
 - **Synthetic data.** The listings are generated, with no photos (cards show a category icon). Real marketplace text would be messier still.
-- **Free-tier limits.** Gemini's free quotas limit how many *new* questions can be answered per day: cached ones are free. Supabase free projects pause after a week of inactivity.
 - **Latency.** A new question takes several seconds (filter extraction, reranking and the reply are three model calls). Cached repeats are much faster. Most of the remaining time on a cached search is the network round trip to the database (about 0.3 s each from the development machine). Hosting the backend next to the database removes most of it.
 - **Replies arrive in one piece.** The summary is checked for prices and links before any of it is sent, so it can't type out word by word. The stages stream: filters, cards, then the summary.
 - **Next:**
-  - observability and hardening: per-step structured logs, rate limiting, CI;
   - deployment on Azure with a public demo;
   - a final documentation pass.

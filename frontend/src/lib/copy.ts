@@ -117,6 +117,7 @@ export const COPY = {
       key === "location" ? `Not in ${label}` : `Not ${inSentence(label, key)}`,
     withoutLabel: (label: string, count: string) => `Remove ${label} to see ${count}`,
     tryAgain: "Try again",
+    reference: (id: string) => `Reference ${id}`,
     summary: "Summary",
     stopped: "Stopped.",
     sheet: {
@@ -133,6 +134,7 @@ export const COPY = {
       connection: "Couldn't connect to MarketLens. Check your connection and try again.",
       unavailable: "Search isn't available right now. Try again in a moment.",
       invalid: "That message couldn't be sent. Try a shorter one.",
+      rate: "You've searched a lot in a short time. Wait a moment, then try again.",
     },
   },
   ar: {
@@ -152,6 +154,7 @@ export const COPY = {
       key === "location" ? `ليس في ${label}` : `لا يطابق: ${label}`,
     withoutLabel: (label: string, count: string) => `احذف ${label} لترى ${count}`,
     tryAgain: "حاول مرة أخرى",
+    reference: (id: string) => `المرجع ${id}`,
     summary: "الملخص",
     stopped: "تم الإيقاف.",
     sheet: {
@@ -168,6 +171,7 @@ export const COPY = {
       connection: "تعذّر الاتصال بـ MarketLens. تحقّق من اتصالك وحاول مرة أخرى.",
       unavailable: "البحث غير متاح حالياً. حاول مرة أخرى بعد قليل.",
       invalid: "تعذّر إرسال الرسالة. جرّب رسالة أقصر.",
+      rate: "أجريت عمليات بحث كثيرة خلال وقت قصير. انتظر قليلاً ثم حاول مرة أخرى.",
     },
   },
 } as const;

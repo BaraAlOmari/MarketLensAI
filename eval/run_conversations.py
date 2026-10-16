@@ -54,6 +54,8 @@ async def run(args) -> dict:
     from app.main import create_app
 
     settings = get_settings()
+    # One in-process client sends every query, so the per-IP limit (Stage 10) is off.
+    settings = settings.model_copy(update={"rate_limit_enabled": False})
     if args.llm_timeout:
         settings = settings.model_copy(
             update={"extraction_timeout_s": args.llm_timeout, "rerank_timeout_s": args.llm_timeout,

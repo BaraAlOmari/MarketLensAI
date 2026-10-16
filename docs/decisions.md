@@ -160,6 +160,21 @@ Every external fact the project relies on is recorded here with its source and t
 | 2026-10-15 | Cards show a category icon placeholder; listings have no photos yet (`image_url` is null in the synthetic data). | Cards render only backend data. |
 
 
+### Stage 10: observability and hardening
+
+| Date | Decision | Reason |
+|---|---|---|
+| 2026-10-16 | **One structured record per pipeline step**, all under the request ID: `chat.understand` (how the model read the message, guard notes, how it merged into the conversation), `search.understand` (filters applied in SQL and where they came from), `search.retrieve` (candidates per side under the filters, keyword text, RRF k), `search.rerank` (model, cached, placed, invalid, error), `search.results` (per result: vector rank, keyword rank, rerank position, RRF score), `chat.nearby` (closest matches and what each misses), `chat.turn` (cards, no-match counts, reply source, citations, grounding), `request.rate_limited`. | Acceptance: "for any query, the logs show why each result was returned". A result is on the page because it passed the SQL filters and ranked there on meaning, exact words and the reranker; the records say exactly that. The listwise reranker returns an order, not scores, so its position is logged. |
+| 2026-10-16 | `scripts/explain.py <request-id>` (or `--last`) turns those records into a readable explanation. Logs go to stderr as JSON lines, and also to `LOG_FILE` when set (git-ignored `backend/logs/`). | The UI shows the request ID ("Reference …") on errors, so a failed search can be looked up directly. |
+| 2026-10-16 | The Next proxy makes the request ID and sends it to the backend, which accepts it only if it is a plain 8–64 character token. The request-ID middleware is pure ASGI. | One ID across UI, proxy and backend. The ID goes into every log line, so a raw header would allow log injection. Starlette's `BaseHTTPMiddleware` resets the context variable once headers are sent, so logs written while an SSE body streams lost their ID (caught by a test). |
+| 2026-10-16 | **Per-IP rate limit**: sliding windows of 12 requests per minute and 300 per day, in memory per instance, on `/api/search` and `/api/chat` (never `/health`); 429 with `Retry-After`, shown in the UI as a plain sentence. Off in the eval runners (one in-process client sends every query). | One client must not spend the shared free Gemini quota (the per-model limiters still cap the total). In-memory is enough for a demo; several instances each keep their own counts. Memory is bounded (oldest of 10,000 clients forgotten). |
+| 2026-10-16 | Client IP: `FORWARDED_HOPS` counts the load balancers / ingress that **append** to X-Forwarded-For, and the client is that many entries from the right; 0 (local) uses the socket address. The Next proxy forwards the header unchanged and does not count. | Entries further left are written by the client and can be forged. Behind ingress -> Next -> ingress -> backend, hops = 2 (set in Stage 11). |
+| 2026-10-16 | Input limits: request bodies over 16 KB get 413, declared or chunked (counted as they arrive); client-sendable filters are capped (models 40, brands 30, keywords 16, attribute value lists 20, names and places 80 characters). Message (500) and session ID formats were already validated. | The catalog has at most 32 models per category and 45 brands, so real searches never reach the caps. A chunked body raises `HTTPException(413)` because FastAPI turns any other error while reading the body into a generic 400. |
+| 2026-10-16 | CORS: `GET`/`POST` only, request headers `content-type` and `x-request-id`, exposes `x-request-id` and `retry-after`. | The UI calls the backend server to server through the Next proxy, so CORS only matters for direct API use; nothing wider is needed. |
+| 2026-10-16 | **CI** (`.github/workflows/ci.yml`): backend (ruff check, ruff format --check, pytest) and frontend (eslint, tsc, prettier --check, next build) on every push to `main` and every PR; read-only permissions, newer runs cancel older ones, no secrets. | The tests need no network, database or key. Prettier passes on Linux checkouts (LF); on this Windows working copy the config files are CRLF only because of `core.autocrlf`. |
+| 2026-10-16 | Tracing with Langfuse (optional in the spec) is not added. | It needs an account and keys; the per-step records already answer the acceptance question. Can be added later behind a setting. |
+| 2026-10-16 | Observed while testing: a rerank call took 44 s while the rest of the search took 1.3 s (free-tier Gemini latency), visible straight away in `search.rerank.latency_ms`. | The kind of failure the logs are for. `RERANK_TIMEOUT_S` caps it; the retrieval order is kept on timeout. |
+
 ## Verified facts
 
 ### Google Gemini API (checked 2026-10-10)
@@ -223,6 +238,10 @@ These are secondary sources (no central-bank page came up). The pegs are long-st
 | Azure Static Web Apps, Free plan | 100 GB bandwidth/subscription, 0.5 GB storage (0.25 GB/app), 2 custom domains/app, free SSL, managed Functions API. Site stops being served when over quota. Next.js hybrid support **not stated** on the pricing page; re-check in Stage 11. | https://azure.microsoft.com/en-us/pricing/details/app-service/static/ |
 | Free account | "65+ always-free services"; separate 12-month free amounts for new customers only | https://azure.microsoft.com/en-us/pricing/free-services |
 | Tentative plan | Backend container on Container Apps (scale to zero, so expect cold starts); frontend on Static Web Apps or a second Container App. Decide in Stage 11. | |
+
+### GitHub Actions (checked 2026-10-16 via the GitHub API, latest releases)
+
+`actions/checkout` v7.0.1, `actions/setup-python` v7.0.0, `actions/setup-node` v7.1.0. Pinned to these exact tags in `ci.yml`. Node 22 (LTS) in CI; Next 16.4 needs Node 20.9 or newer.
 
 ### Library versions pinned (checked 2026-10-10 on PyPI / npm)
 
