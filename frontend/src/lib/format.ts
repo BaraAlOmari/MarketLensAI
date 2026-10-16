@@ -290,3 +290,95 @@ export function keyFacts(listing: Listing, lang: Lang = "en"): string[] {
   }
   return facts.filter((f): f is string => Boolean(f)).slice(0, 3);
 }
+
+const ATTRIBUTE_LABEL: Record<string, [en: string, ar: string]> = {
+  storage_gb: ["Storage", "السعة"],
+  ram_gb: ["Memory", "الرام"],
+  color: ["Color", "اللون"],
+  year: ["Year", "السنة"],
+  battery_health: ["Battery health", "صحة البطارية"],
+  battery_cycles: ["Battery cycles", "دورات البطارية"],
+  sim: ["SIM", "الشريحة"],
+  box_included: ["Box included", "مع العلبة"],
+  warranty: ["Warranty", "الضمان"],
+  cpu: ["Processor", "المعالج"],
+  gpu: ["Graphics", "كرت الشاشة"],
+  screen_in: ["Screen", "الشاشة"],
+  charger_included: ["Charger included", "مع الشاحن"],
+  mileage_km: ["Mileage", "الممشى"],
+  transmission: ["Transmission", "ناقل الحركة"],
+  fuel: ["Fuel", "الوقود"],
+  trim: ["Trim", "الفئة"],
+  cylinders: ["Cylinders", "السلندرات"],
+  service_history: ["Service history", "سجل الصيانة"],
+  gcc_specs: ["GCC specs", "مواصفات خليجية"],
+  accident_free: ["Accident-free", "بدون حوادث"],
+  item_type: ["Item", "القطعة"],
+  material: ["Material", "الخامة"],
+  size: ["Size", "المقاس"],
+  delivery_available: ["Delivery", "التوصيل"],
+  property_type: ["Property type", "نوع العقار"],
+  bedrooms: ["Bedrooms", "غرف النوم"],
+  bathrooms: ["Bathrooms", "دورات المياه"],
+  area_sqm: ["Area", "المساحة"],
+  floor: ["Floor", "الطابق"],
+  furnished: ["Furnishing", "الفرش"],
+  amenities: ["Amenities", "المرافق"],
+  neighborhood: ["Neighborhood", "الحي"],
+  bills_included: ["Bills included", "شامل الفواتير"],
+  private_pool: ["Private pool", "مسبح خاص"],
+  garden: ["Garden", "حديقة"],
+  maid_room: ["Maid's room", "غرفة خادمة"],
+};
+
+// Display order in the detail sheet; anything else follows in key order.
+const ATTRIBUTE_ORDER = Object.keys(ATTRIBUTE_LABEL);
+
+function attributeValue(key: string, v: unknown, lang: Lang): string {
+  const ar = lang === "ar";
+  if (typeof v === "boolean") return v ? (ar ? "نعم" : "Yes") : ar ? "لا" : "No";
+  if (Array.isArray(v)) return v.map((x) => value(x, lang)).join(ar ? "، " : ", ");
+  if (typeof v === "number") {
+    switch (key) {
+      case "storage_gb":
+      case "ram_gb":
+        return sizeLabel(v);
+      case "mileage_km":
+        return `${formatAmount(v)} ${ar ? "كم" : "km"}`;
+      case "area_sqm":
+        return `${formatAmount(v)} m²`;
+      case "battery_health":
+        return `${v}%`;
+      case "screen_in":
+        return `${v}″`;
+      case "year":
+        return String(v);
+      default:
+        return formatAmount(v);
+    }
+  }
+  return value(v, lang);
+}
+
+/** Every attribute of a listing as a labelled row, for the detail sheet. */
+export function attributeRows(
+  listing: Listing,
+  lang: Lang = "en",
+): { label: string; value: string }[] {
+  const keys = Object.keys(listing.attributes).sort(
+    (a, b) =>
+      (ATTRIBUTE_ORDER.indexOf(a) + 1 || 999) - (ATTRIBUTE_ORDER.indexOf(b) + 1 || 999) ||
+      a.localeCompare(b),
+  );
+  return keys
+    .filter((k) => listing.attributes[k] !== null && listing.attributes[k] !== "")
+    .map((k) => ({
+      label: ATTRIBUTE_LABEL[k]?.[lang === "ar" ? 1 : 0] ?? k.replace(/_/g, " "),
+      value: attributeValue(k, listing.attributes[k], lang),
+    }));
+}
+
+export function listingTypeLabel(listing: Pick<Listing, "listing_type">, lang: Lang = "en") {
+  if (lang === "ar") return listing.listing_type === "rent" ? "للإيجار" : "للبيع";
+  return listing.listing_type === "rent" ? "For rent" : "For sale";
+}

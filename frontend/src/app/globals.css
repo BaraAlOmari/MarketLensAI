@@ -178,11 +178,180 @@
   }
 }
 
-/* The one orchestrated moment: result cards ease in as they arrive. Off for Reduce Motion. */
+/*
+ * Materials, depth and category tints (materials.md, liquid-glass.md). Glass is only for the
+ * functional layer, the navigation bar and the composer, never for content. Category hues
+ * are Apple's system colors, used only to tint listing placeholders (content, not controls).
+ */
+:root {
+  --glass: rgb(255 255 255 / 0.72);
+  --bar-glass: rgb(242 242 247 / 0.84); /* thicker: bars carry text over content */
+  --glass-edge: rgb(0 0 0 / 0.06);
+  --glass-highlight: rgb(255 255 255 / 0.7);
+  --glass-shadow: 0 8px 32px rgb(0 0 0 / 0.08), 0 1px 3px rgb(0 0 0 / 0.06);
+  --card-shadow: 0 1px 2px rgb(0 0 0 / 0.04), 0 4px 14px rgb(0 0 0 / 0.04);
+  --card-shadow-hover: 0 2px 6px rgb(0 0 0 / 0.06), 0 12px 32px rgb(0 0 0 / 0.08);
+  --scrim: rgb(0 0 0 / 0.32);
+  --tile-mix: 14%;
+  --tile-sheen: rgb(255 255 255 / 0.35);
+  --grouped: #f2f2f7; /* rows grouped inside a sheet */
+  --lens-hi: #ffffff; /* the empty-state lens's metal rim, top to bottom */
+  --lens-mid: #d8d8dc;
+  --lens-lo: #9d9da2;
+  --lens-sheen: 0.28;
+  --cat-phones: #007aff;
+  --cat-laptops: #5856d6;
+  --cat-cars: #ff9500;
+  --cat-furniture: #a2845e;
+  --cat-apartments: #30b0c7;
+  --cat-villas: #34c759;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --glass: rgb(36 36 38 / 0.68);
+    --bar-glass: rgb(18 18 20 / 0.8);
+    --glass-edge: rgb(255 255 255 / 0.1);
+    --glass-highlight: rgb(255 255 255 / 0.08);
+    --glass-shadow: 0 8px 32px rgb(0 0 0 / 0.5);
+    --card-shadow: none;
+    --card-shadow-hover: 0 0 0 1px rgb(255 255 255 / 0.08);
+    --scrim: rgb(0 0 0 / 0.55);
+    --tile-mix: 24%;
+    --tile-sheen: rgb(255 255 255 / 0.07);
+    --grouped: #2c2c2e;
+    --lens-hi: #9a9aa0;
+    --lens-mid: #4a4a4e;
+    --lens-lo: #232325;
+    --lens-sheen: 0.1;
+    --cat-phones: #0a84ff;
+    --cat-laptops: #5e5ce6;
+    --cat-cars: #ff9f0a;
+    --cat-furniture: #ac8e68;
+    --cat-apartments: #40c8e0;
+    --cat-villas: #30d158;
+  }
+}
+:root[data-theme="dark"] {
+  --glass: rgb(36 36 38 / 0.68);
+  --bar-glass: rgb(18 18 20 / 0.8);
+  --glass-edge: rgb(255 255 255 / 0.1);
+  --glass-highlight: rgb(255 255 255 / 0.08);
+  --glass-shadow: 0 8px 32px rgb(0 0 0 / 0.5);
+  --card-shadow: none;
+  --card-shadow-hover: 0 0 0 1px rgb(255 255 255 / 0.08);
+  --scrim: rgb(0 0 0 / 0.55);
+  --tile-mix: 24%;
+  --tile-sheen: rgb(255 255 255 / 0.07);
+  --grouped: #2c2c2e;
+  --lens-hi: #9a9aa0;
+  --lens-mid: #4a4a4e;
+  --lens-lo: #232325;
+  --lens-sheen: 0.1;
+  --cat-phones: #0a84ff;
+  --cat-laptops: #5e5ce6;
+  --cat-cars: #ff9f0a;
+  --cat-furniture: #ac8e68;
+  --cat-apartments: #40c8e0;
+  --cat-villas: #30d158;
+}
+
+/*
+ * Motion. Two curves: the iOS sheet curve for things that slide, and a gently overshooting
+ * spring (a CSS linear() approximation) for things that appear. Every animation is short and
+ * none blocks input (motion.md: brief, precise, cancellable); all are off for Reduce Motion.
+ */
+:root {
+  --ease-ios: cubic-bezier(0.32, 0.72, 0, 1);
+  --ease-spring: linear(
+    0,
+    0.006,
+    0.025 2.8%,
+    0.101 6.1%,
+    0.539 18.9%,
+    0.721 25.3%,
+    0.849 31.5%,
+    0.937 38.1%,
+    0.968 41.8%,
+    0.991 45.7%,
+    1.006 50.1%,
+    1.015 55%,
+    1.017 63.9%,
+    1.001
+  );
+}
+
+/* Liquid Glass, as far as the web can go: blur, saturation, a translucent fill, a hairline
+ * edge and an inner highlight. Opaque under Reduce Transparency. */
+.glass {
+  background: var(--glass);
+  backdrop-filter: blur(24px) saturate(1.6);
+  box-shadow:
+    inset 0 0.5px 0 var(--glass-highlight),
+    0 0 0 0.5px var(--glass-edge);
+}
+.glass-float {
+  box-shadow:
+    inset 0 0.5px 0 var(--glass-highlight),
+    0 0 0 0.5px var(--glass-edge),
+    var(--glass-shadow);
+}
+@media (prefers-reduced-transparency: reduce) {
+  .glass {
+    background: var(--raised);
+    backdrop-filter: none;
+  }
+}
+
+/* The navigation bar: clear while the page is at the top, glass with a hairline once content
+ * scrolls beneath it (toolbars.md: no bar background at rest). */
+.bar {
+  border-bottom: 0.5px solid transparent;
+  transition:
+    background-color 250ms ease,
+    border-color 250ms ease,
+    backdrop-filter 250ms ease;
+}
+.bar[data-scrolled="true"] {
+  background: var(--bar-glass);
+  backdrop-filter: blur(30px) saturate(1.8);
+  border-color: var(--separator);
+}
+@media (prefers-reduced-transparency: reduce) {
+  .bar[data-scrolled="true"] {
+    background: var(--surface);
+    backdrop-filter: none;
+  }
+}
+
+/* Scroll edge effect under the floating composer: content fades out instead of meeting a
+ * hard bar (liquid-glass.md: a scroll edge effect instead of a solid background). */
+.scroll-edge-bottom {
+  background: linear-gradient(to top, var(--surface) 35%, transparent);
+}
+
+/* Press feedback for tappable surfaces: a quick, small squeeze, like UIKit's highlight. */
+.press {
+  transition:
+    transform 160ms var(--ease-ios),
+    box-shadow 240ms var(--ease-ios);
+}
+.press:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
+/* A listing placeholder tile: the category hue mixed into the surface, the symbol in the
+ * full hue. */
+.tile {
+  background:
+    radial-gradient(120% 90% at 30% 0%, var(--tile-sheen), transparent 60%),
+    color-mix(in srgb, var(--tile) var(--tile-mix), var(--raised));
+  color: var(--tile);
+}
+
 @keyframes rise-in {
   from {
     opacity: 0;
-    transform: translateY(8px) scale(0.98);
+    transform: translateY(10px) scale(0.98);
   }
   to {
     opacity: 1;
@@ -190,27 +359,98 @@
   }
 }
 .rise-in {
-  animation: rise-in 320ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  animation: rise-in 420ms var(--ease-spring) both;
 }
 
-/* Loading placeholders: a slow shimmer, replaced by a still tint for Reduce Motion. */
-@keyframes shimmer {
+/* The person's message grows out of the composer's corner, as in Messages. */
+@keyframes bubble-in {
   from {
-    background-position: 100% 0;
+    opacity: 0;
+    transform: translateY(14px) scale(0.6);
   }
   to {
-    background-position: -100% 0;
+    opacity: 1;
+    transform: none;
+  }
+}
+.bubble-in {
+  transform-origin: 100% 100%;
+  animation: bubble-in 420ms var(--ease-spring) both;
+}
+
+@keyframes pop-in {
+  from {
+    opacity: 0;
+    transform: scale(0.85);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.pop-in {
+  animation: pop-in 320ms var(--ease-spring) both;
+}
+
+/* The summary arrives checked and complete, so it settles in from a soft blur. */
+@keyframes reveal {
+  from {
+    opacity: 0;
+    filter: blur(6px);
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    filter: none;
+    transform: none;
+  }
+}
+.reveal {
+  animation: reveal 460ms var(--ease-ios) both;
+}
+
+/* Status text with a light sweeping across it while MarketLens works. */
+@keyframes shine {
+  from {
+    background-position: 150% 0;
+  }
+  to {
+    background-position: -50% 0;
+  }
+}
+.shine {
+  background: linear-gradient(
+      100deg,
+      var(--secondary) 35%,
+      var(--content) 50%,
+      var(--secondary) 65%
+    )
+    0 0 / 250% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: shine 2.2s linear infinite;
+}
+
+/* Redacted placeholders. The gradient is fixed to the viewport, so one highlight sweeps
+ * across every skeleton at once instead of each flickering on its own. */
+@keyframes shimmer {
+  from {
+    background-position: 100vw 0;
+  }
+  to {
+    background-position: -100vw 0;
   }
 }
 .skeleton {
   background: linear-gradient(
-    90deg,
-    var(--placeholder-a) 25%,
-    var(--placeholder-b) 50%,
-    var(--placeholder-a) 75%
-  );
-  background-size: 200% 100%;
-  animation: shimmer 1.6s linear infinite;
+      90deg,
+      var(--placeholder-a) 0%,
+      var(--placeholder-b) 20%,
+      var(--placeholder-a) 40%
+    )
+    0 0 / 100vw 100% fixed;
+  animation: shimmer 1.8s linear infinite;
 }
 
 /* iOS-style activity indicator: eight spokes stepping round. */
@@ -223,13 +463,102 @@
   animation: spokes 0.8s steps(8) infinite;
 }
 
+/* Sheets: up from the bottom edge on phones, a card scaling in on wider screens. */
+@keyframes sheet-up {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: none;
+  }
+}
+@keyframes sheet-down {
+  to {
+    transform: translateY(100%);
+  }
+}
+@keyframes sheet-in {
+  from {
+    opacity: 0;
+    transform: scale(0.94);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes sheet-out {
+  to {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+}
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes fade-out {
+  to {
+    opacity: 0;
+  }
+}
+dialog.sheet[open] {
+  animation: sheet-up 480ms var(--ease-ios) backwards; /* not "both": a drag sets transform afterwards */
+}
+dialog.sheet[data-closing] {
+  animation: sheet-down 280ms var(--ease-ios) both;
+}
+dialog.sheet::backdrop {
+  background: var(--scrim);
+  animation: fade-in 300ms ease-out both;
+}
+dialog.sheet[data-closing]::backdrop {
+  animation: fade-out 280ms ease-in both;
+}
+@media (min-width: 640px) {
+  dialog.sheet[open] {
+    animation: sheet-in 360ms var(--ease-spring) backwards;
+  }
+  dialog.sheet[data-closing] {
+    animation: sheet-out 200ms ease-in both;
+  }
+}
+
+/* Theme changes cross-fade (View Transitions) instead of snapping. */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 280ms;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .rise-in,
+  .bubble-in,
+  .pop-in,
+  .reveal,
   .skeleton,
-  .activity {
+  .activity,
+  .shine {
     animation: none;
   }
   .skeleton {
     background: var(--placeholder-a);
+  }
+  .shine {
+    background: none;
+    color: var(--secondary);
+  }
+  .press:active:not(:disabled) {
+    transform: none;
+  }
+  dialog.sheet[open] {
+    animation: fade-in 160ms ease-out both;
+  }
+  dialog.sheet[data-closing] {
+    animation: fade-out 160ms ease-in both;
+  }
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation: none;
   }
 }

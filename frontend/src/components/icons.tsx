@@ -1,6 +1,8 @@
-// One icon language: 24-unit grid, 1.75 stroke, round caps, currentColor so every icon follows
-// the text it sits next to in light, dark and increased contrast (icons.md, dark-mode.md).
-// Icons are decorative here; every control that uses one also has a text label.
+// Symbols drawn to read like SF Symbols (sf-symbols.md): one 24-unit grid, a regular-weight
+// stroke with round caps and joins, outline next to text, fill where a symbol needs emphasis
+// (status, a selected state, a badge). Filled symbols cut their inner marks out with evenodd,
+// so they work on any background. All use currentColor and are decorative (aria-hidden):
+// every control that shows one also has a text label.
 
 import type { SVGProps } from "react";
 
@@ -14,7 +16,7 @@ function Icon({ size = 20, children, ...rest }: IconProps) {
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
-      strokeWidth={1.75}
+      strokeWidth={1.6}
       strokeLinecap="round"
       strokeLinejoin="round"
       aria-hidden="true"
@@ -26,82 +28,75 @@ function Icon({ size = 20, children, ...rest }: IconProps) {
   );
 }
 
+/** A filled symbol: no stroke, inner marks are holes (fill-rule evenodd). */
+function Solid({ size = 20, children, ...rest }: IconProps) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="currentColor"
+      fillRule="evenodd"
+      clipRule="evenodd"
+      aria-hidden="true"
+      focusable="false"
+      {...rest}
+    >
+      {children}
+    </svg>
+  );
+}
+
+// Categories (iphone, laptopcomputer, car, sofa, building.2, house).
+
 export const PhoneIcon = (p: IconProps) => (
   <Icon {...p}>
-    <rect x="7" y="2.5" width="10" height="19" rx="2.5" />
-    <path d="M11 18.5h2" />
+    <rect x="6.5" y="2.25" width="11" height="19.5" rx="2.75" />
+    <rect x="10" y="4.25" width="4" height="1.4" rx="0.7" fill="currentColor" stroke="none" />
   </Icon>
 );
 
 export const LaptopIcon = (p: IconProps) => (
   <Icon {...p}>
-    <rect x="4.5" y="5" width="15" height="10" rx="1.5" />
-    <path d="M2.5 19h19" />
+    <rect x="4.5" y="5" width="15" height="10.5" rx="1.75" />
+    <path d="M2.25 18.25h19.5" />
+    <path d="M10.5 18.25h3" strokeWidth={2.4} />
   </Icon>
 );
 
 export const CarIcon = (p: IconProps) => (
   <Icon {...p}>
-    <path d="M4 16v-3.5l1.8-4.6A2 2 0 0 1 7.7 6.5h8.6a2 2 0 0 1 1.9 1.4L20 12.5V16" />
-    <path d="M3.5 16h17" />
-    <circle cx="7.5" cy="16.5" r="1.8" />
-    <circle cx="16.5" cy="16.5" r="1.8" />
+    <path d="M3.75 17v-3.6c0-.6.15-1.2.45-1.73l1.9-3.43A2.5 2.5 0 0 1 8.28 7h7.44a2.5 2.5 0 0 1 2.18 1.24l1.9 3.43c.3.53.45 1.13.45 1.73V17" />
+    <path d="M3.75 13.25h16.5M6.4 11l1.3-2.4M17.6 11l-1.3-2.4" />
+    <path d="M3.75 17h16.5" />
+    <path d="M5.75 17v1.25M18.25 17v1.25" strokeWidth={2.6} />
+    <circle cx="7.25" cy="14.9" r="0.9" fill="currentColor" stroke="none" />
+    <circle cx="16.75" cy="14.9" r="0.9" fill="currentColor" stroke="none" />
   </Icon>
 );
 
 export const SofaIcon = (p: IconProps) => (
   <Icon {...p}>
-    <path d="M5.5 11V8.5A2.5 2.5 0 0 1 8 6h8a2.5 2.5 0 0 1 2.5 2.5V11" />
-    <path d="M3.5 13a2 2 0 0 1 4 0v1.5h9V13a2 2 0 0 1 4 0v4.5h-17Z" />
-    <path d="M5.5 17.5v1.5M18.5 17.5v1.5" />
+    <path d="M5.25 10.5V8.25A2.75 2.75 0 0 1 8 5.5h8a2.75 2.75 0 0 1 2.75 2.75v2.25" />
+    <path d="M3 12.5a2 2 0 0 1 4 0v1.75h10V12.5a2 2 0 0 1 4 0v3.75a1.5 1.5 0 0 1-1.5 1.5h-15A1.5 1.5 0 0 1 3 16.25Z" />
+    <path d="M5.5 17.75v1.25M18.5 17.75v1.25" />
   </Icon>
 );
 
 export const BuildingIcon = (p: IconProps) => (
   <Icon {...p}>
-    <rect x="5.5" y="3" width="13" height="18" rx="1.5" />
-    <path d="M9 7h1.5M13.5 7H15M9 11h1.5M13.5 11H15M9 15h1.5M13.5 15H15M10.5 21v-2.5h3V21" />
+    <path d="M4.5 21V5.5A1.5 1.5 0 0 1 6 4h7a1.5 1.5 0 0 1 1.5 1.5V21" />
+    <path d="M14.5 10H18a1.5 1.5 0 0 1 1.5 1.5V21" />
+    <path d="M3 21h18" />
+    <path d="M7.75 7.5h1M10.75 7.5h1M7.75 11h1M10.75 11h1M7.75 14.5h1M10.75 14.5h1M16.75 13.5h.5M16.75 17h.5" />
   </Icon>
 );
 
 export const HouseIcon = (p: IconProps) => (
   <Icon {...p}>
-    <path d="M3.5 11 12 4l8.5 7" />
-    <path d="M5.5 9.5V20h13V9.5" />
-    <path d="M10 20v-5h4v5" />
-  </Icon>
-);
-
-export const PinIcon = (p: IconProps) => (
-  <Icon {...p}>
-    <path d="M12 21s6-5.6 6-10.5A6 6 0 0 0 6 10.5C6 15.4 12 21 12 21Z" />
-    <circle cx="12" cy="10.5" r="2" />
-  </Icon>
-);
-
-export const ArrowUpIcon = (p: IconProps) => (
-  <Icon {...p}>
-    <path d="M12 18.5V6M6.5 11.5 12 6l5.5 5.5" strokeWidth={2.5} />
-  </Icon>
-);
-
-export const CloseIcon = (p: IconProps) => (
-  <Icon {...p}>
-    <path d="M7 7l10 10M17 7 7 17" />
-  </Icon>
-);
-
-export const ComposeIcon = (p: IconProps) => (
-  <Icon {...p}>
-    <path d="M12 5H6.5A2.5 2.5 0 0 0 4 7.5v10A2.5 2.5 0 0 0 6.5 20h10a2.5 2.5 0 0 0 2.5-2.5V12" />
-    <path d="M17.5 3.5a2.1 2.1 0 0 1 3 3L13 14l-4 1 1-4Z" />
-  </Icon>
-);
-
-export const AlertIcon = (p: IconProps) => (
-  <Icon {...p}>
-    <path d="M12 4 2.8 19.5h18.4Z" />
-    <path d="M12 10v4M12 17h.01" />
+    <path d="M3.25 10.5 12 3.5l8.75 7" />
+    <path d="M5.5 9v10.5a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1V9" />
+    <path d="M10 20.5v-5a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v5" />
   </Icon>
 );
 
@@ -114,8 +109,93 @@ export const CATEGORY_ICON: Record<string, (p: IconProps) => React.ReactElement>
   villas: HouseIcon,
 };
 
+// Interface symbols.
+
+/** magnifyingglass */
+export const MagnifyingGlassIcon = (p: IconProps) => (
+  <Icon {...p} strokeWidth={2}>
+    <circle cx="10.5" cy="10.5" r="6.25" />
+    <path d="m15.25 15.25 5 5" />
+  </Icon>
+);
+
+/** sparkles: generated content (generative-ai.md: make AI involvement clear). */
+export const SparklesIcon = (p: IconProps) => (
+  <Solid {...p}>
+    <path d="M10 3.5c.45 3.6 2.05 5.2 5.75 5.75-3.7.55-5.3 2.15-5.75 5.75-.45-3.6-2.05-5.2-5.75-5.75C7.95 8.7 9.55 7.1 10 3.5Z" />
+    <path d="M17.5 13.25c.25 1.95 1.05 2.75 3 3-1.95.25-2.75 1.05-3 3-.25-1.95-1.05-2.75-3-3 1.95-.25 2.75-1.05 3-3Z" />
+    <path d="M17 3c.17 1.2.68 1.71 1.9 1.9-1.22.17-1.73.68-1.9 1.9-.17-1.22-.68-1.73-1.9-1.9C16.32 4.71 16.83 4.2 17 3Z" />
+  </Solid>
+);
+
+/** checkmark.seal.fill: a recommended listing. */
+export function SealIcon({ size = 14, ...rest }: IconProps) {
+  // A 12-point seal (alternating radii) with the check cut out.
+  const points = Array.from({ length: 24 }, (_, i) => {
+    const r = i % 2 === 0 ? 10 : 8.4;
+    const a = (Math.PI * 2 * i) / 24 - Math.PI / 2;
+    return `${(12 + r * Math.cos(a)).toFixed(2)} ${(12 + r * Math.sin(a)).toFixed(2)}`;
+  });
+  return (
+    <Solid size={size} {...rest}>
+      <path d={`M${points.join("L")}Z M7.9 12.3l2.6 2.6 5.6-5.8-1.1-1.1-4.5 4.7-1.5-1.5Z`} />
+    </Solid>
+  );
+}
+
+/** mappin, filled with the head cut out. */
+export const PinIcon = (p: IconProps) => (
+  <Solid {...p}>
+    <path d="M12 2.5a7 7 0 0 0-7 7c0 4.9 5.6 10.9 6.3 11.6a1 1 0 0 0 1.4 0C13.4 20.4 19 14.4 19 9.5a7 7 0 0 0-7-7Zm0 4.5a2.5 2.5 0 1 1 0 5 2.5 2.5 0 0 1 0-5Z" />
+  </Solid>
+);
+
+/** arrow.up, bold: inside the send button's filled circle. */
+export const ArrowUpIcon = (p: IconProps) => (
+  <Icon {...p} strokeWidth={2.6}>
+    <path d="M12 19V5.5M6 11.25 12 5.25l6 6" />
+  </Icon>
+);
+
+/** stop.fill: cancel the search in progress. */
+export const StopIcon = (p: IconProps) => (
+  <Solid {...p}>
+    <rect x="6.5" y="6.5" width="11" height="11" rx="2.5" />
+  </Solid>
+);
+
+/** xmark */
+export const CloseIcon = (p: IconProps) => (
+  <Icon {...p} strokeWidth={2.2}>
+    <path d="M7 7l10 10M17 7 7 17" />
+  </Icon>
+);
+
+/** xmark.circle.fill: close a sheet. */
+export const CloseCircleIcon = (p: IconProps) => (
+  <Solid {...p}>
+    <path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm-3.3 5.6a.9.9 0 0 0-1.27 1.27L10.73 12l-3.3 3.13a.9.9 0 1 0 1.27 1.27L12 13.27l3.3 3.13a.9.9 0 0 0 1.27-1.27L13.27 12l3.3-3.13a.9.9 0 0 0-1.27-1.27L12 10.73Z" />
+  </Solid>
+);
+
+/** square.and.pencil: a new search. */
+export const ComposeIcon = (p: IconProps) => (
+  <Icon {...p}>
+    <path d="M11.5 4.5H7A2.5 2.5 0 0 0 4.5 7v10A2.5 2.5 0 0 0 7 19.5h10a2.5 2.5 0 0 0 2.5-2.5v-4.5" />
+    <path d="M17.6 3.9a1.9 1.9 0 0 1 2.7 2.7l-7.4 7.4-3.4.7.7-3.4Z" />
+  </Icon>
+);
+
+/** exclamationmark.triangle.fill */
+export const AlertIcon = (p: IconProps) => (
+  <Solid {...p}>
+    <path d="M10.27 3.5a2 2 0 0 1 3.46 0l8 13.75A2 2 0 0 1 20 20.25H4a2 2 0 0 1-1.73-3L10.27 3.5ZM12 8.25a1 1 0 0 0-1 1v4.25a1 1 0 1 0 2 0V9.25a1 1 0 0 0-1-1Zm0 7.25a1.15 1.15 0 1 0 0 2.3 1.15 1.15 0 0 0 0-2.3Z" />
+  </Solid>
+);
+
+/** chevron.forward (mirrors in right-to-left). */
 export const ChevronIcon = (p: IconProps) => (
-  <Icon {...p} className={`rtl:-scale-x-100 ${p.className ?? ""}`}>
+  <Icon {...p} strokeWidth={2} className={`rtl:-scale-x-100 ${p.className ?? ""}`}>
     <path d="m9.5 6 6 6-6 6" />
   </Icon>
 );
@@ -141,6 +221,7 @@ export function ActivityIndicator({ size = 18 }: { size?: number }) {
   );
 }
 
+/** sun.max */
 export const SunIcon = (p: IconProps) => (
   <Icon {...p}>
     <circle cx="12" cy="12" r="4" />
@@ -148,13 +229,14 @@ export const SunIcon = (p: IconProps) => (
   </Icon>
 );
 
+/** moon */
 export const MoonIcon = (p: IconProps) => (
   <Icon {...p}>
     <path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z" />
   </Icon>
 );
 
-/** "Match system": a circle, half filled (like SF Symbols' circle.lefthalf.filled). */
+/** circle.lefthalf.filled: "Match system". */
 export const AutoIcon = (p: IconProps) => (
   <Icon {...p}>
     <circle cx="12" cy="12" r="8" />

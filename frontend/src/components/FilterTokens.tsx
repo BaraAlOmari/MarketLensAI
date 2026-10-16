@@ -26,10 +26,11 @@ export function FilterTokens({
     <div dir={dirOf(lang)} className="flex flex-wrap items-center gap-1.5">
       <span className="me-1 text-footnote text-secondary">{COPY[lang].understoodAs}</span>
       <ul className="contents">
-        {tokens.map((token) => (
+        {tokens.map((token, i) => (
           <li
             key={token.key}
-            className="flex h-8 items-center rounded-full bg-accent-surface ps-3 pe-0.5 text-footnote font-semibold text-accent"
+            className="pop-in flex h-8 items-center rounded-full bg-accent-surface ps-3 pe-0.5 text-footnote font-semibold text-accent"
+            style={{ animationDelay: `${i * 35}ms` }}
           >
             <span dir="auto">{token.label}</span>
             <button
@@ -38,9 +39,9 @@ export function FilterTokens({
               onClick={() => onRemove(token.without(), token.label)}
               aria-label={COPY[lang].removeToken(token.label)}
               title={COPY[lang].removeToken(token.label)}
-              className="ms-0.5 flex h-7 w-7 items-center justify-center rounded-full hover:bg-accent/15 disabled:cursor-not-allowed disabled:opacity-40"
+              className="press ms-0.5 flex h-7 w-7 items-center justify-center rounded-full hover:bg-accent/15 disabled:cursor-not-allowed disabled:opacity-40"
             >
-              <CloseIcon size={14} />
+              <CloseIcon size={12} />
             </button>
           </li>
         ))}

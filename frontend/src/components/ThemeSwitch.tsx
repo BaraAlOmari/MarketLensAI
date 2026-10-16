@@ -32,8 +32,21 @@ export function ThemeSwitch() {
     <div
       role="radiogroup"
       aria-label="Appearance"
-      className="flex h-8 items-center rounded-full bg-fill p-0.5"
+      className="relative flex h-8 items-center rounded-full bg-fill p-0.5"
     >
+      {/* One thumb that slides to the selected segment, as in UISegmentedControl. */}
+      <span
+        aria-hidden="true"
+        className="absolute top-0.5 left-0.5 h-7 w-9 rounded-full bg-thumb shadow-[0_1px_3px_rgb(0_0_0/0.12),0_1px_1px_rgb(0_0_0/0.06)] transition-transform duration-[380ms] ease-[var(--ease-spring)] motion-reduce:transition-none"
+        style={{
+          transform: `translateX(${
+            Math.max(
+              0,
+              OPTIONS.findIndex((o) => o.value === theme),
+            ) * 100
+          }%)`,
+        }}
+      />
       {OPTIONS.map(({ value, label, Icon }, i) => {
         const selected = theme === value;
         return (
@@ -58,10 +71,8 @@ export function ThemeSwitch() {
                 move(i, -1);
               }
             }}
-            className={`flex h-7 w-9 items-center justify-center rounded-full transition-colors duration-200 motion-reduce:transition-none ${
-              selected
-                ? "bg-thumb text-content shadow-[0_1px_3px_rgb(0_0_0/0.12),0_1px_1px_rgb(0_0_0/0.06)]"
-                : "text-secondary hover:text-content"
+            className={`relative flex h-7 w-9 items-center justify-center rounded-full transition-colors duration-200 motion-reduce:transition-none ${
+              selected ? "text-content" : "text-secondary hover:text-content"
             }`}
           >
             <Icon size={16} />

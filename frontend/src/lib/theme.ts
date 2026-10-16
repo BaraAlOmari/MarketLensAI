@@ -24,6 +24,15 @@ export function syncThemeColor(theme: Theme) {
 }
 
 export function setTheme(theme: Theme) {
+  // Cross-fade the change where View Transitions exist and motion is welcome.
+  const fade =
+    "startViewTransition" in document &&
+    !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (fade) document.startViewTransition(() => apply(theme));
+  else apply(theme);
+}
+
+function apply(theme: Theme) {
   const root = document.documentElement;
   if (theme === "system") delete root.dataset.theme;
   else root.dataset.theme = theme;
