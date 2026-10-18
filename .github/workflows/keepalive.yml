@@ -1,0 +1,25 @@
+# Keep-alive: free Supabase projects pause after a week without activity. Every three days,
+# call the public health check, which queries the database through the API.
+name: Keep-alive
+
+on:
+  schedule:
+    - cron: "17 6 */3 * *"
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Health check (allows a cold start)
+        run: |
+          url=https://marketlens-web.nicerock-84250518.japaneast.azurecontainerapps.io/api/health
+          for i in $(seq 1 6); do
+            curl -fsS --max-time 30 "$url" | grep -q '"ok":true' && exit 0
+            sleep 10
+          done
+          echo "::error::$url did not report a working database"
+          exit 1

@@ -230,6 +230,20 @@ npm run dev                         # http://localhost:3000
 
 Open http://localhost:3000 and try one of the example prompts. `http://localhost:8000/health` reports whether the database and pgvector are reachable.
 
+### 3. Deployment
+
+The public demo runs on Azure Container Apps in Japan East, next to the database: the Next.js UI with public HTTPS, and the FastAPI backend with internal ingress only, so the internet can reach it only through the UI's proxy. Both scale to zero when idle and stay inside the monthly free grant (the first visit after a quiet spell waits a few seconds for a cold start). After CI passes on `main`, the Deploy workflow builds both Docker images, pushes them to GitHub Container Registry and rolls the apps onto them; Azure login is OIDC, so no Azure password is stored in GitHub. Setup, logs, rollback and costs: [deploy/README.md](deploy/README.md).
+
+To run the production images locally:
+
+```powershell
+docker build -t marketlens-api backend
+docker build -t marketlens-web frontend
+docker network create marketlens
+docker run -d --name api --network marketlens --env-file backend/.env marketlens-api
+docker run -d --network marketlens -p 3000:3000 -e BACKEND_URL=http://api:8000 marketlens-web
+```
+
 ### Configuration
 
 All settings are environment variables, documented in [backend/.env.example](backend/.env.example). Each pipeline step can be switched off or tuned, for example `RETRIEVAL_MODE=vector`, `RERANK_ENABLED=false`, `HYBRID_CANDIDATES`, `RERANK_TOP_N`, or the per-model rate limits. `LOG_FILE` turns on the log file that `scripts/explain.py` reads, and `RATE_LIMIT_*`, `FORWARDED_HOPS` and `MAX_BODY_BYTES` set the abuse limits. Never commit `.env` or `.env.local`; both are git-ignored.
@@ -259,12 +273,13 @@ backend/
     providers/      Gemini clients: embeddings, structured LLM calls, reranker, rate limits, caches
     models/         Pydantic models for listings, filters, requests and responses
   migrations/       SQL: listings + HNSW index, caches, sessions
-  scripts/          migrate, load, embed, sanity checks
+  scripts/          migrate, load, embed, sanity checks, explain a request
   tests/            pytest suite (234 tests, no network needed)
 frontend/
   src/app/          page, layout, design tokens (globals.css), API route handlers (proxy)
   src/components/   Chat, ListingCard, ListingSheet, FilterTokens, ThemeSwitch, EmptyIllustration, icons
   src/lib/          event-stream client, filter and price formatting, English/Arabic copy, theme
+deploy/             Azure setup script and deployment guide
 data/               synthetic data generator and listings.jsonl
 eval/               frozen queries and conversations, ground truth, runners, reports
 docs/               results, design decisions, setup guide, screenshots
@@ -289,8 +304,7 @@ The eval scripts need the backend's database and API key. Repeated runs mostly h
 ## Limitations and next steps
 
 - **Synthetic data.** The listings are generated, with no photos (cards show a category icon). Real marketplace text would be messier still.
-- **Latency.** A new question takes several seconds (filter extraction, reranking and the reply are three model calls). Cached repeats are much faster. Most of the remaining time on a cached search is the network round trip to the database (about 0.3 s each from the development machine). Hosting the backend next to the database removes most of it.
+- **Latency.** A new question takes several seconds (filter extraction, reranking and the reply are three model calls). Cached repeats are much faster. Most of the remaining time on a cached search is the network round trip to the database (about 0.3 s each from the development machine); the deployed backend runs in the database's region.
 - **Replies arrive in one piece.** The summary is checked for prices and links before any of it is sent, so it can't type out word by word. The stages stream: filters, cards, then the summary.
-- **Next:**
-  - deployment on Azure with a public demo;
-  - a final documentation pass.
+- **Cold starts.** The demo scales to zero to stay free, so the first visit after about five idle minutes waits a few seconds.
+- **Next:** a final documentation pass.

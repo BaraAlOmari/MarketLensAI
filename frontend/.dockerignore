@@ -1,0 +1,10 @@
+# Keep secrets and local build output out of the build context.
+.env*
+!.env.example
+node_modules/
+.next/
+out/
+*.tsbuildinfo
+next-env.d.ts
+Dockerfile
+.dockerignore

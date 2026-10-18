@@ -1,0 +1,12 @@
+# Only pyproject.toml and app/ are copied; keep secrets and local state out of the build context.
+.env
+.env.*
+.venv/
+logs/
+tests/
+scripts/
+migrations/
+**/__pycache__/
+*.egg-info/
+.pytest_cache/
+.ruff_cache/

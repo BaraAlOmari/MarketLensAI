@@ -175,6 +175,23 @@ Every external fact the project relies on is recorded here with its source and t
 | 2026-10-16 | Tracing with Langfuse (optional in the spec) is not added. | It needs an account and keys; the per-step records already answer the acceptance question. Can be added later behind a setting. |
 | 2026-10-16 | Observed while testing: a rerank call took 44 s while the rest of the search took 1.3 s (free-tier Gemini latency), visible straight away in `search.rerank.latency_ms`. | The kind of failure the logs are for. `RERANK_TIMEOUT_S` caps it; the retrieval order is kept on timeout. |
 
+### Stage 11: deployment
+
+| Date | Decision | Reason |
+|---|---|---|
+| 2026-10-18 | **Both parts on Azure Container Apps** (Consumption plan): `marketlens-web` (Next.js standalone server, public ingress) and `marketlens-api` (FastAPI, **internal ingress**, reachable only from inside the environment). Not Static Web Apps. | The chat proxy is a streaming Next.js route handler, and Static Web Apps' pricing page doesn't state Next.js hybrid support. One platform for both is simpler. With internal ingress the only public surface is the UI and its proxy. |
+| 2026-10-18 | **Region Japan East**, next to the Supabase database (`ap-northeast-1`, Tokyo). | A search makes several database round trips; from Qatar each is about 0.3 s. Being near the database matters far more than being near the user. |
+| 2026-10-18 | Scale to zero, at most one replica per app, 0.25 vCPU / 0.5 GiB each. | Both awake costs 1,800 vCPU-s and 3,600 GiB-s an hour, so the free grant covers about 100 awake hours a month. An always-on replica would not fit. One replica keeps the in-memory rate limit exact and caps the worst case (both awake all month, about $34 at Japan East list prices). Cost: cold starts after 5 idle minutes (`cooldownPeriod` 300). Conversations are in Postgres, so they survive scale to zero. |
+| 2026-10-18 | $1 monthly **budget alert** on `marketlens-rg` (actual and forecast), emailed to the account owner. | Pay-as-you-go has no spending cap: past the free grant Azure keeps the apps running and bills. Scoped to the resource group so the owner's other projects don't trigger it. |
+| 2026-10-18 | Images in **GitHub Container Registry** (public packages), not Azure Container Registry. | ACR has no free tier. Public GHCR packages are free and Container Apps pulls them without stored credentials; they hold only code that is already public. |
+| 2026-10-18 | **Deploy workflow** (`deploy.yml`): after CI passes on `main`, build both images (tagged with the commit SHA), `az containerapp update`, then check that `/api/health` reports a working database. Azure login is OIDC with a user-assigned managed identity: Contributor on `marketlens-rg` only, and only from the repository's `production` environment. | No Azure password or key is stored in GitHub. Tagging by SHA makes a rollback one command. |
+| 2026-10-18 | Secrets (`DATABASE_URL`, `GEMINI_API_KEY`) are Container Apps secrets, set by `deploy/azure-setup.sh` straight from `backend/.env` without printing them. Images contain no `.env` (`.dockerignore`) and run as non-root users. | Secrets live in one place outside the repository and the images. |
+| 2026-10-18 | `FORWARDED_HOPS=2` on the API. | Browser -> external ingress -> UI -> internal ingress -> API. Container Apps ingress appends to X-Forwarded-For, and the Next proxy forwards it unchanged, so the client is the second entry from the right. |
+| 2026-10-18 | The UI calls the API at its internal HTTPS FQDN (`https://marketlens-api.internal.<env>.azurecontainerapps.io`). | Plain HTTP on port 80 is redirected to HTTPS by default, and a redirected POST is not something to rely on. |
+| 2026-10-18 | Default TCP probes, no custom `/health` probes. | Uvicorn opens its port only after startup (catalog loaded), so a TCP check already means ready; an HTTP probe on `/health` would also query the database every few seconds while awake. |
+| 2026-10-18 | **Keep-alive** workflow calls `/api/health` (which queries the database) every three days. | Supabase pauses free projects after a week without activity. Costs about an hour of the free grant a month. |
+| 2026-10-18 | Log Analytics workspace with 30-day retention for the container logs; `deploy/README.md` has the query to find a request by its ID. | 5 GB a month and 31 days of retention are free; a chat turn logs a few KB. |
+
 ## Verified facts
 
 ### Google Gemini API (checked 2026-10-10)
@@ -237,7 +254,21 @@ These are secondary sources (no central-bank page came up). The pegs are long-st
 | Azure Container Apps (consumption) | First **180,000 vCPU-seconds, 360,000 GiB-seconds, 2 million requests per subscription per month** free; scale to zero supported, with no usage charge at zero replicas | https://azure.microsoft.com/en-us/pricing/details/container-apps/ |
 | Azure Static Web Apps, Free plan | 100 GB bandwidth/subscription, 0.5 GB storage (0.25 GB/app), 2 custom domains/app, free SSL, managed Functions API. Site stops being served when over quota. Next.js hybrid support **not stated** on the pricing page; re-check in Stage 11. | https://azure.microsoft.com/en-us/pricing/details/app-service/static/ |
 | Free account | "65+ always-free services"; separate 12-month free amounts for new customers only | https://azure.microsoft.com/en-us/pricing/free-services |
-| Tentative plan | Backend container on Container Apps (scale to zero, so expect cold starts); frontend on Static Web Apps or a second Container App. Decide in Stage 11. | |
+| Decided in Stage 11 | Both on Container Apps; see below. | |
+
+### Azure Container Apps (checked 2026-10-18)
+
+| Fact | Value | Source |
+|---|---|---|
+| Free grant | Unchanged: 180,000 vCPU-seconds, 360,000 GiB-seconds, 2 million requests per subscription per calendar month. Only requests from outside the environment are billable; health probes are not. | https://learn.microsoft.com/en-us/azure/container-apps/billing |
+| Scale to zero | "When a revision is scaled to zero replicas, no resource consumption charges are incurred." Idle rates apply only with minimum replicas above zero. | same |
+| Fixed charges | Plan management fees apply only to Dedicated workload profiles, private endpoints and planned maintenance (none used). | same |
+| Japan East list prices | $0.000024 per vCPU-second and $0.000003 per GiB-second (active), $0.40 per million requests. | https://prices.azure.com/api/retail/prices (serviceName 'Azure Container Apps', armRegionName 'japaneast') |
+| Ingress | HTTP request timeout 240 s. X-Forwarded-For: "If specified in initial request, it is appended to." Internal ingress: reachable only from apps in the same environment. | https://learn.microsoft.com/en-us/azure/container-apps/ingress-overview |
+| Scale defaults | `cooldownPeriod` 300 s, `pollingInterval` 30 s (read back from the created apps). | `az containerapp show` |
+| Log Analytics | First 5 GB a month free per billing account; 31 days of retention included. | https://azure.microsoft.com/en-us/pricing/details/monitor/ |
+| GHCR | A new package is private and "inherits the access permissions (but not the visibility) of the linked repository"; making it public is a one-way change in the package settings. | https://docs.github.com/en/packages/learn-github-packages/configuring-a-packages-access-control-and-visibility |
+| Images and actions | `python:3.11.17-slim-trixie`, `node:22.23.3-trixie-slim` (Docker Hub); `docker/setup-buildx-action` v4.4.1, `docker/login-action` v4.6.0, `docker/build-push-action` v7.4.0, `azure/login` v3.1.0 (GitHub releases). | Docker Hub, GitHub API |
 
 ### GitHub Actions (checked 2026-10-16 via the GitHub API, latest releases)
 
