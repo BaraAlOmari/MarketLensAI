@@ -4,6 +4,7 @@
 
 **An AI search assistant for a marketplaces in Qatar.** Search a marketplace the way you'd ask a friend, and MarketLens turns it into an exact search, finds the listings that match, and explains the best picks.
 
+**Live demo:** https://marketlens-web.nicerock-84250518.japaneast.azurecontainerapps.io
 <p align="center">
   <img src="docs/images/start-desktop-light.png" alt="MarketLens start screen: 'What are you looking for?', example prompts, and an illustration of listing cards under a magnifying lens" width="100%">
 </p>
@@ -232,7 +233,7 @@ Open http://localhost:3000 and try one of the example prompts. `http://localhost
 
 ### 3. Deployment
 
-The public demo runs on Azure Container Apps in Japan East, next to the database: the Next.js UI with public HTTPS, and the FastAPI backend with internal ingress only, so the internet can reach it only through the UI's proxy. Both scale to zero when idle and stay inside the monthly free grant (the first visit after a quiet spell waits a few seconds for a cold start). After CI passes on `main`, the Deploy workflow builds both Docker images, pushes them to GitHub Container Registry and rolls the apps onto them; Azure login is OIDC, so no Azure password is stored in GitHub. Setup, logs, rollback and costs: [deploy/README.md](deploy/README.md).
+The public demo runs on Azure Container Apps in Japan East, next to the database: the Next.js UI with public HTTPS, and the FastAPI backend with internal ingress only, so the internet can reach it only through the UI's proxy. Both scale to zero when idle and stay inside the monthly free grant (the first visit after a quiet spell waits about 20 seconds for a cold start). After CI passes on `main`, the Deploy workflow builds both Docker images, pushes them to GitHub Container Registry and rolls the apps onto them; Azure login is OIDC, so no Azure password is stored in GitHub. Setup, logs, rollback and costs: [deploy/README.md](deploy/README.md).
 
 To run the production images locally:
 
@@ -306,5 +307,5 @@ The eval scripts need the backend's database and API key. Repeated runs mostly h
 - **Synthetic data.** The listings are generated, with no photos (cards show a category icon). Real marketplace text would be messier still.
 - **Latency.** A new question takes several seconds (filter extraction, reranking and the reply are three model calls). Cached repeats are much faster. Most of the remaining time on a cached search is the network round trip to the database (about 0.3 s each from the development machine); the deployed backend runs in the database's region.
 - **Replies arrive in one piece.** The summary is checked for prices and links before any of it is sent, so it can't type out word by word. The stages stream: filters, cards, then the summary.
-- **Cold starts.** The demo scales to zero to stay free, so the first visit after about five idle minutes waits a few seconds.
+- **Cold starts.** The demo scales to zero to stay free, so the first visit after about five idle minutes waits about 20 seconds while Azure starts the containers. The page wakes the backend as soon as it loads, so most of that passes while you type.
 - **Next:** a final documentation pass.

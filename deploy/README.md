@@ -30,14 +30,15 @@ Container Registry.
 2. **Deploy identity for GitHub Actions.** A user-assigned managed identity that GitHub can
    log in as with a short-lived OIDC token, so no Azure password or key is stored in GitHub.
    It may manage only `marketlens-rg`, and only from the repository's `production`
-   environment:
+   environment. GitHub's token subject names the owner and repository with their numeric
+   IDs (`owner@id/repo@id`); a failed login prints the exact subject it presented.
 
    ```bash
    az identity create -g marketlens-rg -n marketlens-github-deploy -l japaneast
    az identity federated-credential create -g marketlens-rg \
      --identity-name marketlens-github-deploy -n github-production \
      --issuer https://token.actions.githubusercontent.com \
-     --subject repo:BaraAlOmari/MarketLensAI:environment:production \
+     --subject "repo:BaraAlOmari@195624165/MarketLensAI@1408861496:environment:production" \
      --audiences api://AzureADTokenExchange
    MSYS_NO_PATHCONV=1 az role assignment create --role Contributor \
      --assignee-object-id "$(az identity show -g marketlens-rg -n marketlens-github-deploy --query principalId -o tsv)" \
@@ -83,8 +84,10 @@ ContainerAppConsoleLogs_CL
 
 ## Known limits
 
-- **Cold starts.** After about 5 idle minutes both apps scale to zero, and the next visitor
-  waits a few seconds while they start (the UI, then the API loading its catalog).
+- **Cold starts.** After about 5 idle minutes both apps scale to zero. Waking takes about
+  17 s for the UI and 25 s for the API, almost all of it Azure pulling and creating the
+  container. The page pings `/api/health` as it loads, so the API wakes while the visitor
+  is still typing.
 - **Rate-limit counts reset** when the API scales to zero (they live in memory).
   Conversations are kept in Postgres, so they survive it.
 - **Cost guard.** A $1 monthly budget on `marketlens-rg` emails the account owner when actual

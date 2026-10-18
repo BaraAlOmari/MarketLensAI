@@ -1,8 +1,9 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // A self-contained server.js plus only the files it needs, for the Docker image.
-  output: "standalone",
+  // The Docker image runs a self-contained server.js with only the files it needs. Set by the
+  // Dockerfile only, so local `next start` keeps working without a warning.
+  output: process.env.NEXT_OUTPUT_STANDALONE === "1" ? "standalone" : undefined,
   cacheComponents: true,
   partialPrefetching: true,
   turbopack: {

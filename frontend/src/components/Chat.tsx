@@ -177,6 +177,12 @@ export function Chat() {
     endRef.current?.scrollIntoView({ block: "end", behavior: "smooth" });
   }, [turns.length, last?.status, last?.listings?.length]);
 
+  // Wake the search service while the person reads and types: when deployed it scales to zero,
+  // and a cold start takes about 25 s. Failures don't matter: a chat request waits for the start.
+  useEffect(() => {
+    fetch("/api/health", { cache: "no-store" }).catch(() => {});
+  }, []);
+
   // The bar turns to glass, with its hairline, only once content scrolls under it (as on iOS).
   const [scrolled, setScrolled] = useState(false);
   useEffect(() => {
